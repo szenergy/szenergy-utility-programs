@@ -14,8 +14,6 @@ private:
     // EN: TF world to local map
     // HU: Világból a térkép lokális referencia pontjába
     geometry_msgs::TransformStamped tf_world_map;
-
-
 public:
   NavMsgTfPublisher(std::shared_ptr<ros::NodeHandle> nh,
 		  const std::string msg_frame_id="map"):
