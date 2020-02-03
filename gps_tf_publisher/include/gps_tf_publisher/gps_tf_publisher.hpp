@@ -8,6 +8,16 @@
 #ifndef INCLUDE_GPS_TF_PUBLISHER_GPS_TF_PUBLISHER_HPP_
 #define INCLUDE_GPS_TF_PUBLISHER_GPS_TF_PUBLISHER_HPP_
 
+#include <geometry_msgs/PoseStamped.h>
+
+#include <memory>
+#include <ros/ros.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <geometry_msgs/TransformStamped.h>
+#include <geometry_msgs/PoseStamped.h>
+
+
 namespace szenergy
 {
 
@@ -33,6 +43,9 @@ protected:
     // EN: TF map to base link
     // HU: A térkép referencia pontjából a jármű referencia pontjába
     geometry_msgs::TransformStamped tf_map_baselink;
+    // EN: TF world to local map
+	// HU: Világból a térkép lokális referencia pontjába
+	geometry_msgs::TransformStamped tf_world_map;
 
     void initRosPublishers()
     {
@@ -41,13 +54,19 @@ protected:
     }
 public:
     AbstractGpsTfPublisher(std::shared_ptr<ros::NodeHandle> nh,
-    		const std::string msg_frame_id="map"): nh(nh),
-			msg_frame_id(msg_frame_id),
-			internal_state(NavMsgTfPublisherState::START)
-	{
-    	msg_pose.pose.orientation.w = 1.0;
-    	msg_pose.header.frame_id = msg_frame_id;
-	}
+    		const std::string msg_frame_id="map");
+
+
+    void updateInstantaneousRelativePose(const geometry_msgs::PoseStamped::ConstPtr& msg);
+
+    /*
+     * @brief: You should use this, if you have a relative frame (e.g. "world"),
+     *     map is broadcasted by a localization method (e.g. NDT)
+     * @param
+     */
+    void setRelativeReferenceFrame(const geometry_msgs::PoseStamped::ConstPtr& msg);
+
+    void updateInstantaneousTransform(const geometry_msgs::PoseStamped::ConstPtr& msg);
 
     virtual void init() = 0;
 };

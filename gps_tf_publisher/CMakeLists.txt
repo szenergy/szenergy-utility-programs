@@ -137,8 +137,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(gps_tf_publisher src/gps_tf_publisher.cpp)
-add_executable(gps_tf_publisher_ndt src/gps_tf_publisher.ndt.cpp)
+add_executable(gps_tf_publisher src/gps_tf_publisher.cpp src/gps_tf_publisher_abstract.cpp)
+add_executable(gps_tf_publisher_ndt src/gps_tf_publisher.ndt.cpp src/gps_tf_publisher_abstract.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
