@@ -1,0 +1,5 @@
+<launch>
+  <node type="gps_tf_publisher" name="gps_tf_publisher" pkg="gps_tf_publisher">
+    <param name="parent_frame" value="map"/>
+  </node>
+</launch>
