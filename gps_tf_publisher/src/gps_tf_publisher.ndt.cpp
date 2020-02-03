@@ -16,10 +16,6 @@ private:
   // Constants 
   const std::string msg_frame_id = "world";
   // Var
-  // Reference pose for initial TF position
-  geometry_msgs::PoseStamped ref_pose;
-  // Autoware specific transformation
-  geometry_msgs::TransformStamped tf_map_gps;
   // EN: TF world to local map
   // HU: Világból a térkép lokális referencia pontjába
   geometry_msgs::TransformStamped tf_world_map;
@@ -97,15 +93,11 @@ public:
     }
   }
 
-  bool init()
+  virtual void init() override
   {
-	  if (AbstractGpsTfPublisher::init())
-	  {
-		  sub_currentpose = nh->subscribe("/gps/current_pose", 10,
-			  &NavMsgTfNdtPublisher::CbCurrentPose, this);
-		  return true;
-	  }
-	  return false;
+	  initRosPublishers();
+	  sub_currentpose = nh->subscribe("/gps/current_pose", 10,
+		  &NavMsgTfNdtPublisher::CbCurrentPose, this);
   }
 
 };

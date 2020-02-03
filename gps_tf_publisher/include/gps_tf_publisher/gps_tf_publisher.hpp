@@ -33,6 +33,12 @@ protected:
     // EN: TF map to base link
     // HU: A térkép referencia pontjából a jármű referencia pontjába
     geometry_msgs::TransformStamped tf_map_baselink;
+
+    void initRosPublishers()
+    {
+    	pub_current_pose = nh->advertise<geometry_msgs::PoseStamped>("/gnss_pose", 10);
+		ROS_INFO("ROS client successfully initialized");
+    }
 public:
     AbstractGpsTfPublisher(std::shared_ptr<ros::NodeHandle> nh,
     		const std::string msg_frame_id="map"): nh(nh),
@@ -43,12 +49,7 @@ public:
     	msg_pose.header.frame_id = msg_frame_id;
 	}
 
-    bool init()
-    {
-    	pub_current_pose = nh->advertise<geometry_msgs::PoseStamped>("/gnss_pose", 10);
-		ROS_INFO("ROS client successfully initialized");
-		return true;
-    }
+    virtual void init() = 0;
 };
 
 }

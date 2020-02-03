@@ -14,11 +14,8 @@ private:
     // EN: TF world to local map
     // HU: Világból a térkép lokális referencia pontjába
     geometry_msgs::TransformStamped tf_world_map;
-    // EN: TF map to base link
-    // HU: A térkép referencia pontjából a jármű referencia pontjába
-    geometry_msgs::TransformStamped tf_map_baselink;
-    // Republish current pose in the map reference frame
-    ros::Publisher pub_current_pose;
+
+
 public:
   NavMsgTfPublisher(std::shared_ptr<ros::NodeHandle> nh,
 		  const std::string msg_frame_id="map"):
@@ -26,15 +23,11 @@ public:
   {
   }
 
-  bool init()
+  virtual void init() override
   {
-  	  if (AbstractGpsTfPublisher::init())
-  	  {
-  		  sub_currentpose = nh->subscribe("/gps/current_pose", 10,
-  			  &NavMsgTfPublisher::CbCurrentPose, this);
-  		  return true;
-  	  }
-  	  return false;
+  	  initRosPublishers();
+	  sub_currentpose = nh->subscribe("/gps/current_pose", 10,
+		  &NavMsgTfPublisher::CbCurrentPose, this);
   }
 
 
