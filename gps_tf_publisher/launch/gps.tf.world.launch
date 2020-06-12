@@ -1,8 +1,9 @@
 <launch>
   <arg name="gps_pose" default="/gps/current_pose"/>
   <node type="gps_tf_publisher" name="gps_tf_publisher" pkg="gps_tf_publisher">
-    <param name="parent_frame" value="map"/>
+    <param name="parent_frame" value="world"/>
     <remap from="/gps/current_pose" to="$(arg gps_pose)"/>
     <remap from="/gnss_pose" to="/ref_pose"/>
   </node>
 </launch>
+
