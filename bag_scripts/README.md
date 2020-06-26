@@ -10,4 +10,6 @@
 - `PlotJuggler`, a QT5 based application to display time series in plots, using an intuitive "drag and drop" interface: https://github.com/facontidavide/PlotJuggler 
   - ![imgplt](https://github.com/facontidavide/PlotJuggler/blob/master/docs/images/PlotJuggler.gif)
 - `Rosbag Editor`: remove one or more topics from a rosbag, change the duration of the rosbag, etc: https://github.com/facontidavide/rosbag_editor
-  - ![imgplt](https://github.com/facontidavide/rosbag_editor/blob/master/rosbag_editor.png)
+  - ![imgeditor](https://github.com/facontidavide/rosbag_editor/blob/master/rosbag_editor.png)
+- `Rosbag Exporter`: GUI to extract data from bag files: https://gitlab.com/InstitutMaupertuis/rqt_bag_exporter 
+  - ![imgexporter](https://gitlab.com/InstitutMaupertuis/rqt_bag_exporter/-/raw/melodic/documentation/rqt_bag_exporter.png)
