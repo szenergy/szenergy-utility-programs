@@ -5,24 +5,51 @@
 #include <pcl/console/parse.h>
 #include <pcl/common/transforms.h>
 #include <pcl/visualization/pcl_visualizer.h>
+#include <ros/ros.h> 
+#include <math.h> 
+
+double translation_x,translation_y,translation_z,roll,pitch,yaw;
+std::string source_map;
+std::string new_map;
+
+double Convert(double degree) 
+{ 
+    double pi = 3.14159265359; 
+    return (degree * (pi / 180)); 
+} 
+
+
 
 int
 main (int argc, char** argv)
 {
+  ros::init(argc, argv, "transform_node");
+  ros::NodeHandle nh;
+  nh.getParam("/pcd_transform/translation_x", translation_x);
+  nh.getParam("/pcd_transform/translation_y", translation_y);
+  nh.getParam("/pcd_transform/translation_z", translation_z);
+  nh.getParam("/pcd_transform/roll", roll);
+  nh.getParam("/pcd_transform/pitch", pitch);
+  nh.getParam("/pcd_transform/yaw", yaw);
+  nh.getParam("/pcd_transform/source_map", source_map);
+  nh.getParam("/pcd_transform/new_map", new_map);
+
+
+
   pcl::PointCloud<pcl::PointXYZ>::Ptr source_cloud (new pcl::PointCloud<pcl::PointXYZ> ());
   pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud (new pcl::PointCloud<pcl::PointXYZ> ());
 
-  pcl::io::loadPCDFile ("/home/autonom/pcd_maps/autoware-200518.pcd", *source_cloud);   //source PCD Map
+  pcl::io::loadPCDFile (source_map, *source_cloud);   //source PCD Map
 
   // The angle of rotation in radians 
-  double theta_x = 0.01229554;                        //roll
-  double theta_y= 0.00621208;                        //pitch  
-  double theta_z= 1.61596155+0.0471238898038469;     //yaw
+  double theta_x = Convert(roll);                        //roll
+  double theta_y = Convert(pitch);                       //pitch  
+  double theta_z = Convert(yaw);                         //yaw
 
 
   Eigen::Affine3d transform_2 = Eigen::Affine3d::Identity();
 
-  transform_2.translation() << 6.97195928e+05, 5.28570419e+06, 1.54990998e+02;   //translation in meters xyz
+  transform_2.translation() << translation_x, translation_y, translation_z;   //translation in meters xyz
 
 
   Eigen::Matrix3d m;
@@ -43,7 +70,7 @@ main (int argc, char** argv)
   
   // Executing the transformation
   pcl::transformPointCloud (*source_cloud, *transformed_cloud, transform_2);  
-  pcl::io::savePCDFile<pcl::PointXYZ>("/home/autonom/pcd_maps/campus_sajat_eltolt_v5.pcd", *transformed_cloud); 
+  pcl::io::savePCDFile<pcl::PointXYZ>(new_map, *transformed_cloud); 
 
   // Visualization
 

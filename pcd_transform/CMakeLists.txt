@@ -11,6 +11,7 @@ find_package(Eigen3 QUIET)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
   std_msgs
   nav_msgs
   tf
@@ -18,15 +19,11 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   pcl_conversions
   velodyne_pointcloud
+  dynamic_reconfigure
 )
 
 
-catkin_package(
-        CATKIN_DEPENDS
-        std_msgs
-        velodyne_pointcloud        
-        DEPENDS PCL
-)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -102,10 +99,16 @@ catkin_package(
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+ generate_dynamic_reconfigure_options(
+   cfg/MyParams.cfg
+   cfg/MyParamsQuaterion.cfg)
+
+catkin_package(
+        CATKIN_DEPENDS
+        std_msgs
+        velodyne_pointcloud        
+        DEPENDS PCL
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -116,12 +119,12 @@ catkin_package(
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
+#catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES pcd_transform
 #  CATKIN_DEPENDS roscpp
 #  DEPENDS system_lib
-)
+#)
 
 ###########
 ## Build ##
@@ -133,8 +136,18 @@ include_directories(include ${catkin_INCLUDE_DIRS}
  ${EIGEN3_INCLUDE_DIRS})
 
  add_executable(transform_node src/transform.cpp)
+ add_executable(dynamic_rec_node src/dynamic_params.cpp)
+ add_executable(dynamic_rec2_node src/dynamic_params2.cpp)
+
+ add_dependencies(dynamic_rec_node ${PROJECT_NAME}_gencfg)
+ add_dependencies(dynamic_rec2_node ${PROJECT_NAME}_gencfg)
+
  target_link_libraries(transform_node ${catkin_LIBRARIES})
+ target_link_libraries(dynamic_rec_node ${catkin_LIBRARIES})
+ target_link_libraries(dynamic_rec2_node ${catkin_LIBRARIES})
+
  add_dependencies(transform_node ${catkin_EXPORTED_TARGETS})
+ 
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
@@ -220,3 +233,4 @@ include_directories(include ${catkin_INCLUDE_DIRS}
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+ 
