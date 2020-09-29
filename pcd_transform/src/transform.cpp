@@ -36,8 +36,8 @@ main (int argc, char** argv)
 
 
 
-  pcl::PointCloud<pcl::PointXYZ>::Ptr source_cloud (new pcl::PointCloud<pcl::PointXYZ> ());
-  pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud (new pcl::PointCloud<pcl::PointXYZ> ());
+  pcl::PointCloud<pcl::PointXYZI>::Ptr source_cloud (new pcl::PointCloud<pcl::PointXYZI> ());
+  pcl::PointCloud<pcl::PointXYZI>::Ptr transformed_cloud (new pcl::PointCloud<pcl::PointXYZI> ());
 
   pcl::io::loadPCDFile (source_map, *source_cloud);   //source PCD Map
 
@@ -59,8 +59,10 @@ main (int argc, char** argv)
     
   transform_2.rotate(m);
 
+  // transformed_cloud.data.insert(source_cloud)
 
-  
+
+
 
   // Print the transformation
   printf ("\nTransform Map\n");
@@ -70,7 +72,7 @@ main (int argc, char** argv)
   
   // Executing the transformation
   pcl::transformPointCloud (*source_cloud, *transformed_cloud, transform_2);  
-  pcl::io::savePCDFile<pcl::PointXYZ>(new_map, *transformed_cloud); 
+  pcl::io::savePCDFileASCII(new_map, *transformed_cloud); 
 
   // Visualization
 
