@@ -57,9 +57,12 @@ class PlotHandler(object):
         self.saveWaypointBtn = qtgqt.QtGui.QPushButton("Save waypoints")
         self.selectFileBtn = qtgqt.QtGui.QPushButton("...")
         self.selectFileBtn.setMaximumWidth(22)
+        self.setFileBtn = qtgqt.QtGui.QPushButton("Set")
+        self.setFileBtn.setMaximumWidth(22)
         self.speedLabel = qtgqt.QtGui.QLabel(" **.* Km/h")
         self.angleLabel = qtgqt.QtGui.QLabel(" **.* rad")
         self.csvLabel = qtgqt.QtGui.QLabel("none"); self.csvLabel.setAlignment(pg.QtCore.Qt.AlignRight)
+        self.csvTextbox = qtgqt.QtGui.QLineEdit()
         self.allSensorLaunched = False
         self.waypointLoaded = False
         self.waypointSaving = False
@@ -128,6 +131,8 @@ class PlotHandler(object):
         self.loadWaypointBtn.clicked.connect(self.loadCsv)
         self.saveWaypointBtn.clicked.connect(self.saveCsv)
         self.selectFileBtn.clicked.connect(self.selectCsv)
+        self.setFileBtn.clicked.connect(self.waypointSaveSet)
+        
         self.tGps = pg.TextItem(text = "Gps", color = blue)
         self.tLeaf = pg.TextItem(text = "Leaf odom", color = red)
         self.tstart = pg.TextItem(text = "Start", color = white)
@@ -145,9 +150,14 @@ class PlotHandler(object):
         widg3ctr.addWidget(self.saveWaypointBtn, row=3, col=1)
         widg3ctr.addWidget(self.csvLabel, row=2, col=2)
         widg3ctr.addWidget(self.selectFileBtn, row=2, col=3)
+        widg3ctr.addWidget(self.csvTextbox, row=3, col=2)
+        widg3ctr.addWidget(self.setFileBtn, row=3, col=3)
         dock3ctr.addWidget(widg3ctr)
-        current_file = rospy.get_param("waypoint_file_name")
-        self.csvLabel.setText(os.path.basename(str(current_file)))
+        try:
+            current_file = rospy.get_param("waypoint_file_name")
+            self.csvLabel.setText(os.path.basename(str(current_file)))
+        except:
+            self.csvLabel.setText("No waypoint_file_name param")
         self.win.show()
 
     def updatePose(self):
@@ -169,12 +179,12 @@ class PlotHandler(object):
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
             roslaunch.configure_logging(uuid)
             launchStr = "/home/nvidia/leaf_ws/src/nissan_leaf_ros/nissan_bringup/launch/nissan.leaf.bringup.2020.A.launch"
-            self.launch = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
-            self.launch.start()
+            self.launchAS = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchAS.start()
             rospy.loginfo(launchStr + "started")
             self.allSensorLaunchBtn.setText("Stop AllSensor")
         else:
-            self.launch.shutdown()
+            self.launchAS.shutdown()
             rospy.loginfo("All sensor stopped.....")
             self.allSensorLaunchBtn.setText("Start AllSensor")
         self.allSensorLaunched = not self.allSensorLaunched
@@ -184,32 +194,36 @@ class PlotHandler(object):
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
             roslaunch.configure_logging(uuid)
             launchStr = "/home/nvidia/leaf_ws/src/nissan_leaf_ros/nissan_bringup/launch/demo.waypoint.follow.launch"
-            self.launch = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
-            self.launch.start()
+            self.launchLC = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchLC.start()
             rospy.loginfo(launchStr + "started")
             self.loadWaypointBtn.setText("UnLoad waypoints")
         else:
-            self.launch.shutdown()
+            self.launchLC.shutdown()
             rospy.loginfo("waypoint unloaded")
             self.loadWaypointBtn.setText("Load waypoints")
         self.waypointLoaded = not self.waypointLoaded
 
     def saveCsv(self):
         if self.waypointSaving is False:
-            # TODO
-            #uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-            #roslaunch.configure_logging(uuid)
-            #launchStr = "/home/nvidia/leaf_ws/src/nissan_leaf_ros/nissan_bringup/launch/TODO"
-            #self.launch = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
-            #self.launch.start()
-            #rospy.loginfo(launchStr + "started")
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = "/home/nvidia/leaf_ws/src/nissan_leaf_ros/nissan_bringup/launch/waypoint.saver.launch"
+            self.launchSC = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchSC.start()
+            rospy.loginfo(launchStr + "started")
             rospy.loginfo("waypoint saving started")
             self.saveWaypointBtn.setText("Finish waypoints")
         else:
-            #self.launch.shutdown()
+            self.launchSC.shutdown()
             rospy.loginfo("waypoint saving finished")
             self.saveWaypointBtn.setText("Save saveing wayp")
         self.waypointSaving = not self.waypointSaving    
+
+    def waypointSaveSet(self):
+        new_csv = "/mnt/storage_1tb/waypoint/" + str(self.csvTextbox.text())
+        rospy.set_param("/waypoint_saver/save_filename", new_csv)
+        #print(new_csv)
 
     def selectCsv(self):
         #fname = qtgqt.QtGui.QFileDialog.getOpenFileName(caption="Open file", directory="/mnt/storage_1tb/waypoint",filter="CSV files (*.csv)")
