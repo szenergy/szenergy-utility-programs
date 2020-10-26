@@ -57,8 +57,6 @@ class PlotHandler(object):
         self.saveWaypointBtn = qtgqt.QtGui.QPushButton("Save waypoints")
         self.selectFileBtn = qtgqt.QtGui.QPushButton("...")
         self.selectFileBtn.setMaximumWidth(22)
-        self.setFileBtn = qtgqt.QtGui.QPushButton("Set")
-        self.setFileBtn.setMaximumWidth(22)
         self.speedLabel = qtgqt.QtGui.QLabel(" **.* Km/h")
         self.angleLabel = qtgqt.QtGui.QLabel(" **.* rad")
         self.csvLabel = qtgqt.QtGui.QLabel("none"); self.csvLabel.setAlignment(pg.QtCore.Qt.AlignRight)
@@ -131,7 +129,6 @@ class PlotHandler(object):
         self.loadWaypointBtn.clicked.connect(self.loadCsv)
         self.saveWaypointBtn.clicked.connect(self.saveCsv)
         self.selectFileBtn.clicked.connect(self.selectCsv)
-        self.setFileBtn.clicked.connect(self.waypointSaveSet)
         
         self.tGps = pg.TextItem(text = "Gps", color = blue)
         self.tLeaf = pg.TextItem(text = "Leaf odom", color = red)
@@ -151,7 +148,6 @@ class PlotHandler(object):
         widg3ctr.addWidget(self.csvLabel, row=2, col=2)
         widg3ctr.addWidget(self.selectFileBtn, row=2, col=3)
         widg3ctr.addWidget(self.csvTextbox, row=3, col=2)
-        widg3ctr.addWidget(self.setFileBtn, row=3, col=3)
         dock3ctr.addWidget(widg3ctr)
         try:
             current_file = rospy.get_param("waypoint_file_name")
@@ -206,6 +202,11 @@ class PlotHandler(object):
 
     def saveCsv(self):
         if self.waypointSaving is False:
+            if len(str(self.csvTextbox.text())) < 3:
+                self.csvTextbox.setText("tmp001.csv")
+            new_csv = "/mnt/storage_1tb/waypoint/" + str(self.csvTextbox.text())
+            rospy.set_param("/waypoint_saver/save_filename", new_csv)
+            rospy.loginfo(new_csv + " set as /waypoint_saver/save_filename rosparam")
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
             roslaunch.configure_logging(uuid)
             launchStr = "/home/nvidia/leaf_ws/src/nissan_leaf_ros/nissan_bringup/launch/waypoint.saver.launch"
@@ -219,11 +220,6 @@ class PlotHandler(object):
             rospy.loginfo("waypoint saving finished")
             self.saveWaypointBtn.setText("Save saveing wayp")
         self.waypointSaving = not self.waypointSaving    
-
-    def waypointSaveSet(self):
-        new_csv = "/mnt/storage_1tb/waypoint/" + str(self.csvTextbox.text())
-        rospy.set_param("/waypoint_saver/save_filename", new_csv)
-        #print(new_csv)
 
     def selectCsv(self):
         #fname = qtgqt.QtGui.QFileDialog.getOpenFileName(caption="Open file", directory="/mnt/storage_1tb/waypoint",filter="CSV files (*.csv)")
