@@ -8,3 +8,4 @@ Utility programs useful for every vehicle
 - [pcd_transform](pcd_transform/): A node to translate and rotate NDT maps to global position
 - [ros_guis](ros_guis/): Some useful ROS related GUI programs such as Leaf dashboard in pyqt: ![leaf_dashboard2](ros_guis/img/leaf_dashboard2.gif)
 - [rviz_map_publisher](rviz_map_publisher/): Experimental feature to publish openstreetmap (OSM) data in RVIZ
+- [udp_joystick_ros](udp_joystick_ros/): A simple node which lets you control your simulator / vehicle / robot from an android phone.
