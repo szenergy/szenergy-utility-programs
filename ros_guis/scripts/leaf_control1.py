@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import rospy, rostopic, roslaunch
+import rospy, rostopic, roslaunch, rospkg
 import std_msgs.msg as rosmsg
 import nav_msgs.msg as navmsg
 import geometry_msgs.msg as geomsg
@@ -19,6 +19,7 @@ class PlotHandler(object):
         pg.setConfigOptions(antialias=True)
         self.leaf = leaf
         self.app = qtgqt.QtGui.QApplication([])
+        self.rospack = rospkg.RosPack()
 
     def initializePlot(self):
         self.first_run = True
@@ -174,10 +175,10 @@ class PlotHandler(object):
         if self.allSensorLaunched is False:
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
             roslaunch.configure_logging(uuid)
-            launchStr = "/home/nvidia/leaf_ws/src/nissan_leaf_ros/nissan_bringup/launch/nissan.leaf.bringup.2020.A.launch"
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/nissan.leaf.bringup.2020.A.launch")
             self.launchAS = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
             self.launchAS.start()
-            rospy.loginfo(launchStr + "started")
+            rospy.loginfo(launchStr + " started")
             self.allSensorLaunchBtn.setText("Stop AllSensor")
         else:
             self.launchAS.shutdown()
@@ -189,10 +190,10 @@ class PlotHandler(object):
         if self.waypointLoaded is False:
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
             roslaunch.configure_logging(uuid)
-            launchStr = "/home/nvidia/leaf_ws/src/nissan_leaf_ros/nissan_bringup/launch/demo.waypoint.follow.launch"
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/demo.waypoint.follow.launch")
             self.launchLC = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
             self.launchLC.start()
-            rospy.loginfo(launchStr + "started")
+            rospy.loginfo(launchStr + " started")
             self.loadWaypointBtn.setText("UnLoad waypoints")
         else:
             self.launchLC.shutdown()
@@ -209,10 +210,10 @@ class PlotHandler(object):
             rospy.loginfo(new_csv + " set as /waypoint_saver/save_filename rosparam")
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
             roslaunch.configure_logging(uuid)
-            launchStr = "/home/nvidia/leaf_ws/src/nissan_leaf_ros/nissan_bringup/launch/waypoint.saver.launch"
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/waypoint.saver.launch")
             self.launchSC = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
             self.launchSC.start()
-            rospy.loginfo(launchStr + "started")
+            rospy.loginfo(launchStr + " started")
             rospy.loginfo("waypoint saving started")
             self.saveWaypointBtn.setText("Finish waypoints")
         else:
