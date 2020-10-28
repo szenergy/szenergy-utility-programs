@@ -101,7 +101,9 @@ def xml2obj(src):
 #############################################################
 
 #src = file("map_campus_gyor01.osm")  # basestring python 2 version
-src = open("map_campus_gyor01.osm")
+#src = open("../osm_files/map_campus_zala_egyetemi01.osm")
+src = open("../osm_files/map_campus_gyor01.osm")
+src = open("../osm_files/map_campus_zala_smart_city01.osm")
 myMap = xml2obj(src)
 #main()
 
@@ -163,8 +165,11 @@ maxX, maxY, _, _ = utm.from_latlon(maxLat, maxLon)
 
 fig = plt.figure()
 ax = fig.add_subplot()
-ax.axis("equal")
-ax.axis([minX,maxX,minY,maxY])
+try:
+    ax.axis("equal")
+    ax.axis([minX,maxX,minY,maxY])
+except:
+    print("python2")
 plt.grid()
 for idx,nodeID in enumerate(wayType.keys()):
     try:
