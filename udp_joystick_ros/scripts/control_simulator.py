@@ -3,6 +3,7 @@
 import socket
 import rospy
 import geometry_msgs.msg as geomsg
+import autoware_msgs.msg as auwmsg
 import numpy as np
 import time
 import threading
@@ -13,7 +14,7 @@ class UdpJoystickServer:
     def __init__(self, port):
         self.port = port
         self.controller_state = self.start_controller_state
-        self.pub_tw = rospy.Publisher("cmd_todo", geomsg.Twist, queue_size=10)
+        self.pub_tw = rospy.Publisher("vehicle_cmd", auwmsg.VehicleCmd, queue_size=10)
         
 
     def start_server(self):
@@ -34,7 +35,7 @@ class UdpJoystickServer:
         #s[4:8]
         #s[8:12]
         #s[12:16]
-        msg_tw = geomsg.Twist()
+        msg_aw = auwmsg.VehicleCmd()
         cnt = 1500
         div = 500
         multiply = 1.0
@@ -48,9 +49,10 @@ class UdpJoystickServer:
                         m3 = (float(str(msg)[8:12])  - cnt) / div * multiply
                         m4 = (float(str(msg)[12:16]) - cnt) / div * multiply
                         self.controller_state = np.array([m1, m2, m3, m4])
-                        msg_tw.linear.x = m4
-                        msg_tw.angular.z = m3
-                        self.pub_tw.publish(msg_tw)
+                        msg_aw.header.stamp = rospy.Time.now()
+                        msg_aw.twist_cmd.twist.linear.x = m4
+                        msg_aw.twist_cmd.twist.angular.z = m3
+                        self.pub_tw.publish(msg_aw)
                         #rospy.loginfo(self.controller_state)
                     except (SyntaxError,ValueError):
                         rospy.logerr("Malformed UDP msg to controller server")
