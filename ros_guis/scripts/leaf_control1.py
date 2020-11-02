@@ -23,7 +23,6 @@ class PlotHandler(object):
 
     def initializePlot(self):
         self.first_run = True
-        self.paused = False
         self.win = qtgqt.QtGui.QMainWindow()
         area = darea.DockArea()
         white = (200, 200, 200)
@@ -33,27 +32,38 @@ class PlotHandler(object):
         yellow = (244, 244, 160); yellowB = pg.mkBrush(244, 244, 160, 200)
         darkyellow = (224, 166, 58); darkyellowB = pg.mkBrush(224, 166, 58, 200);
         self.win.setWindowTitle("Leaf control 1")
+        self.win.setWindowIcon(qtgqt.QtGui.QIcon(self.rospack.get_path("ros_guis") + "/img/icon01.png"))
         self.win.resize(700, 600)
         self.win.setCentralWidget(area)
         dock1def = darea.Dock("Default", size = (1,1))  # give this dock minimum possible size
         dock2oth = darea.Dock("Others", size = (1,1))  # give this dock minimum possible size
         dock3ctr = darea.Dock("Control", size = (1,1))  # give this dock minimum possible size
         dock4gps = darea.Dock("2 Gps visualization", size = (500,400)) # size is only a suggestion
-        area.addDock(dock2oth, "left")
-        area.addDock(dock1def, "above", dock2oth)
-        area.addDock(dock3ctr, "bottom", dock1def)
+        area.addDock(dock1def, "left")
+        area.addDock(dock2oth, "bottom", dock1def)
+        area.addDock(dock3ctr, "above", dock2oth)
         area.addDock(dock4gps, "bottom", dock3ctr)
         dhLabel = qtgqt.QtGui.QLabel("Duro:"); dhLabel.setStyleSheet("background-color: rgb(4, 4, 4);"); dhLabel.setAlignment(pg.QtCore.Qt.AlignRight); dhLabel.setFixedSize(50, 25)
         dsLabel = qtgqt.QtGui.QLabel("Duro:"); dsLabel.setStyleSheet("background-color: rgb(4, 4, 4);"); dsLabel.setAlignment(pg.QtCore.Qt.AlignRight); dsLabel.setFixedSize(50, 25)
         nhLabel = qtgqt.QtGui.QLabel("Nova:"); nhLabel.setStyleSheet("background-color: rgb(4, 4, 4);"); nhLabel.setAlignment(pg.QtCore.Qt.AlignRight)
         nsLabel = qtgqt.QtGui.QLabel("Nova:"); nsLabel.setStyleSheet("background-color: rgb(4, 4, 4);"); nsLabel.setAlignment(pg.QtCore.Qt.AlignRight)     
-        self.duroHzLabel = qtgqt.QtGui.QLabel(" **.* Hz")
         self.duroRtkLabel = qtgqt.QtGui.QLabel("+++")
-        self.novaHzLabel = qtgqt.QtGui.QLabel("  **.* Hz")
         self.novaRtkLabel = qtgqt.QtGui.QLabel("+++")
-        self.pauseSensorReadBtn = qtgqt.QtGui.QPushButton("Pause")
+        self.pauseSensorReadClickedBtn = qtgqt.QtGui.QPushButton("Pause")
         self.savePoseBtn = qtgqt.QtGui.QPushButton("Save")
         self.allSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start AllSensor")
+        self.tfSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start TF")
+        self.tfDuroLaunchBtn = qtgqt.QtGui.QPushButton("Start TF Duro")
+        self.tfNovaLaunchBtn = qtgqt.QtGui.QPushButton("Start TF Nova")
+        self.duroSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start Duro GPS")
+        self.novaSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start Nova GPS")
+        self.zedSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start ZED camera")
+        self.sickSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start SICK")
+        self.ousterLeftSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start left Ouster")
+        self.ousterRightSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start right Ouster")
+        self.veloLeftSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start left Velodyne")
+        self.veloRightSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start right Velodyne")
+        self.canSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start CAN")
         self.loadWaypointBtn = qtgqt.QtGui.QPushButton("Load waypoints")
         self.saveWaypointBtn = qtgqt.QtGui.QPushButton("Save waypoints")
         self.selectFileBtn = qtgqt.QtGui.QPushButton("...")
@@ -65,13 +75,24 @@ class PlotHandler(object):
         self.allSensorLaunched = False
         self.waypointLoaded = False
         self.waypointSaving = False
+        self.tfLaunched = False
+        self.tfSensorLaunched = False
+        self.tfDuroLaunched = False
+        self.tfNovaLaunched = False
+        self.duroSensorLaunched = False
+        self.novaSensorLaunched = False
+        self.zedSensorLaunched = False
+        self.sickSensorLaunched = False
+        self.ousterLeftSensorLaunched = False
+        self.ousterRightSensorLaunched = False
+        self.veloLeftSensorLaunched = False
+        self.veloRightSensorLaunched = False
+        self.canSensorLaunched = False
         widg1def = pg.LayoutWidget()
         widg1def.setStyleSheet("background-color: rgb(40, 44, 52); color: rgb(171, 178, 191);")
         dock1def.setStyleSheet("background-color: rgb(18, 20, 23);")
         dock1def.addWidget(widg1def)
-        self.novaHzLabel.setStyleSheet("font-family: Monospace; font: 20pt; color: rgb(6, 106, 166)")
         self.novaRtkLabel.setStyleSheet("font-family: Monospace; font: 20pt; color: rgb(6, 106, 166)")
-        self.duroHzLabel.setStyleSheet("font-family: Monospace; font: 20pt; color: rgb(224, 166, 58)")
         self.duroRtkLabel.setStyleSheet("font-family: Monospace; font: 20pt; color: rgb(244, 166, 58)")
         self.angleLabel.setStyleSheet("font-family: Monospace; font: 20pt; color: rgb(200, 200, 200)")
         self.speedLabel.setStyleSheet("font-family: Monospace; font: 20pt; color: rgb(200, 200, 200)")
@@ -98,7 +119,7 @@ class PlotHandler(object):
         widg1def.addWidget(self.novaRtkLabel, row=2, col=7)
         widg1def.addWidget(self.speedLabel, row=3, col=2)
         widg1def.addWidget(self.angleLabel, row=3, col=4)
-        widg1def.addWidget(self.pauseSensorReadBtn, row=4, col=7)
+        widg1def.addWidget(self.pauseSensorReadClickedBtn, row=4, col=7)
         widg1def.addWidget(olhLabel, row=1, col=1)
         widg1def.addWidget(orhLabel, row=1, col=3)
         widg1def.addWidget(vlhLabel, row=2, col=1)
@@ -124,12 +145,24 @@ class PlotHandler(object):
         self.widgGps.addItem(self.pltGpsOdom)
         self.widgGps.addItem(self.pltLeafOdom)
         dock4gps.addWidget(self.widgGps)
-        self.pauseSensorReadBtn.clicked.connect(self.pauseSensorRead)
-        self.savePoseBtn.clicked.connect(self.saveToCsv)
-        self.allSensorLaunchBtn.clicked.connect(self.startAllSensor)
-        self.loadWaypointBtn.clicked.connect(self.loadCsv)
-        self.saveWaypointBtn.clicked.connect(self.saveCsv)
-        self.selectFileBtn.clicked.connect(self.selectCsv)
+        self.pauseSensorReadClickedBtn.clicked.connect(self.pauseSensorReadClicked)
+        self.savePoseBtn.clicked.connect(self.saveToCsvClicked)
+        self.allSensorLaunchBtn.clicked.connect(self.startAllSensorClicked)
+        self.tfSensorLaunchBtn.clicked.connect(self.startTFClicked)
+        self.tfDuroLaunchBtn.clicked.connect(self.tfDuroClicked)
+        self.tfNovaLaunchBtn.clicked.connect(self.tfNovaClicked)
+        self.zedSensorLaunchBtn.clicked.connect(self.zedSensorClicked)
+        self.duroSensorLaunchBtn.clicked.connect(self.duroSensorClicked)
+        self.novaSensorLaunchBtn.clicked.connect(self.novaSensorClicked)
+        self.sickSensorLaunchBtn.clicked.connect(self.sickSensorClicked)
+        self.ousterLeftSensorLaunchBtn.clicked.connect(self.ousterLeftSensorClicked)
+        self.ousterRightSensorLaunchBtn.clicked.connect(self.ousterRightSensorClicked)
+        self.veloLeftSensorLaunchBtn.clicked.connect(self.veloLeftSensorClicked)
+        self.veloRightSensorLaunchBtn.clicked.connect(self.veloRightSensorClicked)        
+        self.canSensorLaunchBtn.clicked.connect(self.canSensorClicked)        
+        self.loadWaypointBtn.clicked.connect(self.loadCsvClicked)
+        self.saveWaypointBtn.clicked.connect(self.saveCsvClicked)
+        self.selectFileBtn.clicked.connect(self.selectCsvClicked)
         
         self.tGps = pg.TextItem(text = "Gps", color = blue)
         self.tLeaf = pg.TextItem(text = "Leaf odom", color = red)
@@ -138,7 +171,25 @@ class PlotHandler(object):
         
         dock2oth.setStyleSheet("background-color: rgb(18, 20, 23);")
         self.drawCircle(self.widgGps)
-        
+        # other controls
+        widg2oth = pg.LayoutWidget()
+        dock2oth.setStyleSheet("background-color: rgb(18, 20, 23);")
+        widg2oth.setStyleSheet("background-color: rgb(40, 44, 52); color: rgb(171, 178, 191);")
+        widg2oth.addWidget(self.tfSensorLaunchBtn, row=1, col=1)
+        widg2oth.addWidget(self.tfDuroLaunchBtn, row = 1, col = 2)
+        widg2oth.addWidget(self.tfNovaLaunchBtn, row = 1, col = 3)
+        widg2oth.addWidget(self.zedSensorLaunchBtn, row = 2, col = 1)
+        widg2oth.addWidget(self.duroSensorLaunchBtn, row = 2, col = 2)
+        widg2oth.addWidget(self.novaSensorLaunchBtn, row = 2, col = 3)
+        widg2oth.addWidget(self.sickSensorLaunchBtn, row = 3, col = 1)
+        widg2oth.addWidget(self.ousterLeftSensorLaunchBtn, row = 3, col = 2)
+        widg2oth.addWidget(self.ousterRightSensorLaunchBtn, row = 3, col = 3)
+        widg2oth.addWidget(self.canSensorLaunchBtn, row = 4, col = 1)
+        widg2oth.addWidget(self.veloLeftSensorLaunchBtn, row = 4, col = 2)
+        widg2oth.addWidget(self.veloRightSensorLaunchBtn, row = 4, col = 3)
+
+        dock2oth.addWidget(widg2oth)
+
         # control
         widg3ctr = pg.LayoutWidget()
         dock3ctr.setStyleSheet("background-color: rgb(18, 20, 23);")
@@ -150,15 +201,17 @@ class PlotHandler(object):
         widg3ctr.addWidget(self.selectFileBtn, row=2, col=3)
         widg3ctr.addWidget(self.csvTextbox, row=3, col=2)
         dock3ctr.addWidget(widg3ctr)
+        widg3ctr.addWidget(self.allSensorLaunchBtn, row=1, col=1)
         try:
             current_file = rospy.get_param("waypoint_file_name")
             self.csvLabel.setText(os.path.basename(str(current_file)))
         except:
             self.csvLabel.setText("No waypoint_file_name param")
+        self.pauseSensorReadClicked() # start paused - the same effect as pushed the pause button
         self.win.show()
 
     def updatePose(self):
-        if self.paused == False:
+        if self.leaf.stop_slow == False:
             self.duroRtkLabel.setText(self.leaf.duro_rtk)
             self.novaRtkLabel.setText(self.leaf.nova_rtk)
             self.speedLabel.setText("%5.1f Km/h" % (self.leaf.leaf_speed * 3.6))
@@ -171,7 +224,71 @@ class PlotHandler(object):
             self.veloRig.setText(self.leaf.velo_rig_ok)
             self.pltGpsOdom.setPoints(self.leaf.pose_diff.x, self.leaf.pose_diff.y)    
 
-    def startAllSensor(self):
+    def tfDuroClicked(self): 
+        rospy.logwarn("TODO")
+    def tfNovaClicked(self): 
+        rospy.logwarn("TODO")
+    def zedSensorClicked(self): 
+        rospy.logwarn("TODO")
+    def duroSensorClicked(self): 
+        if self.duroSensorLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/sensory/gps.duro.launch")
+            self.launchDuS = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchDuS.start()
+            rospy.loginfo(launchStr + " started")
+            self.duroSensorLaunchBtn.setText("Stop duro")
+        else:
+            self.launchDuS.shutdown()
+            rospy.loginfo("Duro stopped.....")
+            self.duroSensorLaunchBtn.setText("Start Duro sensor")
+        self.duroSensorLaunched = not self.duroSensorLaunched
+
+    def novaSensorClicked(self): 
+        if self.novaSensorLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/sensory/gps.nova.launch")
+            self.launchNoS = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchNoS.start()
+            rospy.loginfo(launchStr + " started")
+            self.novaSensorLaunchBtn.setText("Stop Nova")
+        else:
+            self.launchNoS.shutdown()
+            rospy.loginfo("Nova stopped.....")
+            self.novaSensorLaunchBtn.setText("Start Nova sensor")
+        self.novaSensorLaunched = not self.novaSensorLaunched
+
+    def sickSensorClicked(self): 
+        rospy.logwarn("TODO")
+    def ousterLeftSensorClicked(self): 
+        rospy.logwarn("TODO")
+    def ousterRightSensorClicked(self): 
+        rospy.logwarn("TODO")
+    def veloLeftSensorClicked(self): 
+        rospy.logwarn("TODO")
+    def veloRightSensorClicked(self): 
+        rospy.logwarn("TODO")
+    def canSensorClicked(self):
+        rospy.logwarn("TODO")
+
+    def startTFClicked(self):
+        if self.tfLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/tf_setup/tf_nissanleaf_statictf.launch")
+            self.launchTF = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchTF.start()
+            rospy.loginfo(launchStr + " started")
+            self.tfSensorLaunchBtn.setText("Stop TF")
+        else:
+            self.launchTF.shutdown()
+            rospy.loginfo("TF stopped.....")
+            self.tfSensorLaunchBtn.setText("Start TF")
+        self.tfLaunched = not self.tfLaunched
+
+    def startAllSensorClicked(self):
         if self.allSensorLaunched is False:
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
             roslaunch.configure_logging(uuid)
@@ -186,7 +303,7 @@ class PlotHandler(object):
             self.allSensorLaunchBtn.setText("Start AllSensor")
         self.allSensorLaunched = not self.allSensorLaunched
 
-    def loadCsv(self):
+    def loadCsvClicked(self):
         if self.waypointLoaded is False:
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
             roslaunch.configure_logging(uuid)
@@ -201,7 +318,7 @@ class PlotHandler(object):
             self.loadWaypointBtn.setText("Load waypoints")
         self.waypointLoaded = not self.waypointLoaded
 
-    def saveCsv(self):
+    def saveCsvClicked(self):
         if self.waypointSaving is False:
             if len(str(self.csvTextbox.text())) < 3:
                 self.csvTextbox.setText("tmp001.csv")
@@ -222,7 +339,7 @@ class PlotHandler(object):
             self.saveWaypointBtn.setText("Save saveing wayp")
         self.waypointSaving = not self.waypointSaving    
 
-    def selectCsv(self):
+    def selectCsvClicked(self):
         #fname = qtgqt.QtGui.QFileDialog.getOpenFileName(caption="Open file", directory="/mnt/storage_1tb/waypoint",filter="CSV files (*.csv)")
         dlg = qtgqt.QtGui.QFileDialog()
         dlg.setFileMode(qtgqt.QtGui.QFileDialog.AnyFile)
@@ -238,13 +355,19 @@ class PlotHandler(object):
             #    data = f.read()
             #    print(data)
 
-    def pauseSensorRead(self):
-        self.paused = not self.paused
-        if self.paused:
-            self.pauseSensorReadBtn.setText("UnPause")
+    def pauseSensorReadClicked(self):
+        self.leaf.stop_slow = not self.leaf.stop_slow
+        if self.leaf.stop_slow:
+            self.pauseSensorReadClickedBtn.setText("UnPause")
             self.ousterLefLabel.setText("paused")
+            self.ousterRigLabel.setText("paused")
+            self.duroRtkLabel.setText("paused")
+            self.novaRtkLabel.setText("paused")
+            self.veloLef.setText("paused")
+            self.veloRig.setText("paused")
+            self.sickOkLabel.setText("paused")
         else:
-            self.pauseSensorReadBtn.setText("Pause")
+            self.pauseSensorReadClickedBtn.setText("Pause")
 
     def drawCircle(self, to_plot):
         circle = pg.ScatterPlotItem(size = 8, pen = pg.mkPen(None), brush = pg.mkBrush(80, 80, 80, 200))
@@ -254,7 +377,7 @@ class PlotHandler(object):
         y = np.cos(np.arange(0, np.pi*2, 0.1)) * 1.7
         circle.addPoints(x, y)
 
-    def saveToCsv(self):
+    def saveToCsvClicked(self):
         #rospy.loginfo(self.leaf.pose_duro.x)
         f = open("gps.txt", "a+")
         data_to_save = np.array([self.leaf.pose_duro.x, self.leaf.pose_duro.y, self.leaf.pose_nova.x, self.leaf.pose_nova.y])
@@ -290,6 +413,7 @@ class LeafSubscriber(object):
         self.sick_ok = "-"
         self.duro_rtk = "-"
         self.nova_rtk = "-"
+        self.stop_slow = False # unpaused
     
     def slowGetMsg(self):
         if self.stop_slow is False:
