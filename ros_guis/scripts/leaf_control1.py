@@ -64,6 +64,7 @@ class PlotHandler(object):
         self.veloLeftSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start left Velodyne")
         self.veloRightSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start right Velodyne")
         self.canSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start CAN")
+        self.temporaryLaunchBtn = qtgqt.QtGui.QPushButton("Start temporary")
         self.loadWaypointBtn = qtgqt.QtGui.QPushButton("Load waypoints")
         self.saveWaypointBtn = qtgqt.QtGui.QPushButton("Save waypoints")
         self.selectFileBtn = qtgqt.QtGui.QPushButton("...")
@@ -88,6 +89,7 @@ class PlotHandler(object):
         self.veloLeftSensorLaunched = False
         self.veloRightSensorLaunched = False
         self.canSensorLaunched = False
+        self.temporaryLaunched = False
         widg1def = pg.LayoutWidget()
         widg1def.setStyleSheet("background-color: rgb(40, 44, 52); color: rgb(171, 178, 191);")
         dock1def.setStyleSheet("background-color: rgb(18, 20, 23);")
@@ -160,6 +162,7 @@ class PlotHandler(object):
         self.veloLeftSensorLaunchBtn.clicked.connect(self.veloLeftSensorClicked)
         self.veloRightSensorLaunchBtn.clicked.connect(self.veloRightSensorClicked)        
         self.canSensorLaunchBtn.clicked.connect(self.canSensorClicked)        
+        self.temporaryLaunchBtn.clicked.connect(self.temporaryClicked)
         self.loadWaypointBtn.clicked.connect(self.loadCsvClicked)
         self.saveWaypointBtn.clicked.connect(self.saveCsvClicked)
         self.selectFileBtn.clicked.connect(self.selectCsvClicked)
@@ -187,6 +190,7 @@ class PlotHandler(object):
         widg2oth.addWidget(self.canSensorLaunchBtn, row = 4, col = 1)
         widg2oth.addWidget(self.veloLeftSensorLaunchBtn, row = 4, col = 2)
         widg2oth.addWidget(self.veloRightSensorLaunchBtn, row = 4, col = 3)
+        widg2oth.addWidget(self.temporaryLaunchBtn, row = 5, col = 2)
 
         dock2oth.addWidget(widg2oth)
 
@@ -283,6 +287,21 @@ class PlotHandler(object):
             rospy.loginfo("Duro stopped.....")
             self.duroSensorLaunchBtn.setText("Start Duro sensor")
         self.duroSensorLaunched = not self.duroSensorLaunched
+
+    def temporaryClicked(self): 
+        if self.temporaryLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("ros_guis"), "launch/temporary.launch")
+            self.launchtemp = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchtemp.start()
+            rospy.loginfo(launchStr + " started")
+            self.temporaryLaunchBtn.setText("Stop temporary")
+        else:
+            self.launchtemp.shutdown()
+            rospy.loginfo("temporary stopped.....")
+            self.temporaryLaunchBtn.setText("Start temporary")
+        self.temporaryLaunched = not self.temporaryLaunched
 
     def novaSensorClicked(self): 
         if self.novaSensorLaunched is False:
