@@ -225,11 +225,50 @@ class PlotHandler(object):
             self.pltGpsOdom.setPoints(self.leaf.pose_diff.x, self.leaf.pose_diff.y)    
 
     def tfDuroClicked(self): 
-        rospy.logwarn("TODO")
+        if self.tfDuroLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/tf_setup/tf_duro_global_frame_tf_publisher.statictf.launch")
+            self.launchDtf = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchDtf.start()
+            rospy.loginfo(launchStr + " started")
+            self.tfDuroLaunchBtn.setText("Stop tfDuro")
+        else:
+            self.launchDtf.shutdown()
+            rospy.loginfo("tfDuro stopped.....")
+            self.tfDuroLaunchBtn.setText("Start tfDuro")
+        self.tfDuroLaunched = not self.tfDuroLaunched
+
     def tfNovaClicked(self): 
-        rospy.logwarn("TODO")
+        if self.tfNovaLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/tf_setup/tf_novatel_global_frame_tf_publisher.statictf.launch")
+            self.launchNtf = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchNtf.start()
+            rospy.loginfo(launchStr + " started")
+            self.tfNovaLaunchBtn.setText("Stop tfNova")
+        else:
+            self.launchNtf.shutdown()
+            rospy.loginfo(" stopped.....")
+            self.tfNovaLaunchBtn.setText("Start tfNova")
+        self.tfNovaLaunched = not self.tfNovaLaunched
+
     def zedSensorClicked(self): 
-        rospy.logwarn("TODO")
+        if self.zedSensorLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/sensory/zed_camera_no_tf.launch")
+            self.launchZED = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchZED.start()
+            rospy.loginfo(launchStr + " started")
+            self.zedSensorLaunchBtn.setText("Stop ZED")
+        else:
+            self.launchZED.shutdown()
+            rospy.loginfo("ZED stopped.....")
+            self.zedSensorLaunchBtn.setText("Start ZED")
+        self.zedSensorLaunched = not self.zedSensorLaunched
+
     def duroSensorClicked(self): 
         if self.duroSensorLaunched is False:
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
@@ -261,17 +300,95 @@ class PlotHandler(object):
         self.novaSensorLaunched = not self.novaSensorLaunched
 
     def sickSensorClicked(self): 
-        rospy.logwarn("TODO")
+        if self.sickSensorLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/sensory/sick_lms_111.nissan.launch")
+            self.launchSick = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchSick.start()
+            rospy.loginfo(launchStr + " started")
+            self.sickSensorLaunchBtn.setText("Stop SICK")
+        else:
+            self.launchSick.shutdown()
+            rospy.loginfo("SICK stopped.....")
+            self.sickSensorLaunchBtn.setText("Start SICK")
+        self.sickSensorLaunched = not self.sickSensorLaunched
+
     def ousterLeftSensorClicked(self): 
-        rospy.logwarn("TODO")
+        if self.ousterLeftSensorLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/sensory/ouster_left.launch")
+            self.launchOuLe = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchOuLe.start()
+            rospy.loginfo(launchStr + " started")
+            self.ousterLeftSensorLaunchBtn.setText("Stop ousterLeft")
+        else:
+            self.launchOuLe.shutdown()
+            rospy.loginfo("ousterLeft stopped.....")
+            self.ousterLeftSensorLaunchBtn.setText("Start ousterLeft")
+        self.ousterLeftSensorLaunched = not self.ousterLeftSensorLaunched
+
     def ousterRightSensorClicked(self): 
-        rospy.logwarn("TODO")
+        if self.ousterRightSensorLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/sensory/ouster_right.launch")
+            self.launchOuRi = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchOuRi.start()
+            rospy.loginfo(launchStr + " started")
+            self.ousterRightSensorLaunchBtn.setText("Stop ousterRight")
+        else:
+            self.launchOuRi.shutdown()
+            rospy.loginfo("ousterRight stopped.....")
+            self.ousterRightSensorLaunchBtn.setText("Start ousterRight")
+        self.ousterRightSensorLaunched = not self.ousterRightSensorLaunched
+
     def veloLeftSensorClicked(self): 
-        rospy.logwarn("TODO")
+        if self.veloLeftSensorLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/sensory/velodyne_left.launch")
+            self.launchVeLe = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchVeLe.start()
+            rospy.loginfo(launchStr + " started")
+            self.veloLeftSensorLaunchBtn.setText("Stop veloLeft")
+        else:
+            self.launchVeLe.shutdown()
+            rospy.loginfo("veloLeft stopped.....")
+            self.veloLeftSensorLaunchBtn.setText("Start veloLeft")
+        self.veloLeftSensorLaunched = not self.veloLeftSensorLaunched
+
     def veloRightSensorClicked(self): 
-        rospy.logwarn("TODO")
+        if self.veloRightSensorLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/sensory/velodyne_right.launch")
+            self.launchVeRi = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchVeRi.start()
+            rospy.loginfo(launchStr + " started")
+            self.veloRightSensorLaunchBtn.setText("Stop veloRight")
+        else:
+            self.launchVeRi.shutdown()
+            rospy.loginfo(" stopped.....")
+            self.veloRightSensorLaunchBtn.setText("Start veloRight")
+        self.veloRightSensorLaunched = not self.veloRightSensorLaunched
+
     def canSensorClicked(self):
-        rospy.logwarn("TODO")
+        if self.canSensorLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("can_leaf_driver"), "launch/nissan_can_control.launch")
+            self.launchCAN = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchCAN.start()
+            rospy.loginfo(launchStr + " started")
+            self.canSensorLaunchBtn.setText("Stop CAN")
+        else:
+            self.launchCAN.shutdown()
+            rospy.loginfo("CAN stopped.....")
+            self.canSensorLaunchBtn.setText("Start CAN")
+        self.canSensorLaunched = not self.canSensorLaunched
+
 
     def startTFClicked(self):
         if self.tfLaunched is False:
