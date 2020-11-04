@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import rospy, rostopic, roslaunch, rospkg
+import rospy, rostopic, roslaunch, rospkg, tf
 import std_msgs.msg as rosmsg
 import nav_msgs.msg as navmsg
 import geometry_msgs.msg as geomsg
@@ -140,9 +140,13 @@ class PlotHandler(object):
         self.widgGps = pg.PlotWidget(title="Gps difference")
         self.widgGps.setAspectLocked(True)
         self.pltGpsOdom = pg.ScatterPlotItem(size = 10, pen = pg.mkPen(None), brush = blueB)
+        self.pltDuroOrientation = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(244, 166, 58), width=6))
+        self.pltNovaOrientation = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(200, 66, 66), width=8))
         self.pltLeafOdom = pg.ScatterPlotItem(size = 10, pen = pg.mkPen(None), brush = redB)
         self.widgGps.showGrid(x=True, y=True)
         self.widgGps.addItem(self.pltGpsOdom)
+        self.widgGps.addItem(self.pltNovaOrientation)
+        self.widgGps.addItem(self.pltDuroOrientation)
         self.widgGps.addItem(self.pltLeafOdom)
         dock4gps.addWidget(self.widgGps)
         self.pauseSensorReadClickedBtn.clicked.connect(self.pauseSensorReadClicked)
@@ -222,9 +226,14 @@ class PlotHandler(object):
             self.zedOkLabel.setText(self.leaf.zed_ok)
             self.veloLef.setText(self.leaf.velo_lef_ok)
             self.veloRig.setText(self.leaf.velo_rig_ok)
-            self.pltGpsOdom.setPoints(self.leaf.pose_diff.x, self.leaf.pose_diff.y)    
+            self.pltGpsOdom.setPoints(self.leaf.pose_diff.x, self.leaf.pose_diff.y)
+            self.pltDuroOrientation.setData(np.array([np.cos(self.leaf.duro_orientation), 0.0]), np.array([np.sin(self.leaf.duro_orientation), 0.0]))
+            self.pltNovaOrientation.setData(np.array([np.cos(self.leaf.nova_orientation) * 1.2, 0.0]), np.array([np.sin(self.leaf.nova_orientation)  * 1.2, 0.0]))
 
     def tfDuroClicked(self): 
+        if self.tfNovaLaunched is True:
+            rospy.logerr("Novatel TF publisher is active, it will be shut down and replaced by Duro (leaf_control1)")
+            self.tfNovaClicked() # shut down novatel tf publisher
         if self.tfDuroLaunched is False:
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
             roslaunch.configure_logging(uuid)
@@ -240,6 +249,9 @@ class PlotHandler(object):
         self.tfDuroLaunched = not self.tfDuroLaunched
 
     def tfNovaClicked(self): 
+        if self.tfDuroLaunched is True:
+            rospy.logerr("Duro TF publisher is active, it will be shut down and replaced by Novatel (leaf_control1)")
+            self.tfDuroClicked() # shut duro tf publisher
         if self.tfNovaLaunched is False:
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
             roslaunch.configure_logging(uuid)
@@ -474,6 +486,7 @@ class PlotHandler(object):
 
     def pauseSensorReadClicked(self):
         self.leaf.stop_slow = not self.leaf.stop_slow
+        self.leaf.sub_pos = not self.leaf.sub_pos
         if self.leaf.stop_slow:
             self.pauseSensorReadClickedBtn.setText("UnPause")
             self.ousterLefLabel.setText("paused")
@@ -521,7 +534,7 @@ class LeafSubscriber(object):
 
 
     def __init__(self):
-        self.registerPose()
+        #self.registerPose()
         self.ouster_lef_ok = "-"
         self.ouster_rig_ok = "-"
         self.zed_ok = "-"
@@ -530,40 +543,48 @@ class LeafSubscriber(object):
         self.sick_ok = "-"
         self.duro_rtk = "-"
         self.nova_rtk = "-"
+        self.duro_orientation = 0.0
+        self.nova_orientation = 0.0
+        self.iterator = 0
         self.stop_slow = False # unpaused
-    
+        self.p2 = self.p3 = self.p4 = self.p5 = self.p6 = None
+
     def slowGetMsg(self):
-        if self.stop_slow is False:
-            try:
-                rospy.wait_for_message("/left_os1/os1_cloud_node/points", senmsg.PointCloud2, timeout=0.2)
-                self.ouster_lef_ok = "OK"
-            except rospy.ROSException, e:
-                self.ouster_lef_ok = "ERR"
-            try:
-                rospy.wait_for_message("/right_os1/os1_cloud_node/points", senmsg.PointCloud2, timeout=0.2)
-                self.ouster_rig_ok = "OK"
-            except rospy.ROSException, e:
-                self.ouster_rig_ok = "ERR"
-            try:
-                rospy.wait_for_message("/velodyne_left/velodyne_points", senmsg.PointCloud2, timeout=0.2)
-                self.velo_lef_ok = "OK"
-            except rospy.ROSException, e:
-                self.velo_lef_ok = "ERR"  
-            try:
-                rospy.wait_for_message("/velodyne_right/velodyne_points", senmsg.PointCloud2, timeout=0.2)
-                self.velo_rig_ok = "OK"
-            except rospy.ROSException, e:
-                self.velo_rig_ok = "ERR"  
-            try:
-                rospy.wait_for_message("/cloud", senmsg.PointCloud2, timeout=0.2)
-                self.sick_ok = "OK"
-            except rospy.ROSException, e:
-                self.sick_ok = "ERR"                   
-            try:
-                rospy.wait_for_message("/zed_node/stereo/image_rect_color", senmsg.Image, timeout=0.2)
-                self.zed_ok = "OK"
-            except rospy.ROSException, e:
-                self.zed_ok = "ERR"            
+        if self.iterator == 100: # exeecute only every 100th time
+            self.iterator = 0
+            if self.stop_slow is False:
+                try:
+                    rospy.wait_for_message("/left_os1/os1_cloud_node/points", senmsg.PointCloud2, timeout=0.2)
+                    self.ouster_lef_ok = "OK"
+                except rospy.ROSException, e:
+                    self.ouster_lef_ok = "ERR"
+                try:
+                    rospy.wait_for_message("/right_os1/os1_cloud_node/points", senmsg.PointCloud2, timeout=0.2)
+                    self.ouster_rig_ok = "OK"
+                except rospy.ROSException, e:
+                    self.ouster_rig_ok = "ERR"
+                try:
+                    rospy.wait_for_message("/velodyne_left/velodyne_points", senmsg.PointCloud2, timeout=0.2)
+                    self.velo_lef_ok = "OK"
+                except rospy.ROSException, e:
+                    self.velo_lef_ok = "ERR"  
+                try:
+                    rospy.wait_for_message("/velodyne_right/velodyne_points", senmsg.PointCloud2, timeout=0.2)
+                    self.velo_rig_ok = "OK"
+                except rospy.ROSException, e:
+                    self.velo_rig_ok = "ERR"  
+                try:
+                    rospy.wait_for_message("/cloud", senmsg.PointCloud2, timeout=0.2)
+                    self.sick_ok = "OK"
+                except rospy.ROSException, e:
+                    self.sick_ok = "ERR"                   
+                try:
+                    rospy.wait_for_message("/zed_node/stereo/image_rect_color", senmsg.Image, timeout=0.2)
+                    self.zed_ok = "OK"
+                except rospy.ROSException, e:
+                    self.zed_ok = "ERR"
+        else:
+            self.iterator += 1
 
     def registerPose(self):
         self.stop_slow = False
@@ -574,22 +595,37 @@ class LeafSubscriber(object):
         self.p6 = rospy.Subscriber("/vehicle_status", autowmsgs.VehicleStatus, self.vehicleStatusCallback)
     
     def unregisterPose(self):
-        self.stop_slow = True
-        self.p0.unregister()
-        self.p1.unregister()
-        self.p2.unregister()
-        self.p3.unregister()
-        self.p4.unregister()
-        self.p5.unregister()
-
+        try:
+            self.stop_slow = True
+            self.p2.unregister()
+            self.p3.unregister()
+            self.p4.unregister()
+            self.p5.unregister()
+            self.p6.unregister()
+        except:
+            None # not registered (subscubed) yet
         
     def novaPoseCallBack(self, msg):
         self.pose_nova.x = msg.pose.position.x
         self.pose_nova.y = msg.pose.position.y
+        quaternion = (
+            msg.pose.orientation.x,
+            msg.pose.orientation.y,
+            msg.pose.orientation.z,
+            msg.pose.orientation.w)
+        euler = tf.transformations.euler_from_quaternion(quaternion)
+        self.nova_orientation = euler[2] - np.pi 
 
     def duroPoseCallBack(self, msg):
         self.pose_duro.x = msg.pose.position.x
         self.pose_duro.y = msg.pose.position.y
+        quaternion = (
+            msg.pose.orientation.x,
+            msg.pose.orientation.y,
+            msg.pose.orientation.z,
+            msg.pose.orientation.w)
+        euler = tf.transformations.euler_from_quaternion(quaternion)
+        self.duro_orientation = euler[2] - np.pi 
         self.pose_diff = self.pose_duro -self.pose_nova
 
     def vehicleStatusCallback(self, msg):
@@ -604,7 +640,7 @@ class LeafSubscriber(object):
 
     def handleRegistering(self):      
         if self.sub_pos != self.sub_pos_pre: # if subscribe / unsubscribe
-            rospy.loginfo("Subscribed to pose topics: ", self.sub_pos)
+            rospy.loginfo("Subscribed to pose topics: " + str(self.sub_pos))
             self.sub_pos_pre = self.sub_pos
             if self.sub_pos == True:
                 self.registerPose()
@@ -621,7 +657,7 @@ if __name__ == "__main__":
     ph.initializePlot()
     timerSlowSub = qtgqt.QtCore.QTimer()
     timerSlowSub.timeout.connect(leafSub.slowGetMsg)
-    timerSlowSub.start(3000)
+    timerSlowSub.start(30)
     timerSubUnsub = qtgqt.QtCore.QTimer()
     timerSubUnsub.timeout.connect(leafSub.handleRegistering)
     timerSubUnsub.start(20)
