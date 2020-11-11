@@ -246,10 +246,12 @@ class PlotHandler(object):
             self.launchDtf.start()
             rospy.loginfo(launchStr + " started")
             self.tfDuroLaunchBtn.setText("Stop tfDuro")
+            self.tfDuroLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchDtf.shutdown()
             rospy.loginfo("tfDuro stopped.....")
             self.tfDuroLaunchBtn.setText("Start tfDuro")
+            self.tfDuroLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.tfDuroLaunched = not self.tfDuroLaunched
 
     def tfNovaClicked(self): 
@@ -264,10 +266,12 @@ class PlotHandler(object):
             self.launchNtf.start()
             rospy.loginfo(launchStr + " started")
             self.tfNovaLaunchBtn.setText("Stop tfNova")
+            self.tfNovaLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchNtf.shutdown()
             rospy.loginfo(" stopped.....")
             self.tfNovaLaunchBtn.setText("Start tfNova")
+            self.tfNovaLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.tfNovaLaunched = not self.tfNovaLaunched
 
     def zedSensorClicked(self): 
@@ -279,10 +283,12 @@ class PlotHandler(object):
             self.launchZED.start()
             rospy.loginfo(launchStr + " started")
             self.zedSensorLaunchBtn.setText("Stop ZED")
+            self.zedSensorLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchZED.shutdown()
             rospy.loginfo("ZED stopped.....")
             self.zedSensorLaunchBtn.setText("Start ZED")
+            self.zedSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.zedSensorLaunched = not self.zedSensorLaunched
 
     def duroSensorClicked(self): 
@@ -294,10 +300,12 @@ class PlotHandler(object):
             self.launchDuS.start()
             rospy.loginfo(launchStr + " started")
             self.duroSensorLaunchBtn.setText("Stop duro")
+            self.duroSensorLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchDuS.shutdown()
             rospy.loginfo("Duro stopped.....")
             self.duroSensorLaunchBtn.setText("Start Duro sensor")
+            self.duroSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.duroSensorLaunched = not self.duroSensorLaunched
 
     def temporaryClicked(self): 
@@ -309,10 +317,12 @@ class PlotHandler(object):
             self.launchtemp.start()
             rospy.loginfo(launchStr + " started")
             self.temporaryLaunchBtn.setText("Stop temporary")
+            self.temporaryLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchtemp.shutdown()
             rospy.loginfo("temporary stopped.....")
             self.temporaryLaunchBtn.setText("Start temporary")
+            self.temporaryLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.temporaryLaunched = not self.temporaryLaunched
 
     def novaSensorClicked(self): 
@@ -323,11 +333,13 @@ class PlotHandler(object):
             self.launchNoS = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
             self.launchNoS.start()
             rospy.loginfo(launchStr + " started")
+            self.novaSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
             self.novaSensorLaunchBtn.setText("Stop Nova")
         else:
             self.launchNoS.shutdown()
             rospy.loginfo("Nova stopped.....")
             self.novaSensorLaunchBtn.setText("Start Nova sensor")
+            self.novaSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.novaSensorLaunched = not self.novaSensorLaunched
 
     def sickSensorClicked(self): 
@@ -339,10 +351,12 @@ class PlotHandler(object):
             self.launchSick.start()
             rospy.loginfo(launchStr + " started")
             self.sickSensorLaunchBtn.setText("Stop SICK")
+            self.sickSensorLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchSick.shutdown()
             rospy.loginfo("SICK stopped.....")
             self.sickSensorLaunchBtn.setText("Start SICK")
+            self.sickSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.sickSensorLaunched = not self.sickSensorLaunched
 
     def ousterLeftSensorClicked(self): 
@@ -354,10 +368,12 @@ class PlotHandler(object):
             self.launchOuLe.start()
             rospy.loginfo(launchStr + " started")
             self.ousterLeftSensorLaunchBtn.setText("Stop ousterLeft")
+            self.ousterLeftSensorLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchOuLe.shutdown()
             rospy.loginfo("ousterLeft stopped.....")
             self.ousterLeftSensorLaunchBtn.setText("Start ousterLeft")
+            self.ousterLeftSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.ousterLeftSensorLaunched = not self.ousterLeftSensorLaunched
 
     def ousterRightSensorClicked(self): 
@@ -369,10 +385,12 @@ class PlotHandler(object):
             self.launchOuRi.start()
             rospy.loginfo(launchStr + " started")
             self.ousterRightSensorLaunchBtn.setText("Stop ousterRight")
+            self.ousterRightSensorLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchOuRi.shutdown()
             rospy.loginfo("ousterRight stopped.....")
             self.ousterRightSensorLaunchBtn.setText("Start ousterRight")
+            self.ousterRightSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.ousterRightSensorLaunched = not self.ousterRightSensorLaunched
 
     def veloLeftSensorClicked(self): 
@@ -384,10 +402,12 @@ class PlotHandler(object):
             self.launchVeLe.start()
             rospy.loginfo(launchStr + " started")
             self.veloLeftSensorLaunchBtn.setText("Stop veloLeft")
+            self.veloLeftSensorLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchVeLe.shutdown()
             rospy.loginfo("veloLeft stopped.....")
             self.veloLeftSensorLaunchBtn.setText("Start veloLeft")
+            self.veloLeftSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.veloLeftSensorLaunched = not self.veloLeftSensorLaunched
 
     def veloRightSensorClicked(self): 
@@ -399,10 +419,12 @@ class PlotHandler(object):
             self.launchVeRi.start()
             rospy.loginfo(launchStr + " started")
             self.veloRightSensorLaunchBtn.setText("Stop veloRight")
+            self.veloRightSensorLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchVeRi.shutdown()
             rospy.loginfo(" stopped.....")
             self.veloRightSensorLaunchBtn.setText("Start veloRight")
+            self.veloRightSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.veloRightSensorLaunched = not self.veloRightSensorLaunched
 
     def canSensorClicked(self):
@@ -414,10 +436,12 @@ class PlotHandler(object):
             self.launchCAN.start()
             rospy.loginfo(launchStr + " started")
             self.canSensorLaunchBtn.setText("Stop CAN")
+            self.canSensorLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchCAN.shutdown()
             rospy.loginfo("CAN stopped.....")
             self.canSensorLaunchBtn.setText("Start CAN")
+            self.canSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.canSensorLaunched = not self.canSensorLaunched
 
 
@@ -430,10 +454,12 @@ class PlotHandler(object):
             self.launchTF.start()
             rospy.loginfo(launchStr + " started")
             self.tfSensorLaunchBtn.setText("Stop TF")
+            self.tfSensorLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchTF.shutdown()
             rospy.loginfo("TF stopped.....")
             self.tfSensorLaunchBtn.setText("Start TF")
+            self.tfSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.tfLaunched = not self.tfLaunched
 
     def startAllSensorClicked(self):
@@ -445,10 +471,12 @@ class PlotHandler(object):
             self.launchAS.start()
             rospy.loginfo(launchStr + " started")
             self.allSensorLaunchBtn.setText("Stop AllSensor")
+            self.allSensorLaunchBtn.setStyleSheet("background-color: white")
         else:
             self.launchAS.shutdown()
             rospy.loginfo("All sensor stopped.....")
             self.allSensorLaunchBtn.setText("Start AllSensor")
+            self.allSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.allSensorLaunched = not self.allSensorLaunched
 
     def loadCsvClicked(self):
@@ -460,10 +488,12 @@ class PlotHandler(object):
             self.launchLC.start()
             rospy.loginfo(launchStr + " started")
             self.loadWaypointBtn.setText("UnLoad waypoints")
+            self.loadWaypointBtn.setStyleSheet("color: rgb(224, 166, 58)")
         else:
             self.launchLC.shutdown()
             rospy.loginfo("waypoint unloaded")
             self.loadWaypointBtn.setText("Load waypoints")
+            self.loadWaypointBtn.setStyleSheet("color: rgb(200, 200, 200)")
         self.waypointLoaded = not self.waypointLoaded
 
     def saveCsvClicked(self):
@@ -481,10 +511,12 @@ class PlotHandler(object):
             rospy.loginfo(launchStr + " started")
             rospy.loginfo("waypoint saving started")
             self.saveWaypointBtn.setText("Finish waypoints")
+            self.saveWaypointBtn.setStyleSheet("color: rgb(224, 166, 58)")
         else:
             self.launchSC.shutdown()
             rospy.loginfo("waypoint saving finished")
-            self.saveWaypointBtn.setText("Save saveing wayp")
+            self.saveWaypointBtn.setText("Save waypoints")
+            self.saveWaypointBtn.setStyleSheet("color: rgb(200, 200, 200)")
         self.waypointSaving = not self.waypointSaving    
 
     def selectCsvClicked(self):
