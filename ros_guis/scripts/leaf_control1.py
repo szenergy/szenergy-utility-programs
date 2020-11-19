@@ -333,7 +333,7 @@ class PlotHandler(object):
             self.launchNoS = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
             self.launchNoS.start()
             rospy.loginfo(launchStr + " started")
-            self.novaSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
+            self.novaSensorLaunchBtn.setStyleSheet("background-color: white")
             self.novaSensorLaunchBtn.setText("Stop Nova")
         else:
             self.launchNoS.shutdown()
@@ -483,7 +483,7 @@ class PlotHandler(object):
         if self.waypointLoaded is False:
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
             roslaunch.configure_logging(uuid)
-            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/demo.waypoint.follow.launch")
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/waypoint.no.mpc.launch")
             self.launchLC = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
             self.launchLC.start()
             rospy.loginfo(launchStr + " started")
