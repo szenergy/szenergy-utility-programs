@@ -54,7 +54,7 @@ class PlotHandler():
         self.state = None
         self.widg2 = pg.PlotWidget(title="widg2 (bottom)")
         self.widg2.setAspectLocked(True)
-        self.pltBlue = pg.ScatterPlotItem(size = 10, pen = pg.mkPen(None), brush = blueB)
+        self.pltBlue = ScatterPlotItem(size = 10, pen = pg.mkPen(None), brush = blueB) # instead of pg.ScatterPlotItem use the override ScatterPlotItem
         self.pltRed = pg.ScatterPlotItem(size = 10, pen = pg.mkPen(None), brush = redB)
         self.widg2.showGrid(x=True, y=True)
         self.widg2.addItem(self.pltBlue)
@@ -101,6 +101,14 @@ class PlotHandler():
             data = pd.read_csv(str(filenames[0])) 
             self.pltRed.setPoints(np.asarray(data.x), np.asarray(data.y))
             self.textSpeedArray = np.empty(len(np.asarray(data.x)), dtype=object)
+
+class ScatterPlotItem(pg.ScatterPlotItem):
+    def mousePressEvent(self, ev):
+        if ev.button() == qtgqt.QtCore.Qt.LeftButton:
+            x = np.asarray([ev.pos().x()])
+            y = np.asarray([ev.pos().y()])
+            #print("Pressed: %.2f %.2f" % (x, y))
+            self.addPoints(x, y)
 
 if __name__ == "__main__":
     import sys
