@@ -14,8 +14,8 @@ class UdpJoystickServer:
     def __init__(self, port):
         self.port = port
         self.controller_state = self.start_controller_state
-        self.pub_tw = rospy.Publisher("vehicle_cmd", auwmsg.VehicleCmd, queue_size=10)
-        rospy.loginfo("Publishing vehicle_cmd [autoware_msgs/VehicleCmd]")
+        self.pub_tw = rospy.Publisher("ctrl_cmd", auwmsg.ControlCommand, queue_size=10)
+        rospy.loginfo("Publishing ctrl_cmd [autoware_msgs/ControlCommand]")
 
     def start_server(self):
         thread = threading.Thread(target = self.recieve_msgs)
@@ -35,7 +35,7 @@ class UdpJoystickServer:
         #s[4:8]
         #s[8:12]
         #s[12:16]
-        msg_aw = auwmsg.VehicleCmd()
+        msg_aw = auwmsg.ControlCommand()
         cnt = 1500
         div = 500
         multiply = 1.0
@@ -49,9 +49,8 @@ class UdpJoystickServer:
                         m3 = (float(str(msg)[8:12])  - cnt) / div * multiply
                         m4 = (float(str(msg)[12:16]) - cnt) / div * multiply
                         self.controller_state = np.array([m1, m2, m3, m4])
-                        msg_aw.header.stamp = rospy.Time.now()
-                        msg_aw.twist_cmd.twist.linear.x = m4
-                        msg_aw.twist_cmd.twist.angular.z = m3
+                        msg_aw.linear_velocity = m4
+                        msg_aw.steering_angle = m3
                         self.pub_tw.publish(msg_aw)
                         #rospy.loginfo(self.controller_state)
                     except (SyntaxError,ValueError):

@@ -10,7 +10,12 @@ Download and `catkin build` the `udp_joystick_ros`. (Don't forget to source).
 ### Step 3.
 Set the IP-s and ports and run both the App and the ROS package. The default port is `50505`, but you can change it.
 ```
+rosrun udp_joystick_ros control_simulator.py
 rosrun udp_joystick_ros control_vehicle.py
 rosrun udp_joystick_ros control_vehicle.py _udp_port:=50506
 ```
-This will publish a ROS topic `/cmd_todo` TODO.
+This will publish a ROS topic eg with the following name and type:
+```
+/ctrl_cmd       [autoware_msgs/ControlCommand]
+/vehicle_cmd    [autoware_msgs/VehicleCmd]
+```
