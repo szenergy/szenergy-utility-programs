@@ -16,6 +16,6 @@ rosrun udp_joystick_ros control_vehicle.py _udp_port:=50506
 ```
 This will publish a ROS topic eg with the following name and type:
 ```
-/ctrl_cmd       [autoware_msgs/ControlCommand]
+/ctrl_cmd       [autoware_msgs/ControlCommandStamped]
 /vehicle_cmd    [autoware_msgs/VehicleCmd]
 ```
