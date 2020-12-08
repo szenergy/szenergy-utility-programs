@@ -64,6 +64,8 @@ class PlotHandler(object):
         self.veloLeftSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start left Velodyne")
         self.veloRightSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start right Velodyne")
         self.canSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start CAN")
+        self.radarSensorLaunchBtn = qtgqt.QtGui.QPushButton("Start Radar")
+        self.mpcOnOffBtn = qtgqt.QtGui.QPushButton("Disable MPC")
         self.temporaryLaunchBtn = qtgqt.QtGui.QPushButton("Start temporary")
         self.loadWaypointBtn = qtgqt.QtGui.QPushButton("Load waypoints")
         self.saveWaypointBtn = qtgqt.QtGui.QPushButton("Save waypoints")
@@ -89,7 +91,9 @@ class PlotHandler(object):
         self.veloLeftSensorLaunched = False
         self.veloRightSensorLaunched = False
         self.canSensorLaunched = False
+        self.radarSensorLaunched = False
         self.temporaryLaunched = False
+        self.mpcFollow = True
         widg1def = pg.LayoutWidget()
         widg1def.setStyleSheet("background-color: rgb(40, 44, 52); color: rgb(171, 178, 191);")
         dock1def.setStyleSheet("background-color: rgb(18, 20, 23);")
@@ -165,7 +169,9 @@ class PlotHandler(object):
         self.ousterRightSensorLaunchBtn.clicked.connect(self.ousterRightSensorClicked)
         self.veloLeftSensorLaunchBtn.clicked.connect(self.veloLeftSensorClicked)
         self.veloRightSensorLaunchBtn.clicked.connect(self.veloRightSensorClicked)        
-        self.canSensorLaunchBtn.clicked.connect(self.canSensorClicked)        
+        self.canSensorLaunchBtn.clicked.connect(self.canSensorClicked)
+        self.radarSensorLaunchBtn.clicked.connect(self.radarSensorClicked)
+        self.mpcOnOffBtn.clicked.connect(self.mpcOnOffBtnClicked)
         self.temporaryLaunchBtn.clicked.connect(self.temporaryClicked)
         self.loadWaypointBtn.clicked.connect(self.loadCsvClicked)
         self.saveWaypointBtn.clicked.connect(self.saveCsvClicked)
@@ -192,6 +198,8 @@ class PlotHandler(object):
         widg2oth.addWidget(self.ousterLeftSensorLaunchBtn, row = 3, col = 2)
         widg2oth.addWidget(self.ousterRightSensorLaunchBtn, row = 3, col = 3)
         widg2oth.addWidget(self.canSensorLaunchBtn, row = 4, col = 1)
+        widg2oth.addWidget(self.radarSensorLaunchBtn, row = 5, col = 1)
+        widg2oth.addWidget(self.mpcOnOffBtn, row = 5, col = 3)
         widg2oth.addWidget(self.veloLeftSensorLaunchBtn, row = 4, col = 2)
         widg2oth.addWidget(self.veloRightSensorLaunchBtn, row = 4, col = 3)
         widg2oth.addWidget(self.temporaryLaunchBtn, row = 5, col = 2)
@@ -444,6 +452,33 @@ class PlotHandler(object):
             self.canSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
         self.canSensorLaunched = not self.canSensorLaunched
 
+    def radarSensorClicked(self):
+        if self.radarSensorLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/sensory/radar_continental.launch")
+            self.launchCAN = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchCAN.start()
+            rospy.loginfo(launchStr + " started")
+            self.radarSensorLaunchBtn.setText("Stop Radar")
+            self.radarSensorLaunchBtn.setStyleSheet("background-color: white")
+        else:
+            self.launchCAN.shutdown()
+            rospy.loginfo("CAN stopped.....")
+            self.radarSensorLaunchBtn.setText("Start Radar")
+            self.radarSensorLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
+        self.radarSensorLaunched = not self.radarSensorLaunched
+
+    def mpcOnOffBtnClicked(self):
+        if self.mpcFollow is False:
+            self.mpcOnOffBtn.setText("Disable MPC")
+            self.mpcOnOffBtn.setStyleSheet("background-color: rgb(16, 200, 166)")
+        else:
+            self.mpcOnOffBtn.setText("Enable MPC")
+            self.mpcOnOffBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
+        self.mpcFollow = not self.mpcFollow
+        print(self.mpcFollow)
+
 
     def startTFClicked(self):
         if self.tfLaunched is False:
@@ -483,7 +518,10 @@ class PlotHandler(object):
         if self.waypointLoaded is False:
             uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
             roslaunch.configure_logging(uuid)
-            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/waypoint.no.mpc.launch")
+            if self.mpcFollow is False:
+                launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/waypoint.no.mpc.launch")
+            else:
+                launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/demo.waypoint.follow.launch")
             self.launchLC = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
             self.launchLC.start()
             rospy.loginfo(launchStr + " started")
