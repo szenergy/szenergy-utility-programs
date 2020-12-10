@@ -80,13 +80,13 @@ class PlotHandler():
             data = pd.read_csv(str(filenames[0])) 
             self.pltBlue.setPoints(np.asarray(data.x), np.asarray(data.y))
             self.textSpeedArray = np.empty(len(np.asarray(data.x)), dtype=object)
-            """
+            #"""
             for i in range(len(np.asarray(data.x))):
                 self.textSpeedArray[i] = pg.TextItem(text = "", color = (200, 200, 200))
                 self.textSpeedArray[i].setText("%.1f" % data.velocity[i])
                 self.textSpeedArray[i].setPos(np.asarray(data.x)[i], np.asarray(data.y)[i])
                 self.widg2.addItem(self.textSpeedArray[i])
-            """
+            #"""
 
 
     def selectCsv2Clicked(self):
@@ -103,8 +103,17 @@ class PlotHandler():
             self.textSpeedArray = np.empty(len(np.asarray(data.x)), dtype=object)
 
 class ScatterPlotItem(pg.ScatterPlotItem):
+    # override the default mousePressEvent
     def mousePressEvent(self, ev):
         if ev.button() == qtgqt.QtCore.Qt.LeftButton:
+            pts = self.pointsAt(ev.pos())
+            if len(pts) > 0:
+                self.ptsClicked = pts
+                ev.accept()
+                self.sigClicked.emit(self, self.ptsClicked)
+            else:
+                ev.ignore()
+        elif ev.button() == qtgqt.QtCore.Qt.RightButton:
             x = np.asarray([ev.pos().x()])
             y = np.asarray([ev.pos().y()])
             #print("Pressed: %.2f %.2f" % (x, y))
