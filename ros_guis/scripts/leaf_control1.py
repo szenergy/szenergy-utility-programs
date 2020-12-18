@@ -5,7 +5,10 @@ import std_msgs.msg as rosmsg
 import nav_msgs.msg as navmsg
 import geometry_msgs.msg as geomsg
 import sensor_msgs.msg as senmsg
-import novatel_gps_msgs.msg as novamsg
+try:
+    import novatel_gps_msgs.msg as novamsg
+except:
+    None
 import autoware_msgs.msg as autowmsgs
 import numpy as np
 import pyqtgraph as pg
@@ -680,7 +683,11 @@ class LeafSubscriber(object):
         self.p2 = rospy.Subscriber("/gps/duro/current_pose", geomsg.PoseStamped, self.duroPoseCallBack)
         self.p3 = rospy.Subscriber("/gps/nova/current_pose", geomsg.PoseStamped, self.novaPoseCallBack)
         self.p4 = rospy.Subscriber("/gps/duro/status_string", rosmsg.String, self.duroRtkStatusCallBack)
-        self.p5 = rospy.Subscriber("/gps/nova/bestvel", novamsg.NovatelVelocity, self.novaRtkStatusCallback)
+        try:
+            self.p5 = rospy.Subscriber("/gps/nova/bestvel", novamsg.NovatelVelocity, self.novaRtkStatusCallback)
+        except:
+            rospy.logwarn("no novatel_gps_msgs.msg custom messages built")
+            self.nova_rtk = "NoNovaCustomMsg"
         self.p6 = rospy.Subscriber("/vehicle_status", autowmsgs.VehicleStatus, self.vehicleStatusCallback)
     
     def unregisterPose(self):
