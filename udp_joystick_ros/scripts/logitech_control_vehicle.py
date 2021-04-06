@@ -48,10 +48,10 @@ class GamePadJoystick:
 
     def loop(self):
         msg_aw = auwmsg.ControlCommandStamped()
-        r = rospy.Rate(20) # 20hz
+        r = rospy.Rate(100) # 100hz
         while(not self._stop.isSet()):
             if self.speed_j >= 0.001:
-                msg_aw.cmd.linear_velocity = self.speed_j * 20
+                msg_aw.cmd.linear_velocity = self.speed_j * 10 # max 10 km/h
             else:
                 msg_aw.cmd.linear_velocity = 0.0
             msg_aw.cmd.steering_angle = self.angl_j * 0.5
