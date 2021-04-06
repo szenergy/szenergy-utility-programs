@@ -30,6 +30,7 @@ class GamePadJoystick:
         rospy.loginfo("Game pad based publishing: ctrl_cmd [autoware_msgs/ControlCommandStamped]")
         self.speed_j = 0.0
         self.angl_j = 0.0
+        self.publish_ctrl_cmd = True
 
     def start_callback(self):
         self.sub_joy = rospy.Subscriber("joy", sensmsg.Joy, self.joy_callback)
@@ -56,12 +57,21 @@ class GamePadJoystick:
             msg_aw.cmd.steering_angle = self.angl_j * 0.5
             msg_aw.header.frame_id = "logitech_game_pad"
             msg_aw.header.stamp = rospy.Time.now()
-            self.pub_tw.publish(msg_aw)
+            if self.publish_ctrl_cmd:
+                self.pub_tw.publish(msg_aw)
             r.sleep()
 
     def joy_callback(self, mgs_joy):
         self.speed_j = mgs_joy.axes[3]
         self.angl_j = mgs_joy.axes[0]
+        # buttons: [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0]  number 1 and 6 + 8 start publishing
+        # buttons: [0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0]  number 5 + 6 + 7 + 8 stop publishing
+        if mgs_joy.buttons[0] and mgs_joy.buttons[5] and mgs_joy.buttons[7]:
+            self.publish_ctrl_cmd = True
+            rospy.loginfo("Start publishing ctrl_cmd from logitech gamepad")
+        elif mgs_joy.buttons[4] and mgs_joy.buttons[5] and mgs_joy.buttons[6] and mgs_joy.buttons[7]:
+            self.publish_ctrl_cmd = False
+            rospy.loginfo("Stop publishing ctrl_cmd from logitech gamepad")    
 
 if __name__ == "__main__":
 
