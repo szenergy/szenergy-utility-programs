@@ -1,7 +1,7 @@
 # UDP Joystick Android-ROS interface 
 
 ## What is `udp_joystick_ros` package?
-This is a simple Android-ROS interface to control robots / simulators / vehicles from an Android-based touchscreen joystick.
+This is a simple Android-ROS interface to control robots / simulators / vehicles from an Android-based touchscreen joystick. (*Also the newer scripts support devices such as Logitech G920 and Logitech Cordless Rumblepad 2, so not everything is UDP-based, so the package name is not consistent, sorry*)
 ## Usage
 ### Step 1.
 Download UDP Joystick Android app from [Google Play Store](https://play.google.com/store/apps/details?id=com.denods.udpjoystick&hl=en&gl=US). This app is free and ad-free it only sends UPD packets to the destiination IP from the touchscreen-joystick.
@@ -20,6 +20,13 @@ This will publish a ROS topic eg with the following name and type:
 /vehicle_cmd    [autoware_msgs/VehicleCmd]
 ```
 
+## `control_simulator.py` and `control_vehicle.py`
 ![](img/udp01.svg)
+
+## `gamepad_control_vehicle.py`
+
 ![](img/joy01.svg)
+
+## `wheel_control_vehicle.py`
+
 ![](img/wheel01.svg)
