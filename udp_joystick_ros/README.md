@@ -19,3 +19,7 @@ This will publish a ROS topic eg with the following name and type:
 /ctrl_cmd       [autoware_msgs/ControlCommandStamped]
 /vehicle_cmd    [autoware_msgs/VehicleCmd]
 ```
+
+![](img/udp01.svg)
+![](img/joy01.svg)
+![](img/wheel01.svg)
