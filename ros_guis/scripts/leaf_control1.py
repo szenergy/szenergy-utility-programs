@@ -75,6 +75,7 @@ class PlotHandler(object):
         self.selectFileBtn = qtgqt.QtGui.QPushButton("...")
         self.selectFileBtn.setMaximumWidth(22)
         self.speedLabel = qtgqt.QtGui.QLabel(" **.* Km/h")
+        self.isAutonomLabel = qtgqt.QtGui.QLabel("-")
         self.angleLabel = qtgqt.QtGui.QLabel(" **.* rad")
         self.csvLabel = qtgqt.QtGui.QLabel("none"); self.csvLabel.setAlignment(pg.QtCore.Qt.AlignRight)
         self.csvTextbox = qtgqt.QtGui.QLineEdit()
@@ -105,6 +106,7 @@ class PlotHandler(object):
         self.duroRtkLabel.setStyleSheet("font-family: Monospace; font: 20pt; color: rgb(244, 166, 58)")
         self.angleLabel.setStyleSheet("font-family: Monospace; font: 20pt; color: rgb(200, 200, 200)")
         self.speedLabel.setStyleSheet("font-family: Monospace; font: 20pt; color: rgb(200, 200, 200)")
+        self.isAutonomLabel.setStyleSheet("font-family: Monospace; font: 20pt; color: rgb(200, 200, 200)")
         self.csvLabel.setStyleSheet("font: 10pt; color: rgb(244, 166, 58)")
         sickLabel = qtgqt.QtGui.QLabel("Sick:"); sickLabel.setStyleSheet("background-color: rgb(4, 4, 4);"); sickLabel.setAlignment(pg.QtCore.Qt.AlignRight); sickLabel.setFixedSize(50, 25)
         olhLabel = qtgqt.QtGui.QLabel("OusterLeft:"); olhLabel.setStyleSheet("background-color: rgb(4, 4, 4);"); olhLabel.setAlignment(pg.QtCore.Qt.AlignRight); olhLabel.setFixedSize(80, 25)
@@ -128,6 +130,7 @@ class PlotHandler(object):
         widg1def.addWidget(self.novaRtkLabel, row=2, col=7)
         widg1def.addWidget(self.speedLabel, row=3, col=2)
         widg1def.addWidget(self.angleLabel, row=3, col=4)
+        widg1def.addWidget(self.isAutonomLabel, row=4, col=4)
         widg1def.addWidget(self.pauseSensorReadClickedBtn, row=4, col=7)
         widg1def.addWidget(olhLabel, row=1, col=1)
         widg1def.addWidget(orhLabel, row=1, col=3)
@@ -235,6 +238,7 @@ class PlotHandler(object):
             self.novaRtkLabel.setText(self.leaf.nova_rtk)
             self.speedLabel.setText("%5.1f Km/h" % (self.leaf.leaf_speed * 3.6))
             self.angleLabel.setText("%5.3f rad" % (self.leaf.leaf_angl))
+            self.isAutonomLabel.setText(str(self.leaf.leaf_is_autonomous))
             self.ousterLefLabel.setText(self.leaf.ouster_lef_ok)
             self.ousterRigLabel.setText(self.leaf.ouster_rig_ok)
             self.sickOkLabel.setText(self.leaf.sick_ok)
@@ -640,6 +644,7 @@ class LeafSubscriber(object):
         self.iterator = 0
         self.stop_slow = False # unpaused
         self.p2 = self.p3 = self.p4 = self.p5 = self.p6 = None
+        self.leaf_is_autonomous = "|"
 
     def slowGetMsg(self):
         if self.iterator == 100: # exeecute only every 100th time
@@ -727,6 +732,12 @@ class LeafSubscriber(object):
     def vehicleStatusCallback(self, msg):
         self.leaf_angl = msg.angle
         self.leaf_speed = msg.speed
+        if msg.drivemode == 0: 
+            self.leaf_is_autonomous = "DRIVER"
+        elif msg.drivemode == 1:
+            self.leaf_is_autonomous = "AUTONOMOUS"
+        else:
+            self.leaf_is_autonomous = "UNDEF"
 
     def novaRtkStatusCallback(self, msg):
         self.nova_rtk = msg.velocity_type
