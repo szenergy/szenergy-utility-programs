@@ -72,6 +72,8 @@ class PlotHandler(object):
         self.temporaryLaunchBtn = qtgqt.QtGui.QPushButton("Start temporary")
         self.loadWaypointBtn = qtgqt.QtGui.QPushButton("Load waypoints")
         self.saveWaypointBtn = qtgqt.QtGui.QPushButton("Save waypoints")
+        self.carParamsBtn = qtgqt.QtGui.QPushButton("Publish car parameters")
+        self.imuLaunchBtn = qtgqt.QtGui.QPushButton("Start IMU")
         self.selectFileBtn = qtgqt.QtGui.QPushButton("...")
         self.selectFileBtn.setMaximumWidth(22)
         self.speedLabel = qtgqt.QtGui.QLabel(" **.* Km/h")
@@ -97,6 +99,8 @@ class PlotHandler(object):
         self.canSensorLaunched = False
         self.radarSensorLaunched = False
         self.temporaryLaunched = False
+        self.imuLaunched = False
+        self.carParamsLaunched = False
         self.mpcFollow = True
         widg1def = pg.LayoutWidget()
         widg1def.setStyleSheet("background-color: rgb(40, 44, 52); color: rgb(171, 178, 191);")
@@ -182,6 +186,8 @@ class PlotHandler(object):
         self.loadWaypointBtn.clicked.connect(self.loadCsvClicked)
         self.saveWaypointBtn.clicked.connect(self.saveCsvClicked)
         self.selectFileBtn.clicked.connect(self.selectCsvClicked)
+        self.carParamsBtn.clicked.connect(self.carParamsClicked)   
+        self.imuLaunchBtn.clicked.connect(self.startImuClicked)     
         
         self.tGps = pg.TextItem(text = "Gps", color = blue)
         self.tLeaf = pg.TextItem(text = "Leaf odom", color = red)
@@ -209,6 +215,8 @@ class PlotHandler(object):
         widg2oth.addWidget(self.veloLeftSensorLaunchBtn, row = 4, col = 2)
         widg2oth.addWidget(self.veloRightSensorLaunchBtn, row = 4, col = 3)
         widg2oth.addWidget(self.temporaryLaunchBtn, row = 5, col = 2)
+        widg2oth.addWidget(self.carParamsBtn, row = 6, col = 1)
+        widg2oth.addWidget(self.imuLaunchBtn, row = 6, col = 2)
 
         dock2oth.addWidget(widg2oth)
 
@@ -610,6 +618,37 @@ class PlotHandler(object):
         np.savetxt(f, data_to_save, fmt="%.8f", delimiter=",", newline=" ")
         f.write("\n")
         f.close()
+
+    def startImuClicked(self):
+        if self.imuLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("fsm_imu"), "launch/fsm9.launch")
+            self.launchImu = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchImu.start()
+            rospy.loginfo(launchStr + " started")
+            self.imuLaunchBtn.setText("Stop Imu")
+            self.imuLaunchBtn.setStyleSheet("background-color: white")
+        else:
+            self.launchImu.shutdown()
+            rospy.loginfo("Imu stopped.....")
+            self.imuLaunchBtn.setText("Start Imu")
+            self.imuLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
+        self.imuLaunched = not self.imuLaunched
+
+    def carParamsClicked(self):
+        if self.carParamsLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/sensory/car_parameters_leaf.launch")
+            self.launchcarParams = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchcarParams.start()
+            rospy.loginfo(launchStr + " started")
+            self.carParamsBtn.setText("car params set")
+            self.carParamsBtn.setStyleSheet("background-color: white")
+        
+
+
 
 class Point2D(object):
     x = 0; y = 0
