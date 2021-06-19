@@ -1,0 +1,31 @@
+detection:
+  lidar_detector:
+    cluster_detect_visualization_01: {objects_src_topic: /objects}
+lidar_euclidean_cluster_detect: {clip_max_height: 0.5, clip_min_height: -1.3, cluster_merge_threshold: 1.5,
+  cluster_size_max: 2000, cluster_size_min: 5, clustering_distance: 0.85, clustering_distances: '[0.5,1.1,1.6,2.1,2.6]',
+  clustering_ranges: '[15,30,45,60]', downsample_cloud: false, keep_lane_left_distance: 5,
+  keep_lane_right_distance: 5, keep_lanes: false, leaf_size: 0.1, output_frame: right_os1/os1_lidar,
+  points_node: /points_no_ground, pose_estimation: false, remove_ground: false, remove_points_upto: 0,
+  use_diffnormals: false, use_gpu: true, use_multiple_thres: false}
+localizer: velodyne
+ray_ground_filter: {base_frame: right_os1/os1_sensor, clipping_height: -0.34, concentric_divider_distance: 0.01,
+  general_max_slope: 17, ground_point_topic: /points_ground, input_point_topic: /right_os1/os1_cloud_node/points,
+  local_max_slope: 17, min_height_threshold: 0.05, min_point_distance: 1.85, no_ground_point_topic: /points_no_ground,
+  radial_divider_angle: 1.04, reclass_distance_threshold: 0.2}
+rosdistro: 'melodic
+
+  '
+roslaunch:
+  uris: {host_192_168_1_5__33389: 'http://192.168.1.5:33389/', host_192_168_1_5__35979: 'http://192.168.1.5:35979/',
+    host_192_168_1_5__40793: 'http://192.168.1.5:40793/'}
+rosversion: '1.14.3
+
+  '
+run_id: 4f96d8dc-0444-11e8-affb-00044bcb9866
+tf_pitch: 0.0
+tf_roll: 0.0
+tf_x: 1.2
+tf_y: 0.0
+tf_yaw: 0.0
+tf_z: 2.0
+use_sim_time: false
