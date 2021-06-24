@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="drivemode_sound" type="velotype_sound.py" name="velotype_novatel_sound"/> 
+  <node pkg="drivemode_sound" type="play_sound_sub.py" name="autonomous_sound"/> 
+</launch>
