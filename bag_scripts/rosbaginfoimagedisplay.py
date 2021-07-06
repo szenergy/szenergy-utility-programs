@@ -80,4 +80,4 @@ if inp < 0: # if -1 save as image
     for x in range(len(rosbags)):
         create_rosbag_plot(rosbags, x, "save")
 else: # display rosbag info with matplotlib
-    create_rosbag_plot(rosbags, inp, "save")
+    create_rosbag_plot(rosbags, inp, "display")
