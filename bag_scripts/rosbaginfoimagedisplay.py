@@ -20,13 +20,17 @@ def create_rosbag_plot(rosbags, x, save_or_disp):
     bridge = CvBridge()
     count = 0
     cv_img = None
-    for topic, msg, t in bag.read_messages(topics=['/zed_node/left/image_rect_color/compressed', '/current_pose']):
+    for topic, msg, t in bag.read_messages(topics=['/zed_node/left/image_rect_color/compressed', '/zed_node/rgb/image_rect_color', '/current_pose']):
         if topic == '/current_pose':
             pose_curr.x.append(msg.pose.position.x)
             pose_curr.y.append(msg.pose.position.y)
         if topic == '/zed_node/left/image_rect_color/compressed':
             if count == 0:
                 cv_img = bridge.compressed_imgmsg_to_cv2(msg, desired_encoding="passthrough")
+                count += 1
+        if topic == '/zed_node/rgb/image_rect_color':
+            if count == 0:
+                cv_img = bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
                 count += 1
 
     px = 1/plt.rcParams['figure.dpi']  # pixel in inches
@@ -76,4 +80,4 @@ if inp < 0: # if -1 save as image
     for x in range(len(rosbags)):
         create_rosbag_plot(rosbags, x, "save")
 else: # display rosbag info with matplotlib
-    create_rosbag_plot(rosbags, inp, "display")
+    create_rosbag_plot(rosbags, inp, "save")
