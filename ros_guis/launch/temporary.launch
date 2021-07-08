@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launch>
-  <node pkg="nissan_bringup" type="current_pose_from_tf.py" name="current_pose_from_tf"/> <!-- temporary fix TODO: replace with the c++ version-->
+  <node pkg="nissan_bringup" type="current_pose_from_tf" name="current_pose_from_tf"/> 
   <node pkg="topic_tools" type="relay" name="cmd_relay" args="/ctrl_raw /ctrl_cmd" />
 </launch>

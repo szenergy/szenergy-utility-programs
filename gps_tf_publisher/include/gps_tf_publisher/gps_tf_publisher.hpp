@@ -36,7 +36,7 @@ protected:
 
     void initRosPublishers()
     {
-    	pub_current_pose = nh->advertise<geometry_msgs::PoseStamped>("/gnss_pose", 10);
+    	pub_current_pose = nh->advertise<geometry_msgs::PoseStamped>("/gnss_pose", 20);
 		ROS_INFO("ROS client successfully initialized");
     }
 public:
