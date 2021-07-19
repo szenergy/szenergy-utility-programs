@@ -75,7 +75,7 @@ for rosbag1 in rosbags:
     i += 1
 inp = input()
 
-if inp < 0: # if -1 save as image
+if int(inp) < 0: # if -1 save as image
     print("Saving images...")
     for x in range(len(rosbags)):
         create_rosbag_plot(rosbags, x, "save")
