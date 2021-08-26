@@ -21,6 +21,7 @@ import sensor_msgs.msg as sensmsg
 import numpy as np
 import time
 import threading
+import math
 
 class GamePadJoystick:
     start_controller_state = np.array([0, 0, 0, 0])
@@ -29,8 +30,18 @@ class GamePadJoystick:
         self.pub_tw = rospy.Publisher("ctrl_cmd", auwmsg.ControlCommandStamped, queue_size=10)
         rospy.loginfo("Wheel based publishing: ctrl_cmd [autoware_msgs/ControlCommandStamped]")
         self.speed_j = 0.0
+        self.unfiltspeed_prev = 0.0
+        self.unfiltspeed = 0.0
+        self.filtspeed_prev = 0.0
+        self.filtspeed = 0.0
+        self.diff = 0.0
         self.angl_j = 0.0
         self.publish_ctrl_cmd = True
+        self.pubrate = 20 # 20hz
+        self.downslope1sec = 2 / float(self.pubrate) # maximum amount of down km/h slope in one sec 
+        self.upslope1sec = 10 / float(self.pubrate) # maximum amount of down km/h slope in one sec 
+        rospy.loginfo("downslope at 1 sec is %.1f km/h", self.downslope1sec * self.pubrate)
+        rospy.loginfo("  upslope at 1 sec is %.1f km/h", self.upslope1sec * self.pubrate)
 
     def start_callback(self):
         self.sub_joy = rospy.Subscriber("joy", sensmsg.Joy, self.joy_callback)
@@ -48,10 +59,28 @@ class GamePadJoystick:
 
     def loop(self):
         msg_aw = auwmsg.ControlCommandStamped()
-        r = rospy.Rate(20) # 20hz
+        r = rospy.Rate(self.pubrate) 
+        downslope = False
+        upslope = False
         while(not self._stop.isSet()):
             if self.speed_j >= 0.001:
-                msg_aw.cmd.linear_velocity = self.speed_j * 10 # max 10 km/h
+                self.unfiltspeed = self.speed_j * 20 # max 20 km/h
+                self.diff = self.unfiltspeed - self.unfiltspeed_prev
+                if self.diff < -0.1:
+                    downslope = True
+                if downslope == True:
+                    self.filtspeed = self.filtspeed_prev - self.downslope1sec
+                    # if filtered and unfiltered speed is close end the downslope
+                    if self.filtspeed - self.unfiltspeed < 1.5:
+                        downslope = False
+                elif downslope == False:
+                    self.filtspeed = self.unfiltspeed
+                if self.filtspeed < 0: 
+                    self.filtspeed = 0
+                msg_aw.cmd.linear_velocity = self.filtspeed
+                msg_aw.cmd.linear_acceleration = self.unfiltspeed
+                self.filtspeed_prev = self.filtspeed
+                self.unfiltspeed_prev = self.unfiltspeed
             else:
                 msg_aw.cmd.linear_velocity = 0.0
             msg_aw.cmd.steering_angle = self.angl_j * 0.5
@@ -71,7 +100,7 @@ class GamePadJoystick:
             rospy.loginfo("Start publishing ctrl_cmd from logitech wheel")
         elif mgs_joy.buttons[1] and mgs_joy.buttons[5]:
             self.publish_ctrl_cmd = False
-            rospy.loginfo("Stop publishing ctrl_cmd from logitech wheel")    
+            rospy.loginfo("Stop publishing ctrl_cmd from logitech wheel")
 
 if __name__ == "__main__":
 
