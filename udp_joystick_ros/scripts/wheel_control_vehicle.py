@@ -36,9 +36,10 @@ class GamePadJoystick:
         self.filtspeed = 0.0
         self.diff = 0.0
         self.angl_j = 0.0
+        self.brake = 0.0
         self.publish_ctrl_cmd = True
         self.pubrate = 20 # 20hz
-        self.downslope1sec = 2 / float(self.pubrate) # maximum amount of down km/h slope in one sec 
+        self.downslope1sec = 1 / float(self.pubrate) # maximum amount of down km/h slope in one sec 
         self.upslope1sec = 10 / float(self.pubrate) # maximum amount of down km/h slope in one sec 
         rospy.loginfo("downslope at 1 sec is %.1f km/h", self.downslope1sec * self.pubrate)
         rospy.loginfo("  upslope at 1 sec is %.1f km/h", self.upslope1sec * self.pubrate)
@@ -63,26 +64,28 @@ class GamePadJoystick:
         downslope = False
         upslope = False
         while(not self._stop.isSet()):
-            if self.speed_j >= 0.001:
+            if self.speed_j >= 0.0:
                 self.unfiltspeed = self.speed_j * 20 # max 20 km/h
-                self.diff = self.unfiltspeed - self.unfiltspeed_prev
-                if self.diff < -0.1:
+                self.deceleration = self.brake * (4 /float(self.pubrate))   # fekezes 4 (km/h)/sec             
+                
+                if self.unfiltspeed < self.unfiltspeed_prev:
                     downslope = True
                 if downslope == True:
-                    self.filtspeed = self.filtspeed_prev - self.downslope1sec
+                    self.filtspeed = self.filtspeed_prev - self.downslope1sec - self.deceleration
                     # if filtered and unfiltered speed is close end the downslope
-                    if self.filtspeed - self.unfiltspeed < 1.5:
+                    if self.filtspeed - self.unfiltspeed < 0.1:
                         downslope = False
+
                 elif downslope == False:
-                    self.filtspeed = self.unfiltspeed
+                    self.filtspeed = self.unfiltspeed - self.deceleration
                 if self.filtspeed < 0: 
                     self.filtspeed = 0
                 msg_aw.cmd.linear_velocity = self.filtspeed
                 msg_aw.cmd.linear_acceleration = self.unfiltspeed
                 self.filtspeed_prev = self.filtspeed
                 self.unfiltspeed_prev = self.unfiltspeed
-            else:
-                msg_aw.cmd.linear_velocity = 0.0
+            # else:
+            #     msg_aw.cmd.linear_velocity = 0.0
             msg_aw.cmd.steering_angle = self.angl_j * 0.5
             msg_aw.header.frame_id = "logitech_wheel"
             msg_aw.header.stamp = rospy.Time.now()
@@ -91,8 +94,12 @@ class GamePadJoystick:
             r.sleep()
 
     def joy_callback(self, mgs_joy):
-        self.speed_j = mgs_joy.axes[1]
+        self.speed_j = (mgs_joy.axes[1] +1)/2
         self.angl_j = mgs_joy.axes[0]
+        #if mgs_joy.axes[2] !=0:
+        self.brake = (mgs_joy.axes[2]+1)*(1/0.27)     # -1 tol -0.73 tartomany
+        if (mgs_joy.axes[2]+1)*(1/0.27) > 1:
+            self.brake = 1.0 
         # buttons: [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] A + RB start publishing
         # buttons: [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] B + LB stop publishing
         if mgs_joy.buttons[0] and mgs_joy.buttons[4]:
