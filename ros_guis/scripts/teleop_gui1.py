@@ -81,26 +81,29 @@ class PlotHandler(object):
         self.wright2.addItem(self.plot_right2)
         self.dright2.addWidget(self.wright2)
 
-        self.drawRedCircle(self.wleft2)
+        self.blueWheelHoriz = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(6, 106, 166), width=10))
+        self.wleft2.addItem(self.blueWheelHoriz)
+        self.blueWheelVertic = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(6, 106, 166), width=10))
+        self.wleft2.addItem(self.blueWheelVertic)
+        self.blueWheelText1 = pg.TextItem(text="-", color = blue)
+        self.wleft2.addItem(self.blueWheelText1)
         self.drawBlueCircle(self.wleft2)
 
+        self.drawRedCircle(self.wleft2)
         self.redWheelHoriz = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(200, 66, 66), width=10))
-        self.redWheelText2 = pg.TextItem(text="-", color = red)
+        self.redWheelText1 = pg.TextItem(text="-", color = red)
         self.wleft2.addItem(self.redWheelHoriz)
-        self.wleft2.addItem(self.redWheelText2)
+        self.wleft2.addItem(self.redWheelText1)
 
         self.redWheelVertic = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(200, 66, 66), width=10))
         self.wleft2.addItem(self.redWheelVertic)
 
-        self.blueWheelHoriz = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(6, 106, 166), width=10))
-        self.wleft2.addItem(self.blueWheelHoriz)
-        self.textZ2 = pg.TextItem(text="-", color = blue)
-        self.wleft2.addItem(self.textZ2)
 
         self.wleft2.setAspectLocked(True)
         self.win.show()
 
     def updateFirstPlot(self):
+        """
         try:
 
             self.plot_right2.addPoints(self.vehicle.wheel_actual_rad, self.vehicle.odom_data_y)
@@ -114,16 +117,27 @@ class PlotHandler(object):
             None
         except:
             None # todo
+        """
+        None
 
     def updateSecondPlot(self):
-        self.redWheelText2.setText("%.2f" % (self.vehicle.wheel_actual_rad))
-        self.redWheelText2.setPos(110 * np.cos(self.vehicle.wheel_actual_rad), 110 * np.sin(self.vehicle.wheel_actual_rad))
+        self.redWheelText1.setText("%.0f" % np.rad2deg(self.vehicle.wheel_actual_rad))
+        self.blueWheelText1.setText("%.0f" % np.rad2deg(self.vehicle.wheel_gamepa_rad))
+        self.redWheelText1.setPos(110 * np.cos(self.vehicle.wheel_actual_rad), 110 * np.sin(self.vehicle.wheel_actual_rad))
+        self.blueWheelText1.setPos(-120 * np.cos(self.vehicle.wheel_gamepa_rad), -120 * np.sin(self.vehicle.wheel_gamepa_rad))
         r1 = np.array([100 * np.cos(self.vehicle.wheel_actual_rad), -100 * np.cos(self.vehicle.wheel_actual_rad)], dtype = np.float).flatten()
         r2 = np.array([100 * np.sin(self.vehicle.wheel_actual_rad), -100 * np.sin(self.vehicle.wheel_actual_rad)], dtype = np.float).flatten()
         r0 = np.array([100 * np.cos(self.vehicle.wheel_actual_rad - np.math.pi / 2), 0.], dtype = np.float)
         r3 = np.array([100 * np.sin(self.vehicle.wheel_actual_rad - np.math.pi / 2), 0.], dtype = np.float)
         self.redWheelHoriz.setData(r1, r2)
         self.redWheelVertic.setData(r0, r3)
+        b1 = np.array([80 * np.cos(self.vehicle.wheel_gamepa_rad), -80 * np.cos(self.vehicle.wheel_gamepa_rad)], dtype = np.float).flatten()
+        b2 = np.array([80 * np.sin(self.vehicle.wheel_gamepa_rad), -80 * np.sin(self.vehicle.wheel_gamepa_rad)], dtype = np.float).flatten()
+        b0 = np.array([80 * np.cos(self.vehicle.wheel_gamepa_rad - np.math.pi / 2), 0.], dtype = np.float)
+        b3 = np.array([80 * np.sin(self.vehicle.wheel_gamepa_rad - np.math.pi / 2), 0.], dtype = np.float)
+        self.blueWheelHoriz.setData(b1, b2)
+        self.blueWheelVertic.setData(b0, b3)
+
 
     def updateLabels(self):
         self.accLabel.setText("x: %9.6f\ny: %9.6f\nz: %9.6f" % (self.vehicle.imu_acc_x, self.vehicle.imu_acc_y, self.vehicle.imu_acc_z))        
@@ -164,6 +178,7 @@ class TeleopSub(object):
 
     def wheelDegCallBack(self, msg_deg): 
         self.wheel_actual_rad = np.deg2rad(np.array([msg_deg.data]))
+        self.wheel_gamepa_rad = self.wheel_actual_rad +  (np.random.uniform(.2, 1.1) )
         self.odom_data_y = np.array([msg_deg.data])
         #print("odom: %.4f %.4f " % (msg.pose.pose.position.x, msg.pose.pose.position.y))
 
