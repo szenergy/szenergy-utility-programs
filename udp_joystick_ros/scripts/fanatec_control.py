@@ -18,6 +18,7 @@ import rospy
 import geometry_msgs.msg as geomsg
 import autoware_msgs.msg as auwmsg
 import sensor_msgs.msg as sensmsg
+import std_msgs.msg as stdmsg
 import numpy as np
 import time
 import threading
@@ -28,6 +29,9 @@ class GamePadJoystick:
 
     def __init__(self):
         self.pub_tw = rospy.Publisher("ctrl_cmd", auwmsg.ControlCommandStamped, queue_size=10)
+        self.pub_gas = rospy.Publisher("gas", stdmsg.Float32, queue_size=10)
+        self.pub_brake = rospy.Publisher("brake", stdmsg.Float32, queue_size=10)
+
         rospy.loginfo("Wheel based publishing: ctrl_cmd [autoware_msgs/ControlCommandStamped]")
         self.speed_j = 0.0
         self.unfiltspeed_prev = 0.0
@@ -93,6 +97,8 @@ class GamePadJoystick:
             msg_aw.header.stamp = rospy.Time.now()
             if self.publish_ctrl_cmd:
                 self.pub_tw.publish(msg_aw)
+                self.pub_gas.publish(self.speed_j)
+                self.pub_brake.publish(self.brake)
             r.sleep()
 
     def joy_pedal_callback(self, mgs_joy):
