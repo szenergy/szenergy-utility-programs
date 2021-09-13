@@ -37,7 +37,7 @@ class PlotHandler(object):
              
         self.win.setWindowTitle("Teleop plotter")
         self.win.setWindowIcon(qtgqt.QtGui.QIcon(self.rospack.get_path("ros_guis") + "/img/icon02.png"))
-        self.win.resize(600,800)
+        self.win.resize(1500,2160)
         self.win.move(0,0)
         self.win.setCentralWidget(self.area)
 
@@ -64,8 +64,8 @@ class PlotHandler(object):
         #self.wleft1.addWidget(self.clrBtn, row=2, col=0) # TODO 1
         self.wleft1.setStyleSheet("background-color: rgb(40, 44, 52); color: rgb(171, 178, 191);")
         self.dlefttop.setStyleSheet("background-color: rgb(18, 20, 23);")
-        self.speedLabel.setStyleSheet("font-family: Monospace; font: 30pt; background-color: rgb(44, 48, 56)")
-        self.isAutonomLabel.setStyleSheet("font: 30pt; background-color: rgb(200, 66, 66); color: rgb(44, 48, 56)")
+        self.speedLabel.setStyleSheet("font-family: Monospace; font: 120pt; background-color: rgb(0, 0, 0)")
+        self.isAutonomLabel.setStyleSheet("font: 120pt; background-color: rgb(200, 66, 66); color: rgb(44, 48, 56)")
         self.isAutonomLabel.setAlignment(pg.QtCore.Qt.AlignCenter)
         self.dlefttop.addWidget(self.wleft1)
         self.state = None
@@ -93,21 +93,21 @@ class PlotHandler(object):
         self.dright2.addWidget(self.wright2)
         """
 
-        self.blueWheelHoriz = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(6, 106, 166), width=10))
+        self.blueWheelHoriz = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(6, 106, 166), width=40))
         self.wleftbottom.addItem(self.blueWheelHoriz)
-        self.blueWheelVertic = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(6, 106, 166), width=10))
+        self.blueWheelVertic = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(6, 106, 166), width=40))
         self.wleftbottom.addItem(self.blueWheelVertic)
         self.blueWheelText1 = pg.TextItem(text="-", color = blue)
         self.wleftbottom.addItem(self.blueWheelText1)
         self.drawBlueCircle(self.wleftbottom)
 
         self.drawRedCircle(self.wleftbottom)
-        self.redWheelHoriz = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(200, 66, 66), width=10))
+        self.redWheelHoriz = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(200, 66, 66), width=40))
         self.redWheelText1 = pg.TextItem(text="-", color = red)
         self.wleftbottom.addItem(self.redWheelHoriz)
         self.wleftbottom.addItem(self.redWheelText1)
 
-        self.redWheelVertic = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(200, 66, 66), width=10))
+        self.redWheelVertic = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(200, 66, 66), width=40))
         self.wleftbottom.addItem(self.redWheelVertic)
 
 
@@ -117,13 +117,13 @@ class PlotHandler(object):
     def updateFirstPlot(self):
         self.isAutonomLabel.setText(str(self.vehicle.leaf_is_autonomous))
         if str(self.vehicle.leaf_is_autonomous) == "UNDEF":
-            self.isAutonomLabel.setStyleSheet("font: 30pt; background-color: rgb(244, 244, 160); color: rgb(44, 48, 56)")
+            self.isAutonomLabel.setStyleSheet("font: 120pt; background-color: rgb(244, 244, 160); color: rgb(44, 48, 56)")
         elif str(self.vehicle.leaf_is_autonomous) == "IN CAR DRIVER":
-            self.isAutonomLabel.setStyleSheet("font: 30pt; background-color: rgb(6, 106, 166); color: rgb(44, 48, 56)")
+            self.isAutonomLabel.setStyleSheet("font: 120pt; background-color: rgb(6, 106, 166); color: rgb(44, 48, 56)")
         elif str(self.vehicle.leaf_is_autonomous) == "YOU DRIVE":
-            self.isAutonomLabel.setStyleSheet("font: 30pt; background-color: rgb(200, 66, 66); color: rgb(44, 48, 56)")
+            self.isAutonomLabel.setStyleSheet("font: 120pt; background-color: rgb(200, 66, 66); color: rgb(44, 48, 56)")
         else:
-            self.isAutonomLabel.setStyleSheet("font: 30pt; background-color: rgb(200, 200, 200); color: rgb(44, 48, 56)")
+            self.isAutonomLabel.setStyleSheet("font: 120pt; background-color: rgb(200, 200, 200); color: rgb(44, 48, 56)")
 
         """
         try:
@@ -162,7 +162,7 @@ class PlotHandler(object):
 
 
     def updateLabels(self):
-        self.speedLabel.setText("actual: %3.1f km/h\nrefer : %3.1f km/h" % (self.vehicle.actual_speed, self.vehicle.ref_speed))        
+        self.speedLabel.setText("actual: %4.1f km/h\nrefer : %4.1f km/h" % (self.vehicle.actual_speed, self.vehicle.ref_speed))        
         #self.isAutonomLabel.setText("x: %9.6f\ny: %9.6f" % (self.vehicle.wheel_actual_rad, self.vehicle.odom_data_y))          
 
     def clear(self):
@@ -170,7 +170,7 @@ class PlotHandler(object):
         self.first_run = True
     
     def drawBlueCircle(self, to_plot):
-        circle = pg.ScatterPlotItem(size = 10, pen = pg.mkPen(None), brush = pg.mkBrush(6, 106, 166))
+        circle = pg.ScatterPlotItem(size = 40, pen = pg.mkPen(None), brush = pg.mkBrush(6, 106, 166))
         to_plot.addItem(circle)
         to_plot.setAspectLocked(lock = True, ratio = 1)
         x = np.sin(np.arange(0, np.pi*2, 0.01)) * 80
@@ -178,7 +178,7 @@ class PlotHandler(object):
         circle.addPoints(x, y)
 
     def drawRedCircle(self, to_plot):
-        circleB = pg.ScatterPlotItem(size = 10, pen = pg.mkPen(None), brush = pg.mkBrush(200, 66, 66))
+        circleB = pg.ScatterPlotItem(size = 40, pen = pg.mkPen(None), brush = pg.mkBrush(200, 66, 66))
         to_plot.addItem(circleB)
         x = np.sin(np.arange(0, np.pi*2, 0.01)) * 100
         y = np.cos(np.arange(0, np.pi*2, 0.01)) * 100
@@ -211,7 +211,7 @@ class TeleopSub(object):
         #self.ref_speed = self.actual_speed +  (np.random.uniform(.5, 4.1) ) # TODO
 
     def wheelDegCallBack(self, msg_deg): 
-        self.wheel_actual_rad = np.deg2rad(np.array([msg_deg.data]))
+        self.wheel_actual_rad = np.deg2rad(np.array([msg_deg.data])) * 19.68 # 19.68 wheel to steering ratio
         #self.wheel_gamepa_rad = self.wheel_actual_rad +  (np.random.uniform(.2, 0.5) ) # TODO
         self.odom_data_y = np.array([msg_deg.data])
         #print("odom: %.4f %.4f " % (msg.pose.pose.position.x, msg.pose.pose.position.y))
@@ -227,8 +227,8 @@ class TeleopSub(object):
             self.leaf_is_autonomous = "UNDEF"
 
     def vehicleCtrlCallback(self, msg_ctrl):
-        self.ref_speed = msg_ctrl.cmd.linear_velocity
-        self.wheel_gamepa_rad = msg_ctrl.cmd.steering_angle
+        self.ref_speed = msg_ctrl.cmd.linear_velocity 
+        self.wheel_gamepa_rad = msg_ctrl.cmd.steering_angle * 19.68 # 19.68 wheel to steering ratio
         #print(self.ref_speed, self.wheel_gamepa_rad)
 
 if __name__ == "__main__":
