@@ -74,7 +74,7 @@ class GamePadJoystick:
             
             if self.speed_j >= 0.0:
                 self.unfiltspeed = self.speed_j * 20 # max 20 km/h
-                self.deceleration = self.brake * (4 /float(self.pubrate))   # fekezes 4 (km/h)/sec 
+                self.deceleration = self.brake * (8 /float(self.pubrate))   # fekezes 8 (km/h)/sec 
                 
                 
                 if self.unfiltspeed < self.unfiltspeed_prev:
