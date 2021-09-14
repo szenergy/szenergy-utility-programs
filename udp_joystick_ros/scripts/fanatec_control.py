@@ -14,6 +14,7 @@ $ rosparam set joy_node/dev "/dev/input/js0"
 """
 
 
+from __future__ import division 
 import rospy
 import geometry_msgs.msg as geomsg
 import autoware_msgs.msg as auwmsg
@@ -25,12 +26,12 @@ import threading
 import math
 
 class GamePadJoystick:
-    start_controller_state = np.array([0, 0, 0, 0])
+    
 
     def __init__(self):
         self.pub_tw = rospy.Publisher("ctrl_cmd", auwmsg.ControlCommandStamped, queue_size=10)
-        self.pub_gas = rospy.Publisher("gas", stdmsg.Float32, queue_size=10)
-        self.pub_brake = rospy.Publisher("brake", stdmsg.Float32, queue_size=10)
+        # self.pub_gas = rospy.Publisher("gas", stdmsg.Float32, queue_size=10)
+        # self.pub_brake = rospy.Publisher("brake", stdmsg.Float32, queue_size=10)
 
         rospy.loginfo("Wheel based publishing: ctrl_cmd [autoware_msgs/ControlCommandStamped]")
         self.speed_j = 0.0
@@ -43,7 +44,7 @@ class GamePadJoystick:
         self.brake = 0.0
         self.publish_ctrl_cmd = True
         self.pubrate = 20 # 20hz
-        self.downslope1sec = 1 / float(self.pubrate) # maximum amount of down km/h slope in one sec 
+        self.downslope1sec = (1 / float(self.pubrate)) # maximum amount of down km/h slope in one sec 
         self.upslope1sec = 10 / float(self.pubrate) # maximum amount of down km/h slope in one sec 
         rospy.loginfo("downslope at 1 sec is %.1f km/h", self.downslope1sec * self.pubrate)
         rospy.loginfo("  upslope at 1 sec is %.1f km/h", self.upslope1sec * self.pubrate)
@@ -70,9 +71,11 @@ class GamePadJoystick:
         downslope = False
         upslope = False
         while(not self._stop.isSet()):
+            
             if self.speed_j >= 0.0:
                 self.unfiltspeed = self.speed_j * 20 # max 20 km/h
-                self.deceleration = self.brake * (4 /float(self.pubrate))   # fekezes 4 (km/h)/sec             
+                self.deceleration = self.brake * (4 /float(self.pubrate))   # fekezes 4 (km/h)/sec 
+                
                 
                 if self.unfiltspeed < self.unfiltspeed_prev:
                     downslope = True
@@ -97,13 +100,17 @@ class GamePadJoystick:
             msg_aw.header.stamp = rospy.Time.now()
             if self.publish_ctrl_cmd:
                 self.pub_tw.publish(msg_aw)
-                self.pub_gas.publish(self.speed_j)
-                self.pub_brake.publish(self.brake)
+                #self.pub_gas.publish(self.speed_j)
+                #self.pub_brake.publish(self.brake)
             r.sleep()
 
     def joy_pedal_callback(self, mgs_joy):
         self.speed_j = ((mgs_joy.axes[0] *(-1))+1)/2
-        self.brake = (mgs_joy.axes[1]*(-1))+1     # 1 tol 0-ig megy tartomany
+        if mgs_joy.axes[1] == 0:
+            self.brake= 0.0
+        else:
+            self.brake = (mgs_joy.axes[1]*(-1))+1     # 1 tol 0-ig megy tartomany
+        
         if self.brake > 1:
             self.brake = 1.0 
         # buttons: [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] A + RB start publishing
