@@ -37,7 +37,7 @@ class PlotHandler(object):
              
         self.win.setWindowTitle("Teleop plotter")
         self.win.setWindowIcon(qtgqt.QtGui.QIcon(self.rospack.get_path("ros_guis") + "/img/icon02.png"))
-        self.win.resize(300,400)
+        self.win.resize(300,300)
         self.win.setCentralWidget(self.area)
 
         self.dleftbottom = darea.Dock("left bottom", size = (500,400)) # size is only a suggestion
@@ -53,8 +53,8 @@ class PlotHandler(object):
         self.widgplot.showGrid(x=True, y=True)
         self.widgplot.addItem(self.plot_left2)
         self.dleftbottom.addWidget(self.widgplot)
-        #self.widgplot.hideAxis('bottom') # TODO 1
-        #self.widgplot.hideAxis('left') # TODO 1
+        self.widgplot.hideAxis('bottom') # TODO 1
+        self.widgplot.hideAxis('left') # TODO 1
         self.tcurr = pg.TextItem(text="Teleop", color = white)
         self.tstart = pg.TextItem(text="Start", color = red)
         self.blueWheelHoriz = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(6, 106, 166), width=8))
@@ -90,7 +90,7 @@ class PlotHandler(object):
 
         #self.widgplot.setAspectLocked(True)
         self.win.show()
-        self.win.move(400,200) # TODO 2
+        self.win.move(960,0) # TODO 2
         self.widgplot.setXRange(-150, 150, padding=0) # TODO 2
         self.widgplot.setYRange(-120, 180, padding=0) # TODO 2
 
@@ -120,17 +120,18 @@ class PlotHandler(object):
         r0 = np.array([100 * np.cos(self.vehicle.wheel_actual_rad - np.math.pi / 2), 0.], dtype = np.float)
         r3 = np.array([100 * np.sin(self.vehicle.wheel_actual_rad - np.math.pi / 2), 0.], dtype = np.float)
         xx = 20.0 # TODO  self.vehicle.actual_speed
-        pos = (xx * 10) - 100
+        posr = (self.vehicle.actual_speed * 10) - 100
+        posb = (self.vehicle.ref_speed * 10) - 100
         self.redSpeedText1.setText("%.0f" % self.vehicle.actual_speed)
-        self.redSpeedText1.setPos(pos + 10, 150)
-        self.blueSpeedText1.setText("%.0f" % self.vehicle.actual_speed)
-        self.blueSpeedText1.setPos(pos + 10, 130)
-        a1 = np.array([pos, -100.], dtype = np.float)
+        self.redSpeedText1.setPos(posr + 10, 150)
+        self.blueSpeedText1.setText("%.0f" % self.vehicle.ref_speed)
+        self.blueSpeedText1.setPos(posb + 10, 130)
+        a1 = np.array([posr, -100.], dtype = np.float)
         a2 = np.array([140.0, 140.], dtype = np.float)
         self.redSpeedBar.setData(a1, a2)
         self.redWheelHoriz.setData(r1, r2)
         self.redWheelVertic.setData(r0, r3)
-        b1 = np.array([pos, -100.], dtype = np.float)
+        b1 = np.array([posb, -100.], dtype = np.float)
         b2 = np.array([120.0, 120.], dtype = np.float)
         self.blueSpeedBar.setData(b1, b2)
 
