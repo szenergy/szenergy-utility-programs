@@ -48,6 +48,7 @@ class PlotHandler(object):
         self.speedLabel.setStyleSheet("font-family: Monospace; font: 30pt; background-color: rgb(0, 0, 0)")
         self.state = None
         self.widgplot = pg.PlotWidget() # TODO 1
+        self.widgplot.setBackground('w')
         self.widgplot.setAspectLocked(True)
         self.plot_left2 = pg.ScatterPlotItem(size=10, pen=pg.mkPen(None), brush=pg.mkBrush(6,106,166,255))
         self.widgplot.showGrid(x=True, y=True)
@@ -82,7 +83,7 @@ class PlotHandler(object):
         self.statusText1 = pg.TextItem(text="-", color = red, anchor=(0.5,0))
         self.widgplot.addItem(self.statusText1)  
         self.statusText1.setPos(0, 180)
-        
+        self.statusText1.setFont(qtgqt.QtGui.QFont('Sans Bold', 18, qtgqt.QtGui.QFont.Bold))
 
         self.redWheelVertic = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(200, 66, 66), width=8))
         self.widgplot.addItem(self.redWheelVertic)
@@ -93,24 +94,28 @@ class PlotHandler(object):
         self.win.move(960,0) # TODO 2
         self.widgplot.setXRange(-150, 150, padding=0) # TODO 2
         self.widgplot.setYRange(-120, 180, padding=0) # TODO 2
+        self.blinker = True
 
-    def updateFirstPlot(self):
+    def updateSlow(self):
         self.statusText1.setText(str(self.vehicle.leaf_is_autonomous))
-
-        None
-        """
-        self.isAutonomLabel.setText(str(self.vehicle.leaf_is_autonomous))
         if str(self.vehicle.leaf_is_autonomous) == "UNDEF":
-            self.isAutonomLabel.setStyleSheet("font: 30pt; background-color: rgb(244, 244, 160); color: rgb(44, 48, 56)")
+            self.blinker = not self.blinker
+            if self.blinker:
+                self.statusText1.setColor(qtgqt.QtGui.QColor(0, 40, 100))
+            else:
+                self.statusText1.setColor(qtgqt.QtGui.QColor(244, 244, 160))
         elif str(self.vehicle.leaf_is_autonomous) == "IN CAR DRIVER":
-            self.isAutonomLabel.setStyleSheet("font: 30pt; background-color: rgb(6, 106, 166); color: rgb(44, 48, 56)")
+            self.blinker = not self.blinker
+            if self.blinker:
+                self.statusText1.setColor(qtgqt.QtGui.QColor(0, 40, 100))
+            else:
+                self.statusText1.setColor(qtgqt.QtGui.QColor(150, 180, 240))
         elif str(self.vehicle.leaf_is_autonomous) == "YOU DRIVE":
-            self.isAutonomLabel.setStyleSheet("font: 30pt; background-color: rgb(200, 66, 66); color: rgb(44, 48, 56)")
+            self.statusText1.setColor(qtgqt.QtGui.QColor(20, 140, 70))
         else:
-            self.isAutonomLabel.setStyleSheet("font: 30pt; background-color: rgb(200, 200, 200); color: rgb(44, 48, 56)")
-        """
+            self.statusText1.setColor(qtgqt.QtGui.QColor(50, 60, 110))
 
-    def updateSecondPlot(self):
+    def updateFast(self):
         self.redWheelText1.setText("%.0f" % np.rad2deg(self.vehicle.wheel_actual_rad))
         self.blueWheelText1.setText("%.0f" % np.rad2deg(self.vehicle.wheel_gamepa_rad))
         self.redWheelText1.setPos(110 * np.cos(self.vehicle.wheel_actual_rad), 110 * np.sin(self.vehicle.wheel_actual_rad))
@@ -217,11 +222,11 @@ if __name__ == "__main__":
     ph = PlotHandler(vehSub)
     ph.initializePlot()
     timer1 = qtgqt.QtCore.QTimer()
-    timer1.timeout.connect(ph.updateSecondPlot)
+    timer1.timeout.connect(ph.updateFast)
     timer1.start(30)
     timer2 = qtgqt.QtCore.QTimer()
-    timer2.timeout.connect(ph.updateFirstPlot)
-    timer2.start(50)
+    timer2.timeout.connect(ph.updateSlow)
+    timer2.start(600)
     timer3 = qtgqt.QtCore.QTimer()
     timer3.timeout.connect(ph.updateLabels)
     timer3.start(30)
