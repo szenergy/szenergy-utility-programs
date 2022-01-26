@@ -74,6 +74,7 @@ class PlotHandler(object):
         self.saveWaypointBtn = qtgqt.QtGui.QPushButton("Save waypoints")
         self.carParamsBtn = qtgqt.QtGui.QPushButton("Publish car parameters")
         self.imuLaunchBtn = qtgqt.QtGui.QPushButton("Start IMU")
+        self.odomLaunchBtn = qtgqt.QtGui.QPushButton("Start Odom")
         self.selectFileBtn = qtgqt.QtGui.QPushButton("...")
         self.selectFileBtn.setMaximumWidth(22)
         self.speedLabel = qtgqt.QtGui.QLabel(" **.* Km/h")
@@ -101,6 +102,7 @@ class PlotHandler(object):
         self.temporaryLaunched = False
         self.imuLaunched = False
         self.carParamsLaunched = False
+        self.odomLaunched = False
         self.mpcFollow = True
         widg1def = pg.LayoutWidget()
         widg1def.setStyleSheet("background-color: rgb(40, 44, 52); color: rgb(171, 178, 191);")
@@ -187,7 +189,8 @@ class PlotHandler(object):
         self.saveWaypointBtn.clicked.connect(self.saveCsvClicked)
         self.selectFileBtn.clicked.connect(self.selectCsvClicked)
         self.carParamsBtn.clicked.connect(self.carParamsClicked)   
-        self.imuLaunchBtn.clicked.connect(self.startImuClicked)     
+        self.imuLaunchBtn.clicked.connect(self.startImuClicked) 
+        self.odomLaunchBtn.clicked.connect(self.startOdomClicked)    
         
         self.tGps = pg.TextItem(text = "Gps", color = blue)
         self.tLeaf = pg.TextItem(text = "Leaf odom", color = red)
@@ -217,6 +220,7 @@ class PlotHandler(object):
         widg2oth.addWidget(self.temporaryLaunchBtn, row = 5, col = 2)
         widg2oth.addWidget(self.carParamsBtn, row = 6, col = 1)
         widg2oth.addWidget(self.imuLaunchBtn, row = 6, col = 2)
+        widg2oth.addWidget(self.odomLaunchBtn, row = 6, col = 3)
 
         dock2oth.addWidget(widg2oth)
 
@@ -646,6 +650,24 @@ class PlotHandler(object):
             rospy.loginfo(launchStr + " started")
             self.carParamsBtn.setText("car params set")
             self.carParamsBtn.setStyleSheet("background-color: white")
+
+    def startOdomClicked(self):
+        if self.odomLaunched is False:
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            launchStr = os.path.join(self.rospack.get_path("nissan_bringup"), "launch/sensory/odom.launch")
+            self.launchodom = roslaunch.parent.ROSLaunchParent(uuid, [launchStr])
+            self.launchodom.start()
+            rospy.loginfo(launchStr + " started")
+            self.odomLaunchBtn.setText("Stop Odom")
+            self.odomLaunchBtn.setStyleSheet("background-color: white")
+        else:
+            self.launchodom.shutdown()
+            rospy.loginfo("Imu stopped.....")
+            self.odomLaunchBtn.setText("Start Odom")
+            self.odomLaunchBtn.setStyleSheet("background-color: rgb(40, 44, 52)")
+        self.odomLaunched = not self.odomLaunched
+
         
 
 
