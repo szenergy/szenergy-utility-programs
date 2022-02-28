@@ -52,9 +52,11 @@ class GamePadJoystick:
         while(not self._stop.isSet()):
             if self.speed_j >= 0.001:
                 msg_aw.cmd.linear_velocity = self.speed_j * 10 # max 10 km/h
+            elif self.speed_j <= -0.001:
+                msg_aw.cmd.linear_velocity = self.speed_j * 5  # max 5 km/h
             else:
                 msg_aw.cmd.linear_velocity = 0.0
-            msg_aw.cmd.steering_angle = self.angl_j * 0.5
+            msg_aw.cmd.steering_angle = self.angl_j * 0.15708       # +- 9 deg
             msg_aw.header.frame_id = "logitech_game_pad"
             msg_aw.header.stamp = rospy.Time.now()
             if self.publish_ctrl_cmd:
