@@ -64,16 +64,22 @@ class PlotHandler(object):
         self.widgplot.addItem(self.blueWheelVertic)
         self.blueWheelText1 = pg.TextItem(text="-", color = blue)
         self.widgplot.addItem(self.blueWheelText1)
-        self.drawBlueCircle(self.widgplot)
+        #self.drawBlueCircle(self.widgplot)
 
         self.blueSpeedBar = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(6, 106, 166), width=8))
         self.widgplot.addItem(self.blueSpeedBar)
 
-        self.drawRedCircle(self.widgplot)
+        #self.drawRedCircle(self.widgplot)
+        self.redWheelcircle = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(200, 66, 66), width=8))
         self.redWheelHoriz = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(200, 66, 66), width=8))
         self.redWheelText1 = pg.TextItem(text="-", color = red)
         self.widgplot.addItem(self.redWheelHoriz)
         self.widgplot.addItem(self.redWheelText1)
+        self.widgplot.addItem(self.redWheelcircle)
+        self.redWheelcircle.setData(np.sin(np.arange(0, np.pi*2, 0.01)) * 100,np.cos(np.arange(0, np.pi*2, 0.01)) * 100)
+        self.blueWheelcircle = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(6, 106, 166), width=8))
+        self.widgplot.addItem(self.blueWheelcircle)
+        self.blueWheelcircle.setData(np.sin(np.arange(0, np.pi*2, 0.01)) * 80,np.cos(np.arange(0, np.pi*2, 0.01)) * 80)
         self.redSpeedBar = pg.PlotCurveItem(pen=pg.mkPen(qtgqt.QtGui.QColor(200, 66, 66), width=8))
         self.widgplot.addItem(self.redSpeedBar)
         self.redSpeedText1 = pg.TextItem(text="-", color = red)
@@ -116,6 +122,7 @@ class PlotHandler(object):
             self.statusText1.setColor(qtgqt.QtGui.QColor(50, 60, 110))
 
     def updateFast(self):
+        
         self.redWheelText1.setText("%.0f" % np.rad2deg(self.vehicle.wheel_actual_rad))
         self.blueWheelText1.setText("%.0f" % np.rad2deg(self.vehicle.wheel_gamepa_rad))
         self.redWheelText1.setPos(110 * np.cos(self.vehicle.wheel_actual_rad), 110 * np.sin(self.vehicle.wheel_actual_rad))
@@ -153,7 +160,7 @@ class PlotHandler(object):
         #self.isAutonomLabel.setText("x: %9.6f\ny: %9.6f" % (self.vehicle.wheel_actual_rad, self.vehicle.odom_data_y))          
 
     def drawBlueCircle(self, to_plot):
-        circle = pg.ScatterPlotItem(size = 8, pen = pg.mkPen(None), brush = pg.mkBrush(6, 106, 166))
+        circle = pg.ScatterPlotItem(size = 8, pen =pg.mkPen(qtgqt.QtGui.QColor(200, 66, 66)), brush = pg.mkBrush(6, 106, 166))
         to_plot.addItem(circle)
         to_plot.setAspectLocked(lock = True, ratio = 1)
         x = np.sin(np.arange(0, np.pi*2, 0.01)) * 80
@@ -161,11 +168,16 @@ class PlotHandler(object):
         circle.addPoints(x, y)
 
     def drawRedCircle(self, to_plot):
-        circleB = pg.ScatterPlotItem(size = 8, pen = pg.mkPen(None), brush = pg.mkBrush(200, 66, 66))
+        circleB=pg.PlotCurveItem(size=8, pen = pg.mkPen(None), brush = pg.mkBrush(200, 66, 66))
+        #circleB = pg.ScatterPlotItem(size = 8, pen = pg.mkPen(None), brush = pg.mkBrush(200, 66, 66))
+        #x = np.sin(np.arange(0, np.pi*2, 0.01)) * 100
+        #y = np.cos(np.arange(0, np.pi*2, 0.01)) * 100
+        #print(x,y)
+        #circleB.addPoints(x, y)
+        x=[10,20]
+        y=[-20,-50]
+        circleB.setData(x,y)
         to_plot.addItem(circleB)
-        x = np.sin(np.arange(0, np.pi*2, 0.01)) * 100
-        y = np.cos(np.arange(0, np.pi*2, 0.01)) * 100
-        circleB.addPoints(x, y)
 
 
 
