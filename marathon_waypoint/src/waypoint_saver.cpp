@@ -27,7 +27,7 @@
 
 #include <fstream>
 
-//#include "libwaypoint_follower/libwaypoint_follower.h"
+#include "libwaypoint_follower.h"
 
 static const int SYNC_FRAMES = 50;
 
@@ -42,7 +42,7 @@ public:
 
 private:
   // functions
-/* // TODO
+  
   void TwistPoseCallback(const geometry_msgs::TwistStampedConstPtr &twist_msg,
                          const geometry_msgs::PoseStampedConstPtr &pose_msg) const;
   void poseCallback(const geometry_msgs::PoseStampedConstPtr &pose_msg) const;
@@ -65,9 +65,9 @@ private:
   bool save_velocity_;
   double interval_;
   std::string filename_, pose_topic_, velocity_topic_;
-  */ // TODO
+    
 };
-/* // TODO
+ 
 WaypointSaver::WaypointSaver() : private_nh_("~")
 {
   // parameter settings
@@ -76,6 +76,8 @@ WaypointSaver::WaypointSaver() : private_nh_("~")
   private_nh_.param<std::string>("velocity_topic", velocity_topic_, std::string("current_velocity"));
   private_nh_.param<double>("interval", interval_, 1.0);
   private_nh_.param<bool>("save_velocity", save_velocity_, false);
+
+  ROS_INFO_STREAM("Marathon waypoint saver | " << filename_ << " | " << pose_topic_);
 
   // subscriber
   pose_sub_ = new message_filters::Subscriber<geometry_msgs::PoseStamped>(nh_, pose_topic_, 50);
@@ -110,8 +112,8 @@ void WaypointSaver::poseCallback(const geometry_msgs::PoseStampedConstPtr &pose_
 void WaypointSaver::TwistPoseCallback(const geometry_msgs::TwistStampedConstPtr &twist_msg,
                                       const geometry_msgs::PoseStampedConstPtr &pose_msg) const
 {
-  //outputProcessing(pose_msg->pose, mps2kmph(twist_msg->twist.linear.x)); // TODO mps2kmph
-  outputProcessing(pose_msg->pose, (twist_msg->twist.linear.x));
+  outputProcessing(pose_msg->pose, mps2kmph(twist_msg->twist.linear.x));   // mps2kmph
+  //outputProcessing(pose_msg->pose, (twist_msg->twist.linear.x));
 }
 
 void WaypointSaver::outputProcessing(geometry_msgs::Pose current_pose, double velocity) const
@@ -188,11 +190,11 @@ void WaypointSaver::displayMarker(geometry_msgs::Pose pose, double velocity) con
   id++;
   
 }
-*/ // TODO
+ 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "waypoint_saver");
-  //WaypointSaver ws;
+  WaypointSaver ws;
   ros::spin();
   return 0;
 }
