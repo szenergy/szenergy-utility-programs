@@ -1,0 +1,9 @@
+<!--
+rosrun marathon_waypoint waypoint_saver _save_filename:=del.csv _pose_topic:=current_pose
+-->
+<launch>
+    <node pkg="marathon_waypoint" type="waypoint_saver" name="waypoint_saver1" output="screen">
+        <param name="save_filename" type="string" value="/mnt/c/bag/temp/del.csv" />
+        <param name="pose_topic" type="string" value="current_pose" />
+    </node>
+</launch>
