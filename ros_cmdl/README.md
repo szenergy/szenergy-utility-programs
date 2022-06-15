@@ -11,5 +11,4 @@ Terminal based diagnostic tool which comes handy for autonomous developments
 ```
 pip install nvidia-ml-py3
 pip install colorama
-
 ```
