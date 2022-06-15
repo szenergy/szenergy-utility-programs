@@ -74,8 +74,8 @@ WaypointSaver::WaypointSaver() : private_nh_("~")
   private_nh_.param<std::string>("save_filename", filename_, std::string("data.txt"));
   private_nh_.param<std::string>("pose_topic", pose_topic_, std::string("current_pose"));
   private_nh_.param<std::string>("velocity_topic", velocity_topic_, std::string("current_velocity"));
-  private_nh_.param<double>("interval", interval_, 1.0);
-  private_nh_.param<bool>("save_velocity", save_velocity_, false);
+  private_nh_.param<double>("interval", interval_, 0.5);
+  private_nh_.param<bool>("save_velocity", save_velocity_, true);
 
   ROS_INFO_STREAM("Marathon waypoint saver | " << filename_ << " | " << pose_topic_);
 
@@ -112,8 +112,8 @@ void WaypointSaver::poseCallback(const geometry_msgs::PoseStampedConstPtr &pose_
 void WaypointSaver::TwistPoseCallback(const geometry_msgs::TwistStampedConstPtr &twist_msg,
                                       const geometry_msgs::PoseStampedConstPtr &pose_msg) const
 {
-  outputProcessing(pose_msg->pose, mps2kmph(twist_msg->twist.linear.x));   // mps2kmph
-  //outputProcessing(pose_msg->pose, (twist_msg->twist.linear.x));
+  // outputProcessing(pose_msg->pose, mps2kmph(twist_msg->twist.linear.x));   // mps2kmph
+  outputProcessing(pose_msg->pose, (twist_msg->twist.linear.x));
 }
 
 void WaypointSaver::outputProcessing(geometry_msgs::Pose current_pose, double velocity) const
@@ -182,7 +182,7 @@ void WaypointSaver::displayMarker(geometry_msgs::Pose pose, double velocity) con
   marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
   marker.action = visualization_msgs::Marker::ADD;
   std::ostringstream oss;
-  oss << std::fixed << std::setprecision(2) << velocity << " km/h";
+  oss << std::fixed << std::setprecision(2) << velocity << " m/s";
   marker.text = oss.str();
   marray.markers.push_back(marker);
 
