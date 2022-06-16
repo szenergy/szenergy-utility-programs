@@ -21,7 +21,7 @@ class PlotHandler(object):
         self.area = darea.DockArea()
         self.win = qtgqt.QtGui.QMainWindow()
         self.rospack = rospkg.RosPack()
-        self.win.move
+        self.win.move 
 
     def initializePlot(self):
         self.first_run = True
