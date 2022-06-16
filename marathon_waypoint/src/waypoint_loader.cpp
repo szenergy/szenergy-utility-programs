@@ -33,7 +33,7 @@ void WaypointLoaderNode::initPubSub()
 {
   private_nh_.param<std::string>("multi_lane_csv", multi_lane_csv_, "/tmp/driving_lane.csv");
   // setup publisher
-  lane_pub_ = nh_.advertise<autoware_msgs::LaneArray>("/base_waypoints", 10, true);  
+  lane_pub_ = nh_.advertise<autoware_msgs::Lane>("/base_waypoints", 10, true);  
 }
 
 void WaypointLoaderNode::run()
@@ -42,11 +42,12 @@ void WaypointLoaderNode::run()
   parseColumns(multi_lane_csv_, &multi_file_path_);
   ROS_INFO_STREAM("loading csv: " << multi_lane_csv_);
   autoware_msgs::LaneArray lane_array; 
+  autoware_msgs::Lane lane_publisher;
   ros::Rate loop_rate(0.5); // 0.5 Hz
   while (ros::ok())
   {
-    createLaneArray(multi_file_path_, &lane_array);
-    lane_pub_.publish(lane_array);
+    createLaneWaypoint(multi_file_path_.front(),lane_publisher);
+    lane_pub_.publish(lane_publisher);
     output_lane_array_ = lane_array;
     ros::spinOnce();
     loop_rate.sleep();
@@ -54,17 +55,7 @@ void WaypointLoaderNode::run()
   //ros::spin();
 }
 
-void WaypointLoaderNode::createLaneArray(const std::vector<std::string>& paths, autoware_msgs::LaneArray* lane_array)  
-{
-  for (const auto& el : paths)
-  {
-    autoware_msgs::Lane lane;  
-    createLaneWaypoint(el, &lane);
-    lane_array->lanes.emplace_back(lane);
-  }
-}
-
-void WaypointLoaderNode::createLaneWaypoint(const std::string& file_path, autoware_msgs::Lane* lane)  
+void WaypointLoaderNode::createLaneWaypoint(const std::string& file_path, autoware_msgs::Lane &lane)  
 {
   if (!verifyFileConsistency(file_path.c_str()))
   {
@@ -87,9 +78,9 @@ void WaypointLoaderNode::createLaneWaypoint(const std::string& file_path, autowa
   {
     loadWaypointsForVer3(file_path.c_str(), &wps);
   }
-  lane->header.frame_id = "/map";
-  lane->header.stamp = ros::Time(0);
-  lane->waypoints = wps;
+  lane.header.frame_id = "/map";
+  lane.header.stamp = ros::Time(0);
+  lane.waypoints = wps;
 }
 
 void WaypointLoaderNode::loadWaypointsForVer1(const char* filename, std::vector<autoware_msgs::Waypoint>* wps)  
