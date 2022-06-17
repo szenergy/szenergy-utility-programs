@@ -45,9 +45,9 @@ void WaypointLoaderNode::displayMarker(autoware_msgs::Lane lane_publisher)
     marker.header.frame_id = "map";
     marker.header.stamp = ros::Time();
     marker.frame_locked = true;
-    marker.scale.x = 0.5;
-    marker.scale.y = 0.1;
-    marker.scale.z = 0.1;
+    marker.scale.x = 0.6;
+    marker.scale.y = 0.3;
+    marker.scale.z = 0.2;
     marker.color.a = 1.0;
     marker.color.r = 0.0;
     marker.color.g = 1.0;
