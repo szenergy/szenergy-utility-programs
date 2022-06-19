@@ -79,12 +79,14 @@ void WaypointLoaderNode::run()
   ROS_INFO_STREAM("loading csv: " << multi_lane_csv_);
   autoware_msgs::LaneArray lane_array; 
   autoware_msgs::Lane lane_publisher;
+  createLaneWaypoint(multi_file_path_.front(),lane_publisher);
+  displayMarker(lane_publisher);
+  
   ros::Rate loop_rate(0.5); // 0.5 Hz
   while (ros::ok())
   {
     createLaneWaypoint(multi_file_path_.front(),lane_publisher);
     lane_pub_.publish(lane_publisher);
-    displayMarker(lane_publisher);
     output_lane_array_ = lane_array;
     ros::spinOnce();
     loop_rate.sleep();
