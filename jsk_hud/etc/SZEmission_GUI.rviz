@@ -12,7 +12,6 @@ Panels:
         - /Marker4
         - /MarkerArray1
         - /LaserScan1
-        - /OverlayText1
       Splitter Ratio: 0.5
     Tree Height: 448
   - Class: rviz/Selection
@@ -135,68 +134,22 @@ Visualization Manager:
       Foreground Alpha: 0.800000011920929
       Foreground Color: 0; 0; 0
       Invert Shadow: false
-      Name: OverlayText
+      Name: status report
       Overtake BG Color Properties: true
       Overtake FG Color Properties: true
-      Overtake Position Properties: false
+      Overtake Position Properties: true
       Topic: /status_text
       Value: true
-      font: DejaVu Sans Mono
-      height: 128
-      left: 0
+      font: Noto Mono
+      height: 600
+      left: 10
       line width: 2
-      text size: 12
-      top: 0
-      width: 128
-    - Class: jsk_rviz_plugin/PieChart
-      Enabled: true
-      Name: angle
-      Topic: /wheel_angle_deg
-      Value: true
-      auto color change: true
-      background color: 0; 0; 0
-      backround alpha: 0
-      clockwise rotate direction: false
-      foreground alpha: 0.699999988079071
-      foreground alpha 2: 0.4000000059604645
-      foreground color: 25; 255; 240
-      left: 310
-      max color: 255; 0; 0
-      max color change threthold: 0
-      max value: 60
-      med color: 250; 255; 0
-      med color change threthold: 0
-      min value: 0
-      show caption: true
-      size: 120
-      text size: 20
+      text size: 16
       top: 10
+      width: 300
     - Class: jsk_rviz_plugin/PieChart
       Enabled: true
-      Name: speed
-      Topic: /vehicle_speed_kmph
-      Value: true
-      auto color change: true
-      background color: 0; 0; 0
-      backround alpha: 0
-      clockwise rotate direction: false
-      foreground alpha: 0.699999988079071
-      foreground alpha 2: 0.4000000059604645
-      foreground color: 138; 226; 52
-      left: 430
-      max color: 255; 0; 0
-      max color change threthold: 0
-      max value: 60
-      med color: 250; 255; 0
-      med color change threthold: 0
-      min value: 0
-      show caption: true
-      size: 120
-      text size: 20
-      top: 10
-    - Class: jsk_rviz_plugin/PieChart
-      Enabled: true
-      Name: CPU
+      Name: CPU %
       Topic: /cpu_monitor/total_cpu
       Value: true
       auto color change: true
@@ -206,7 +159,7 @@ Visualization Manager:
       foreground alpha: 0.699999988079071
       foreground alpha 2: 0.4000000059604645
       foreground color: 138; 226; 52
-      left: 550
+      left: 10
       max color: 255; 0; 0
       max color change threthold: 0
       max value: 100
@@ -216,12 +169,156 @@ Visualization Manager:
       show caption: true
       size: 80
       text size: 12
+      top: 450
+    - Class: jsk_rviz_plugin/PieChart
+      Enabled: true
+      Name: CPU °C
+      Topic: ""
+      Value: true
+      auto color change: true
+      background color: 0; 0; 0
+      backround alpha: 0
+      clockwise rotate direction: true
+      foreground alpha: 0.699999988079071
+      foreground alpha 2: 0.4000000059604645
+      foreground color: 138; 226; 52
+      left: 100
+      max color: 255; 0; 0
+      max color change threthold: 0
+      max value: 100
+      med color: 250; 255; 0
+      med color change threthold: 0
+      min value: 0
+      show caption: true
+      size: 80
+      text size: 12
+      top: 450
+    - Buffer length: 100
+      Class: jsk_rviz_plugin/Plotter2D
+      Enabled: true
+      Name: "                    a_ref"
+      Show Value: false
+      Topic: ""
+      Value: true
+      auto color change: false
+      auto scale: false
+      background color: 0; 0; 0
+      backround alpha: 0
+      border: true
+      foreground alpha: 0.699999988079071
+      foreground color: 239; 41; 41
+      height: 125
+      left: 850
+      linewidth: 1
+      max color: 255; 0; 0
+      max value: 12
+      min value: -12
+      show caption: true
+      text size: 12
       top: 10
+      update interval: 0.03999999910593033
+      width: 125
+    - Buffer length: 100
+      Class: jsk_rviz_plugin/Plotter2D
+      Enabled: true
+      Name: "angle                    "
+      Show Value: true
+      Topic: /wheel_angle_deg
+      Value: true
+      auto color change: false
+      auto scale: false
+      background color: 0; 0; 0
+      backround alpha: 0
+      border: true
+      foreground alpha: 0.699999988079071
+      foreground color: 0; 0; 255
+      height: 125
+      left: 850
+      linewidth: 1
+      max color: 255; 0; 0
+      max value: 12
+      min value: -12
+      show caption: true
+      text size: 12
+      top: 10
+      update interval: 0.03999999910593033
+      width: 125
+    - Buffer length: 100
+      Class: jsk_rviz_plugin/Plotter2D
+      Enabled: true
+      Name: "                    sp_ref"
+      Show Value: false
+      Topic: ""
+      Value: true
+      auto color change: false
+      auto scale: false
+      background color: 0; 0; 0
+      backround alpha: 0
+      border: true
+      foreground alpha: 0.699999988079071
+      foreground color: 239; 41; 41
+      height: 125
+      left: 1000
+      linewidth: 1
+      max color: 255; 0; 0
+      max value: 25
+      min value: 0
+      show caption: true
+      text size: 12
+      top: 10
+      update interval: 0.03999999910593033
+      width: 125
+    - Buffer length: 100
+      Class: jsk_rviz_plugin/Plotter2D
+      Enabled: true
+      Name: "speed                    "
+      Show Value: true
+      Topic: /vehicle_speed_kmph
+      Value: true
+      auto color change: false
+      auto scale: false
+      background color: 0; 0; 0
+      backround alpha: 0
+      border: true
+      foreground alpha: 0.699999988079071
+      foreground color: 0; 0; 255
+      height: 125
+      left: 1000
+      linewidth: 1
+      max color: 255; 0; 0
+      max value: 25
+      min value: 0
+      show caption: true
+      text size: 12
+      top: 10
+      update interval: 0.03999999910593033
+      width: 125
+    - Align Bottom: false
+      Background Alpha: 0.20000000298023224
+      Background Color: 243; 243; 243
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.800000011920929
+      Foreground Color: 0; 0; 0
+      Invert Shadow: false
+      Name: CHALLENGE
+      Overtake BG Color Properties: true
+      Overtake FG Color Properties: true
+      Overtake Position Properties: true
+      Topic: /challenge_state_text
+      Value: true
+      font: Noto Mono
+      height: 128
+      left: 1080
+      line width: 2
+      text size: 80
+      top: 450
+      width: 65
   Enabled: true
   Global Options:
     Background Color: 255; 255; 255
     Default Light: true
-    Fixed Frame: base_link
+    Fixed Frame: laser
     Frame Rate: 30
   Name: root
   Tools:
@@ -245,7 +342,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 33.699485778808594
+      Distance: 31.86687469482422
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -260,10 +357,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.785398006439209
+      Pitch: 0.6003980040550232
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.785398006439209
+      Yaw: 4.980404853820801
     Saved: ~
 Window Geometry:
   Displays:
