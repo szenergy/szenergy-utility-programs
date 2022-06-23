@@ -17,11 +17,22 @@
 float freq = 0.2;               //refresh frequency
 float maxtime = 0.5;            //max time to wait for topics
 
+std::vector<std::string> chstr =
+{
+    "[0] Idle",
+    "[1] Distance",
+    "[2] Parking",
+    "[3] Obstacle avoidance",
+    "[4] Distance Challenge",
+    "[5] Parking Challenge",
+    "[6] Obstacle avoidance Challenge"
+};                                      //challenge state text values
+
 jsk_rviz_plugins::OverlayText stxt;     //status text
 jsk_rviz_plugins::OverlayText ctxt;     //challenge state text
 
 ros::Subscriber sub_ctxt;           //challenge_state
-ros::Publisher  pub_ctxt;
+ros::Publisher  pub_ctxt;           //challenge_state_text
 
 ros::Publisher pub_stxt;
 
@@ -53,7 +64,7 @@ std::vector<topok> status; //text-based topic status indicator ("topic: OK")
 
 //callbacks
 
-void cb_ctxt    (const std_msgs::Int8 &data_in)                 {ctxt.text = " " + std::to_string(data_in.data);}
+void cb_ctxt    (const std_msgs::Int8 &data_in)                 {ctxt.text = chstr[data_in.data];}
 
 void cb_ouster  (const pcl::PCLPointCloud2ConstPtr &data_in)    {status[0].ts = ros::Time::now();}
 void cb_sick    (const sensor_msgs::LaserScan &data_in)         {status[1].ts = ros::Time::now();}
@@ -103,7 +114,7 @@ int main(int argc, char **argv)
 
     ros::Timer timer = nh.createTimer(ros::Duration(freq), timerCallback);
 
-    status.push_back(topok("/os1/os1_cloud_node/points", "ouster"));
+    status.push_back(topok("/os_cloud_node/points", "ouster"));
     status.push_back(topok("/scan", "sick"));
     status.push_back(topok("/current_pose", "gps"));
     status.push_back(topok("/gps/duro/status_string", "gps status"));
@@ -131,7 +142,7 @@ int main(int argc, char **argv)
     pub_stxt = nh.advertise<jsk_rviz_plugins::OverlayText>("status_text", 1); //all-in-one status text publisher
     pub_ctxt = nh.advertise<jsk_rviz_plugins::OverlayText>("challenge_state_text", 1); //challenge state (text) publisher
     
-    ctxt.text = "0";
+    ctxt.text = "-";
 
     ros::spin();
 }
