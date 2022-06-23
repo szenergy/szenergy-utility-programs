@@ -2,6 +2,7 @@
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Int8.h>
 #include <std_msgs/UInt64.h>
 #include <std_msgs/Float32.h>
 #include <sensor_msgs/LaserScan.h>
@@ -13,12 +14,15 @@
 #include <jsk_rviz_plugins/OverlayText.h>
 
 //global variables (todo: dynamic recfg)
-float freq = 0.1;               //refresh frequency
+float freq = 0.2;               //refresh frequency
 float maxtime = 0.5;            //max time to wait for topics
-bool text_in_boxes = false;     //text in separate boxes (to do)
 
-jsk_rviz_plugins::OverlayText stxt;
-std::vector<ros::Subscriber> subber;
+jsk_rviz_plugins::OverlayText stxt;     //status text
+jsk_rviz_plugins::OverlayText ctxt;     //challenge state text
+
+ros::Subscriber sub_ctxt;           //challenge_state
+ros::Publisher  pub_ctxt;
+
 ros::Publisher pub_stxt;
 
 const std::string base_text = "TOPIC STATUS REPORT:\n";
@@ -47,11 +51,14 @@ struct topok
 
 std::vector<topok> status; //text-based topic status indicator ("topic: OK")
 
-//callbacks - todo: general subscriber [*sigh*] - easier to rewrite in python??! (dynamic parameter argument types!)
+//callbacks
+
+void cb_ctxt    (const std_msgs::Int8 &data_in)                 {ctxt.text = " " + std::to_string(data_in.data);}
+
 void cb_ouster  (const pcl::PCLPointCloud2ConstPtr &data_in)    {status[0].ts = ros::Time::now();}
 void cb_sick    (const sensor_msgs::LaserScan &data_in)         {status[1].ts = ros::Time::now();}
 void cb_gps     (const geometry_msgs::PoseStamped &data_in)     {status[2].ts = ros::Time::now();}
-void cb_gps_s   (const std_msgs::String &data_in)               {status[3].outmsg = data_in.data;}
+void cb_gps_s   (const std_msgs::String &data_in)               {status[3].outmsg = "<span style=\"color: blue;\">" + data_in.data + "</span>";}
 void cb_left    (const visualization_msgs::Marker &data_in)     {status[4].ts = ros::Time::now();}
 void cb_right   (const visualization_msgs::Marker &data_in)     {status[5].ts = ros::Time::now();}
 void cb_traj	(const visualization_msgs::MarkerArray &data_in){status[6].ts = ros::Time::now();}
@@ -79,15 +86,13 @@ void timerCallback(const ros::TimerEvent& event)
             if (status[i].ok) status[i].outmsg = oktext;
             else status[i].outmsg = notoktext;
         }
-        else
-        {
-            status[i].outmsg = "<span style=\"color: blue;\">" + status[i].outmsg + "</span>";
-        }
+
         status_text += "\n" + status[i].name + ": " + status[i].outmsg;
         stxt.text = base_text + status_text;
     }
     
-    if (!text_in_boxes) pub_stxt.publish(stxt);
+    pub_stxt.publish(stxt);
+    pub_ctxt.publish(ctxt);
 }
 
 int main(int argc, char **argv)
@@ -121,16 +126,12 @@ int main(int argc, char **argv)
 
     status[3].okonly = false;
 
+    sub_ctxt = nh.subscribe("/challenge_state", 1, cb_ctxt);
+
     pub_stxt = nh.advertise<jsk_rviz_plugins::OverlayText>("status_text", 1); //all-in-one status text publisher
+    pub_ctxt = nh.advertise<jsk_rviz_plugins::OverlayText>("challenge_state_text", 1); //challenge state (text) publisher
     
-    stxt.width = 300;
-    stxt.height = 600;
-    stxt.left = 10;
-    stxt.top = 10;
-    stxt.text_size = 16;
-    stxt.line_width = 2;
-    stxt.font = "DejaVu Sans Mono";
-    stxt.text = base_text;
-    
+    ctxt.text = "0";
+
     ros::spin();
 }

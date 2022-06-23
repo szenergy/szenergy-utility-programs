@@ -27,9 +27,8 @@
 #include <std_msgs/Bool.h>
 #include <tf/transform_datatypes.h>
 #include <unordered_map>
-#include <visualization_msgs/MarkerArray.h>
 
-#include <autoware_msgs/LaneArray.h>   
+#include "autoware_msgs/LaneArray.h"   
 
 namespace waypoint_maker
 {
@@ -68,7 +67,7 @@ private:
   ros::NodeHandle private_nh_;
 
   // publisher & subscriber
-  ros::Publisher lane_pub_,waypoint_saver_pub_;
+  ros::Publisher lane_pub_;
   ros::Subscriber config_sub_;
 
   // variables
@@ -80,9 +79,8 @@ private:
   void initPubSub();
 
   // functions
-  void createLaneWaypoint(const std::string& file_path, autoware_msgs::Lane &lane);  
+  void createLaneWaypoint(const std::string& file_path, autoware_msgs::Lane* lane);  
   void createLaneArray(const std::vector<std::string>& paths, autoware_msgs::LaneArray* lane_array);  
-  void displayMarker(autoware_msgs::Lane lane_publisher);
 
   FileFormat checkFileFormat(const char* filename);
   bool verifyFileConsistency(const char* filename);
