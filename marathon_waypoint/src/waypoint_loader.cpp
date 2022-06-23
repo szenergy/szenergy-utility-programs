@@ -29,47 +29,11 @@ WaypointLoaderNode::~WaypointLoaderNode()
 {
 }
 
-void WaypointLoaderNode::displayMarker(autoware_msgs::Lane lane_publisher)
-{
-  static visualization_msgs::MarkerArray marray;
-  static int id = 0;
-
-  // initialize marker
-
-  // create saved waypoint marker
-
-  for(int i = 0;i < lane_publisher.waypoints.size();i++)
-  {
-    visualization_msgs::Marker marker;
-    marker.id = i;
-    marker.header.frame_id = "map";
-    marker.header.stamp = ros::Time();
-    marker.frame_locked = true;
-    marker.scale.x = 0.6;
-    marker.scale.y = 0.3;
-    marker.scale.z = 0.2;
-    marker.color.a = 1.0;
-    marker.color.r = 0.0;
-    marker.color.g = 1.0;
-    marker.color.b = 0.0;
-    marker.ns = "saved_waypoint_arrow";
-    marker.type = visualization_msgs::Marker::ARROW;
-    marker.action = visualization_msgs::Marker::ADD;
-    marker.pose = lane_publisher.waypoints[i].pose.pose;
-    marray.markers.push_back(marker);
-
-  }
-
-  waypoint_saver_pub_.publish(marray);
-  
-}
-
 void WaypointLoaderNode::initPubSub()
 {
   private_nh_.param<std::string>("multi_lane_csv", multi_lane_csv_, "/tmp/driving_lane.csv");
-  waypoint_saver_pub_ = nh_.advertise<visualization_msgs::MarkerArray>("waypoint_saver_marker", 10, true);
   // setup publisher
-  lane_pub_ = nh_.advertise<autoware_msgs::Lane>("/base_waypoints", 10, true);  
+  lane_pub_ = nh_.advertise<autoware_msgs::LaneArray>("/based/lane_waypoints_raw", 10, true);  
 }
 
 void WaypointLoaderNode::run()
@@ -78,23 +42,30 @@ void WaypointLoaderNode::run()
   parseColumns(multi_lane_csv_, &multi_file_path_);
   ROS_INFO_STREAM("loading csv: " << multi_lane_csv_);
   autoware_msgs::LaneArray lane_array; 
-  autoware_msgs::Lane lane_publisher;
-  createLaneWaypoint(multi_file_path_.front(),lane_publisher);
-  displayMarker(lane_publisher);
-  
   ros::Rate loop_rate(0.5); // 0.5 Hz
   while (ros::ok())
   {
-    createLaneWaypoint(multi_file_path_.front(),lane_publisher);
-    lane_pub_.publish(lane_publisher);
+    createLaneArray(multi_file_path_, &lane_array);
+    lane_pub_.publish(lane_array);
     output_lane_array_ = lane_array;
     ros::spinOnce();
     loop_rate.sleep();
+    break;
   }
   //ros::spin();
 }
 
-void WaypointLoaderNode::createLaneWaypoint(const std::string& file_path, autoware_msgs::Lane &lane)  
+void WaypointLoaderNode::createLaneArray(const std::vector<std::string>& paths, autoware_msgs::LaneArray* lane_array)  
+{
+  for (const auto& el : paths)
+  {
+    autoware_msgs::Lane lane;  
+    createLaneWaypoint(el, &lane);
+    lane_array->lanes.emplace_back(lane);
+  }
+}
+
+void WaypointLoaderNode::createLaneWaypoint(const std::string& file_path, autoware_msgs::Lane* lane)  
 {
   if (!verifyFileConsistency(file_path.c_str()))
   {
@@ -117,9 +88,9 @@ void WaypointLoaderNode::createLaneWaypoint(const std::string& file_path, autowa
   {
     loadWaypointsForVer3(file_path.c_str(), &wps);
   }
-  lane.header.frame_id = "/map";
-  lane.header.stamp = ros::Time(0);
-  lane.waypoints = wps;
+  lane->header.frame_id = "/map";
+  lane->header.stamp = ros::Time(0);
+  lane->waypoints = wps;
 }
 
 void WaypointLoaderNode::loadWaypointsForVer1(const char* filename, std::vector<autoware_msgs::Waypoint>* wps)  
