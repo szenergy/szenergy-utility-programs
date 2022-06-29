@@ -86,8 +86,7 @@ void cb_ref     (const autoware_msgs::ControlCommandStamped &data_in)    {status
                                                                 a_temp.data = data_in.cmd.steering_angle;
                                                                 pub_s_ref.publish(a_temp);
                                                                 s_temp.data = data_in.cmd.linear_velocity;
-                                                                pub_a_ref.publish(s_temp);       
-                                                                ROS_INFO("angle = %7.3f", data_in.cmd.steering_angle); }
+                                                                pub_a_ref.publish(s_temp);       }
 
 void timerCallback(const ros::TimerEvent& event)
 {
@@ -156,7 +155,7 @@ int main(int argc, char **argv)
     pub_stxt = nh.advertise<jsk_rviz_plugins::OverlayText>("status_text", 1);           //all-in-one status text publisher
     pub_ctxt = nh.advertise<jsk_rviz_plugins::OverlayText>("challenge_state_text", 1);  //challenge state (text) publisher
     pub_a_ref = nh.advertise<std_msgs::Float32>("wheel_angle_deg_ref", 1);              //ctrl_cmd angle reference
-    pub_a_ref = nh.advertise<std_msgs::Float32>("vehicle_speed_kmph_ref", 1);           //ctrl_cmd speed reference
+    pub_s_ref = nh.advertise<std_msgs::Float32>("vehicle_speed_kmph_ref", 1);           //ctrl_cmd speed reference
     
     ctxt.text = "-";
 
