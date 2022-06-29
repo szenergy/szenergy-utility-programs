@@ -33,7 +33,7 @@ void WaypointLoaderNode::initPubSub()
 {
   private_nh_.param<std::string>("multi_lane_csv", multi_lane_csv_, "/tmp/driving_lane.csv");
   // setup publisher
-  lane_pub_ = nh_.advertise<autoware_msgs::LaneArray>("/base_waypoints", 10, true);  
+  lane_pub_ = nh_.advertise<autoware_msgs::LaneArray>("/based/lane_waypoints_raw", 10, true);  
 }
 
 void WaypointLoaderNode::run()
@@ -50,6 +50,7 @@ void WaypointLoaderNode::run()
     output_lane_array_ = lane_array;
     ros::spinOnce();
     loop_rate.sleep();
+    break;
   }
   //ros::spin();
 }

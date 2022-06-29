@@ -5,7 +5,7 @@ rosrun marathon_waypoint waypoint_saver _save_filename:=del.csv _pose_topic:=cur
     <node pkg="marathon_waypoint" type="waypoint_saver" name="waypoint_saver1" output="screen">
         <param name="interval" type="double" value="0.2" />
         <param name="save_velocity" type="bool" value="True" />
-        <param name="save_filename" type="string" value="/home/jkk/waypoints/pure_p_waypoints.csv" />
+        <param name="save_filename" type="string" value="/home/matyko/waypoints/distance_waypoints.csv" />
         <param name="pose_topic" type="string" value="current_pose" />
     </node>
 </launch>
