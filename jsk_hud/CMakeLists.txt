@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   jsk_rviz_plugins
+  autoware_msgs
 )
 
 ## System dependencies are found with CMake's conventions
