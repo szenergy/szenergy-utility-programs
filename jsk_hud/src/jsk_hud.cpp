@@ -5,6 +5,7 @@
 #include <std_msgs/Int8.h>
 #include <std_msgs/UInt64.h>
 #include <std_msgs/Float32.h>
+#include <geometry_msgs/TwistStamped.h>
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <visualization_msgs/Marker.h>
@@ -12,10 +13,15 @@
 #include <pcl/point_cloud.h>
 #include <pcl_ros/point_cloud.h>
 #include <jsk_rviz_plugins/OverlayText.h>
+#include <autoware_msgs/ControlCommandStamped.h>
+
+const float rtod = 180/M_PI;  //rad-to-deg
 
 //global variables (todo: dynamic recfg)
 float freq = 0.2;               //refresh frequency
 float maxtime = 0.5;            //max time to wait for topics
+
+std_msgs::Float32 a_temp, s_temp;
 
 std::vector<std::string> chstr =
 {
@@ -23,18 +29,21 @@ std::vector<std::string> chstr =
     "[1] Distance",
     "[2] Parking",
     "[3] Obstacle avoidance",
-    "[4] Distance Challenge",
-    "[5] Parking Challenge",
-    "[6] Obstacle avoidance Challenge"
+    "[4] Distance C",
+    "[5] Parking C",
+    "[6] Obstacle avoidance C"
 };                                      //challenge state text values
 
 jsk_rviz_plugins::OverlayText stxt;     //status text
 jsk_rviz_plugins::OverlayText ctxt;     //challenge state text
 
+ros::Subscriber sub_refvec;            //ctrl_cmd speed and angle reference
 ros::Subscriber sub_ctxt;           //challenge_state
 ros::Publisher  pub_ctxt;           //challenge_state_text
 
 ros::Publisher pub_stxt;
+ros::Publisher pub_a_ref;          //angle reference (ctrl_cmd)
+ros::Publisher pub_s_ref;          //speed reference (ctrl_cmd)
 
 const std::string base_text = "TOPIC STATUS REPORT:\n";
 const std::string oktext = "<span style=\"color: green;\">OK</span>";
@@ -64,17 +73,24 @@ std::vector<topok> status; //text-based topic status indicator ("topic: OK")
 
 //callbacks
 
-void cb_ctxt    (const std_msgs::Int8 &data_in)                 {ctxt.text = chstr[data_in.data];}
+void cb_ctxt    (const std_msgs::Int8 &data_in)                         {ctxt.text = chstr[data_in.data];}
 
-void cb_ouster  (const pcl::PCLPointCloud2ConstPtr &data_in)    {status[0].ts = ros::Time::now();}
-void cb_sick    (const sensor_msgs::LaserScan &data_in)         {status[1].ts = ros::Time::now();}
-void cb_gps     (const geometry_msgs::PoseStamped &data_in)     {status[2].ts = ros::Time::now();}
-void cb_gps_s   (const std_msgs::String &data_in)               {status[3].outmsg = "<span style=\"color: blue;\">" + data_in.data + "</span>";}
-void cb_left    (const visualization_msgs::Marker &data_in)     {status[4].ts = ros::Time::now();}
-void cb_right   (const visualization_msgs::Marker &data_in)     {status[5].ts = ros::Time::now();}
-void cb_traj	(const visualization_msgs::MarkerArray &data_in){status[6].ts = ros::Time::now();}
-void cb_angle   (const std_msgs::Float32 &data_in)              {status[7].ts = ros::Time::now();}
-void cb_speed   (const std_msgs::Float32 &data_in)              {status[8].ts = ros::Time::now();}
+void cb_ouster  (const pcl::PCLPointCloud2ConstPtr &data_in)            {status[0].ts = ros::Time::now();}
+void cb_sick    (const sensor_msgs::LaserScan &data_in)                 {status[1].ts = ros::Time::now();}
+void cb_gps     (const geometry_msgs::PoseStamped &data_in)             {status[2].ts = ros::Time::now();}
+void cb_gps_s   (const std_msgs::String &data_in)                       {status[3].outmsg = "<span style=\"color: blue;\">" + data_in.data + "</span>";}
+void cb_left    (const visualization_msgs::Marker &data_in)             {status[4].ts = ros::Time::now();}
+void cb_right   (const visualization_msgs::Marker &data_in)             {status[5].ts = ros::Time::now();}
+void cb_traj	(const visualization_msgs::MarkerArray &data_in)        {status[6].ts = ros::Time::now();}
+void cb_angle   (const std_msgs::Float32 &data_in)                      {status[7].ts = ros::Time::now();}
+void cb_speed   (const std_msgs::Float32 &data_in)                      {status[8].ts = ros::Time::now();}
+void cb_ref     (const autoware_msgs::ControlCommandStamped &data_in)   {status[9].ts = ros::Time::now();
+                                                                            a_temp.data = data_in.cmd.steering_angle * rtod;
+                                                                            pub_a_ref.publish(a_temp);
+                                                                            s_temp.data = data_in.cmd.linear_velocity;
+                                                                            pub_s_ref.publish(s_temp);    }
+void cb_cirval  (const visualization_msgs::MarkerArray &data_in)        {status[10].ts = ros::Time::now();}
+void cb_mgoal   (const geometry_msgs::PoseStamped &data_in)             {status[11].ts = ros::Time::now();}
 
 void timerCallback(const ros::TimerEvent& event)
 {
@@ -121,9 +137,11 @@ int main(int argc, char **argv)
     status.push_back(topok("/left_lane", "left lane"));
     status.push_back(topok("/right_lane", "right lane"));
     status.push_back(topok("/waypoints_saver_marker", "trajectory"));
-    //etc: (needed?)
     status.push_back(topok("/wheel_angle_deg", "steering angle"));
     status.push_back(topok("/vehicle_speed_kmph", "speed"));
+    status.push_back(topok("/ctrl_cmd", "control command"));
+    status.push_back(topok("/valid_circle", "valid circle"));
+    status.push_back(topok("/goal_middle", "goal middle"));
 
     status[0].s = (nh.subscribe(status[0].tn, 1, cb_ouster));
     status[1].s = (nh.subscribe(status[1].tn, 1, cb_sick));
@@ -134,13 +152,18 @@ int main(int argc, char **argv)
     status[6].s = (nh.subscribe(status[6].tn, 1, cb_traj));
     status[7].s = (nh.subscribe(status[7].tn, 1, cb_angle));
     status[8].s = (nh.subscribe(status[8].tn, 1, cb_speed));
+    status[9].s = (nh.subscribe(status[9].tn, 1, cb_ref));
+    status[10].s = (nh.subscribe(status[10].tn, 1, cb_cirval));
+    status[11].s = (nh.subscribe(status[11].tn, 1, cb_mgoal));
 
     status[3].okonly = false;
 
     sub_ctxt = nh.subscribe("/challenge_state", 1, cb_ctxt);
 
-    pub_stxt = nh.advertise<jsk_rviz_plugins::OverlayText>("status_text", 1); //all-in-one status text publisher
-    pub_ctxt = nh.advertise<jsk_rviz_plugins::OverlayText>("challenge_state_text", 1); //challenge state (text) publisher
+    pub_stxt = nh.advertise<jsk_rviz_plugins::OverlayText>("status_text", 1);           //all-in-one status text publisher
+    pub_ctxt = nh.advertise<jsk_rviz_plugins::OverlayText>("challenge_state_text", 1);  //challenge state (text) publisher
+    pub_a_ref = nh.advertise<std_msgs::Float32>("wheel_angle_deg_ref", 1);              //ctrl_cmd angle reference
+    pub_s_ref = nh.advertise<std_msgs::Float32>("vehicle_speed_kmph_ref", 1);           //ctrl_cmd speed reference
     
     ctxt.text = "-";
 
