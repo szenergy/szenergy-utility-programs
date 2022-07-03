@@ -36,6 +36,12 @@ for i in range(0,len(df)):
   f.write(str(x)+','+str(y)+','+str(z)+','+str(yaw)+','+str(velocity)+','+str(change_flag)+'\n')
 f.close()
 
+plt.plot(y_cords,x_cords)
+plt.gca().set_aspect('equal')
+plt.ylabel('XY')
+plt.title('XY plot')
+plt.show()
+
 plt.plot(yaw_values)
 plt.ylabel('Angle')
 plt.title('Yaw angle 0.2m-es lépésközzel')
