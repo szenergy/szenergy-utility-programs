@@ -120,23 +120,29 @@ class PlotHandler(object):
         return valid, ipList
 
     def buttonClicked(self, command):
-        validIP, ipAddress = self.validateIPAddress()
-        if(validIP):
-            ipAddress = '.'.join(ipAddress)
-            hostAddress = self.userData['username']+'@'+ipAddress
-            sshCommand = []
-            print(type(command))
-            for i in range(0, len(command)-1):
-                sshCommand.append(command[i])
-            sshCommand.append('ssh')
-            sshCommand.append('-X')
-            sshCommand.append(hostAddress)
-            sshCommand.append("source /opt/ros/"+self.userData['ros']+"/setup.zsh; "+command[len(command)-1])
-            print(sshCommand)
-            p = subprocess.Popen(sshCommand)
-            self.update()
+        if self.allowSSH.isChecked() == True:
+            validIP, ipAddress = self.validateIPAddress()
+            if(validIP):
+                ipAddress = '.'.join(ipAddress)
+            else:
+                print(f"Invalid IP address: {'.'.join(ipAddress)}")
+                return
         else:
-            print(f"Invalid IP address: {'.'.join(ipAddress)}")
+            ipAddress = "127.0.0.1"
+        
+        hostAddress = self.userData['username']+'@'+ipAddress
+        sshCommand = []
+        # print(command)
+        for i in range(0, len(command)-1):
+            sshCommand.append(command[i])
+        sshCommand.append('ssh')
+        sshCommand.append('-X')
+        sshCommand.append(hostAddress)
+        sshCommand.append("source /opt/ros/"+self.userData['ros']+"/setup.zsh; "+command[len(command)-1])
+        print(sshCommand)
+        p = subprocess.Popen(sshCommand)
+        self.update()
+
 
     def update(self):
         self.listwidget.clear()
