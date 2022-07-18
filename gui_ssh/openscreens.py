@@ -18,9 +18,10 @@ import re
 from functools import partial
 
 class PlotHandler(object):
-    def __init__(self, buttonData):
+    def __init__(self, buttonData, userData):
         super(PlotHandler, self).__init__()
         self.buttonData = buttonData
+        self.userData = userData
         self.screenButtons = {}
         pg.setConfigOptions(antialias=True)
         self.app = qtgqt.QtGui.QApplication([])
@@ -69,6 +70,8 @@ class PlotHandler(object):
         self.win.setFixedSize(800, 600)
         self.win.move(600, 200)
         self.win.setCentralWidget(area)
+        self.allowSSH = qtgqt.QtGui.QCheckBox("SSH")
+        
         dock1 = darea.Dock("", size = (1,1))  # give this dock minimum possible size
         area.addDock(dock1, "left")
         widg1 = pg.LayoutWidget()
@@ -84,6 +87,7 @@ class PlotHandler(object):
         widg1.addWidget(self.updateBtn, row=1, col=2)
         widg1.addWidget(self.textArea, row=1, col=1)
         widg1.addWidget(self.sshLabel, row=0, col=1)
+        widg1.addWidget(self.allowSSH, row=0, col=0)
         self.textArea.setMaximumHeight(25)
         self.textArea.setMaximumWidth(200)
         widg1.setStyleSheet("background-color: rgb(40, 44, 52); color: rgb(171, 178, 191);")
@@ -119,7 +123,7 @@ class PlotHandler(object):
         validIP, ipAddress = self.validateIPAddress()
         if(validIP):
             ipAddress = '.'.join(ipAddress)
-            hostAddress = "patorik@"+ipAddress
+            hostAddress = self.userData['username']+'@'+ipAddress
             sshCommand = []
             print(type(command))
             for i in range(0, len(command)-1):
@@ -127,7 +131,7 @@ class PlotHandler(object):
             sshCommand.append('ssh')
             sshCommand.append('-X')
             sshCommand.append(hostAddress)
-            sshCommand.append("source /opt/ros/noetic/setup.zsh; "+command[len(command)-1])
+            sshCommand.append("source /opt/ros/"+self.userData['ros']+"/setup.zsh; "+command[len(command)-1])
             print(sshCommand)
             p = subprocess.Popen(sshCommand)
             self.update()
