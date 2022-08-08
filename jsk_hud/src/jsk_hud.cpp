@@ -136,7 +136,7 @@ int main(int argc, char **argv)
     status.push_back(topok("/gps/duro/status_string", "gps status"));
     status.push_back(topok("/left_lane", "left lane"));
     status.push_back(topok("/right_lane", "right lane"));
-    status.push_back(topok("/waypoints_saver_marker", "trajectory"));
+    status.push_back(topok("/global_waypoints/visualization", "trajectory"));
     status.push_back(topok("/wheel_angle_deg", "steering angle"));
     status.push_back(topok("/vehicle_speed_kmph", "speed"));
     status.push_back(topok("/ctrl_cmd", "control command"));
