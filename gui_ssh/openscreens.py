@@ -10,7 +10,7 @@ import subprocess
 import pyqtgraph as pg
 import pyqtgraph.Qt as qtgqt
 import pyqtgraph.dockarea as darea
-from PyQt5.QtCore import QTimer
+import PySide2.QtCore as qt
 #import numpy as np
 
 import re
@@ -103,7 +103,7 @@ class PlotHandler(object):
         self.listwidget
         dock1.addWidget(self.listwidget)
         self.update()
-        self.timer = QTimer()
+        self.timer = qt.QTimer()
         self.timer.timeout.connect(self.update)
         self.timer.start(1000*10)
         self.win.show()
@@ -125,7 +125,7 @@ class PlotHandler(object):
             if(validIP):
                 ipAddress = '.'.join(ipAddress)
             else:
-                print(f"Invalid IP address: {'.'.join(ipAddress)}")
+                print("Invalid IP address", '.'.join(ipAddress))
                 return
         else:
             ipAddress = "127.0.0.1"

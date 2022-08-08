@@ -12,5 +12,4 @@ class CSVReader:
                 self.data.append(actData)
 
     def printData(self):
-        print("CSV DATA:")
-        print(f"{self.data}")
+        print("CSV DATA:", self.data)
