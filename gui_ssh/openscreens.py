@@ -10,11 +10,7 @@ import subprocess
 import pyqtgraph as pg
 import pyqtgraph.Qt as qtgqt
 import pyqtgraph.dockarea as darea
-import PySide2.QtCore as qt
-#import numpy as np
-
 import re
-
 from functools import partial
 
 class PlotHandler(object):
@@ -81,7 +77,7 @@ class PlotHandler(object):
         self.sshLabel = qtgqt.QtGui.QLabel("SSH IP")
         self.sshLabel.setAlignment(qtgqt.QtCore.Qt.AlignCenter)
         self.sshLabel.setMaximumHeight(15)
-        self.textArea = qtgqt.QtGui.QTextEdit("127.0.0.1")
+        self.textArea = qtgqt.QtGui.QTextEdit("192.168.1.5")
         self.textArea.setStyleSheet("color: rgb" + green)
         widg1.addWidget(self.wipeBtn, row=1, col=0)
         widg1.addWidget(self.updateBtn, row=1, col=2)
@@ -103,7 +99,7 @@ class PlotHandler(object):
         self.listwidget
         dock1.addWidget(self.listwidget)
         self.update()
-        self.timer = qt.QTimer()
+        self.timer = qtgqt.QtCore.QTimer()
         self.timer.timeout.connect(self.update)
         self.timer.start(1000*10)
         self.win.show()
@@ -135,11 +131,16 @@ class PlotHandler(object):
         # print(command)
         for i in range(0, len(command)-1):
             sshCommand.append(command[i])
-        sshCommand.append('ssh')
-        sshCommand.append('-X')
-        sshCommand.append(hostAddress)
-        sshCommand.append("source /opt/ros/"+self.userData['ros']+"/setup.zsh; "+command[len(command)-1])
-        print(sshCommand)
+        if self.allowSSH.isChecked() == True:
+            sshCommand.append('ssh')
+            sshCommand.append('-X')
+            sshCommand.append(hostAddress)
+            sshCommand.append("source ~/.bashrc; "+ command[len(command)-1])
+        else:
+            sshCommand.append('bash')
+            sshCommand.append('-c')
+            sshCommand.append(command[len(command)-1])
+        print(" ".join(sshCommand))
         p = subprocess.Popen(sshCommand)
         self.update()
 
