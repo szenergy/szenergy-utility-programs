@@ -45,7 +45,7 @@ class PlotHandler(object):
                 widget.addWidget(self.screenButtons[buttonName], row=row, col=col)
             buttonFunction = buttonFunction.replace("'","")
             buttonFunction = re.split(r'[,]\s*', buttonFunction)
-            print(buttonFunction)
+            print(" ".join(buttonFunction))
             self.screenButtons[buttonName].clicked.connect(partial(self.buttonClicked, buttonFunction))
             self.screenButtons[buttonName].setStyleSheet("background-color: " + buttonBgColor + "; color: " + buttonTextColor)
             if col<2:
@@ -53,6 +53,7 @@ class PlotHandler(object):
             else:
                 col=0
                 row+=1
+        print(" ")
 
     def initializePlot(self):
         self.win = qtgqt.QtGui.QMainWindow()
@@ -119,24 +120,32 @@ class PlotHandler(object):
         if self.allowSSH.isChecked() == True:
             validIP, ipAddress = self.validateIPAddress()
             if(validIP):
-                ipAddress = '.'.join(ipAddress)
+                #ipAddress = '.'.join(str(unicode(ipAddress)))
+                ipAddress = "192.168.1.5" # TODO
             else:
-                print("Invalid IP address", '.'.join(ipAddress))
+                print("Invalid IP address", '.'.join(unicode(ipAddress)))
                 return
         else:
             ipAddress = "127.0.0.1"
         
         hostAddress = self.userData['username']+'@'+ipAddress
         sshCommand = []
-        # print(command)
-        for i in range(0, len(command)-1):
-            sshCommand.append(command[i])
+        # ssh nvidia@192.168.1.5 screen -mdS mc2 bash -c "source ~/.bashrc&& mc"
         if self.allowSSH.isChecked() == True:
             sshCommand.append('ssh')
-            sshCommand.append('-X')
             sshCommand.append(hostAddress)
-            sshCommand.append("source ~/.bashrc; "+ command[len(command)-1])
+            for i in range(0, len(command)-1):
+                sshCommand.append(command[i])
+            sshCommand.append('bash')
+            sshCommand.append('-c')
+            sshCommand.append('"')
+            sshCommand.append('source ~/.bashrc && '+ command[len(command)-1])
+            sshCommand.append('"')
+            #sshCommand.append(command[len(command)-1])
+            #sshCommand.append('-X')
         else:
+            for i in range(0, len(command)-1):
+                sshCommand.append(command[i])
             sshCommand.append('bash')
             sshCommand.append('-c')
             sshCommand.append(command[len(command)-1])
@@ -159,13 +168,13 @@ class PlotHandler(object):
 
     def openscreen(self):
         item = self.listwidget.currentItem()
-        print(item.text() + " >> double click")        
+        #print(item.text() + " >> double click")        
         toexec = ''.join(['screen -r ', str(item.text()), '; exec bash'])
         subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', toexec])
 
     def listclick(self, qmodelindex):
         item = self.listwidget.currentItem()
-        print("single click: " + item.text())
+        #print("single click: " + item.text())
 
     def wipeAllScreens(self):
         cmd = ['pkill', 'screen']

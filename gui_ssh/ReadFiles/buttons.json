@@ -21,7 +21,19 @@
         {
             "id":"rqtReconfigureButton",
             "label":"rqtreconfigure",
-            "command":"'screen', '-mdS', 'rqt_reconfigure', 'rosrun rqt_reconfigure rqt_reconfigure'"
+            "command":"'screen', '-mdS', 'rqt_reconfigure1', 'rosrun rqt_reconfigure rqt_reconfigure'"
+        },
+        {
+            "id":"mcButton",
+            "label":"mc",
+            "command":"'screen', '-mdS', 'mc1', 'mc'"
+        },
+        {
+            "id":"coreButton",
+            "label":"start_core",
+            "command":"'screen', '-mdS', 'start_core1', '/home/nvidia/start_core.sh'"
         }
+
+
     ]
 }
