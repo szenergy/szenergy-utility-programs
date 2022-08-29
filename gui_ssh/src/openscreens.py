@@ -150,7 +150,11 @@ class PlotHandler(object):
             sshCommand.append('-c')
             sshCommand.append(command[len(command)-1])
         print(" ".join(sshCommand))
-        p = subprocess.Popen(sshCommand)
+        #print(sshCommand)
+        #subprocess.check_call(sshCommand) 
+        # TODO
+        p = subprocess.Popen(sshCommand, stdout=subprocess.PIPE)
+        print(p.communicate()[0])
         self.update()
 
 

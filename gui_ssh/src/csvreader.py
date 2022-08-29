@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+
 class CSVReader:
     def __init__(self, filename):
         self.filename = filename
