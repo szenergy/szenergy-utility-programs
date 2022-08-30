@@ -4,12 +4,12 @@ from csvreader import *
 import sys
 from jsonreader import JSONReader
 from openscreens import *
-import rospkg
+import os
 
 if __name__ == '__main__':
-    rospack = rospkg.RosPack()
-    buttonReader = JSONReader(rospack.get_path("gui_ssh") + '/ReadFiles/buttons.json')
-    userDataReader = JSONReader(rospack.get_path("gui_ssh") + '/ReadFiles/userdata.json')
+    scriptDir = os.path.dirname(os.path.realpath(__file__))
+    buttonReader = JSONReader(scriptDir + '/../ReadFiles/buttons.json')
+    userDataReader = JSONReader(scriptDir + '/../ReadFiles/userdata.json')
     print(__file__, "- started ")
     ph = PlotHandler(buttonReader.data["buttons"], userDataReader.data["userdata"])
     ph.initializePlot()

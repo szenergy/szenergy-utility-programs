@@ -108,28 +108,32 @@ class PlotHandler(object):
     def validateIPAddress(self):
         ipList = self.textArea.toPlainText().split('.')
         valid = True
-        for i in ipList:
-            if int(i)>255 or int(i)<0 or (len(i)>1 and i[0]=='0'):
-                valid = False
-                break
+
         if len(ipList)!=4 or '' in ipList:
             valid = False
+        else:
+            for i in ipList:
+                if int(i)>255 or int(i)<0 or (len(i)>1 and i[0]=='0'):
+                    valid = False
+                    break
+
         return valid, ipList
 
     def buttonClicked(self, command):
         if self.allowSSH.isChecked() == True:
             validIP, ipAddress = self.validateIPAddress()
             if(validIP):
-                #ipAddress = '.'.join(str(unicode(ipAddress)))
-                ipAddress = "192.168.1.5" # TODO
+                ipAddress = '.'.join(ipAddress)
             else:
-                print("Invalid IP address", '.'.join(unicode(ipAddress)))
+                print("Invalid IP address", '.'.join(ipAddress))
                 return
         else:
             ipAddress = "127.0.0.1"
+        print(ipAddress)
         
         hostAddress = self.userData['username']+'@'+ipAddress
         sshCommand = []
+        
         # ssh nvidia@192.168.1.5 screen -mdS mc2 bash -c "source ~/.bashrc&& mc"
         if self.allowSSH.isChecked() == True:
             sshCommand.append('ssh')
@@ -149,12 +153,13 @@ class PlotHandler(object):
             sshCommand.append('bash')
             sshCommand.append('-c')
             sshCommand.append(command[len(command)-1])
-        print(" ".join(sshCommand))
+        
+        #print(" ".join(sshCommand))
         #print(sshCommand)
         #subprocess.check_call(sshCommand) 
         # TODO
-        p = subprocess.Popen(sshCommand, stdout=subprocess.PIPE)
-        print(p.communicate()[0])
+        #p = subprocess.Popen(sshCommand, stdout=subprocess.PIPE)
+        #print(p.communicate()[0])
         self.update()
 
 
