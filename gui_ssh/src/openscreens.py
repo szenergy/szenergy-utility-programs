@@ -13,12 +13,16 @@ import pyqtgraph.dockarea as darea
 import re
 from functools import partial
 
+from sh import ssh
+
+
 class PlotHandler(object):
     def __init__(self, buttonData, userData):
         super(PlotHandler, self).__init__()
         self.buttonData = buttonData
         self.userData = userData
         self.screenButtons = {}
+        self.runningScreens = []
         pg.setConfigOptions(antialias=True)
         self.app = qtgqt.QtGui.QApplication([])
 
@@ -78,7 +82,7 @@ class PlotHandler(object):
         self.sshLabel = qtgqt.QtGui.QLabel("SSH IP")
         self.sshLabel.setAlignment(qtgqt.QtCore.Qt.AlignCenter)
         self.sshLabel.setMaximumHeight(15)
-        self.textArea = qtgqt.QtGui.QTextEdit("192.168.1.5")
+        self.textArea = qtgqt.QtGui.QTextEdit("127.0.0.1")
         self.textArea.setStyleSheet("color: rgb" + green)
         widg1.addWidget(self.wipeBtn, row=1, col=0)
         widg1.addWidget(self.updateBtn, row=1, col=2)
@@ -98,7 +102,20 @@ class PlotHandler(object):
         self.listwidget.clicked.connect(self.listclick)
         self.listwidget.itemDoubleClicked.connect(self.openscreen)
         self.listwidget
+        
+        self.listwidgetSSH = qtgqt.QtGui.QListWidget()
+        self.listwidgetSSH.setStyleSheet("""QListWidget{ color: rgb(171, 178, 191);}""")
+        self.listwidgetSSH.clicked.connect(self.listclick)
+        self.listwidgetSSH.itemDoubleClicked.connect(self.openscreenSSH)
+        self.listwidgetSSH
+        
         dock1.addWidget(self.listwidget)
+        
+        SSHCommandLabel = qtgqt.QtGui.QLabel("SSH Commands")
+        SSHCommandLabel.setStyleSheet("""background-color: rgb(24, 28, 31); color:white""")
+        dock1.addWidget(SSHCommandLabel)
+        dock1.addWidget(self.listwidgetSSH)
+
         self.update()
         self.timer = qtgqt.QtCore.QTimer()
         self.timer.timeout.connect(self.update)
@@ -125,70 +142,102 @@ class PlotHandler(object):
             if(validIP):
                 ipAddress = '.'.join(ipAddress)
             else:
-                print("Invalid IP address", '.'.join(ipAddress))
+                print("Invalid IP address", '.'.join(unicode(ipAddress)))
                 return
         else:
             ipAddress = "127.0.0.1"
-        print(ipAddress)
         
         hostAddress = self.userData['username']+'@'+ipAddress
         sshCommand = []
-        
         # ssh nvidia@192.168.1.5 screen -mdS mc2 bash -c "source ~/.bashrc&& mc"
         if self.allowSSH.isChecked() == True:
+            sshCommand.append('sshpass')
+            sshCommand.append('-p')
+            sshCommand.append(self.userData['password'])
             sshCommand.append('ssh')
             sshCommand.append(hostAddress)
             for i in range(0, len(command)-1):
                 sshCommand.append(command[i])
+            sshCommand.append('`')
             sshCommand.append('bash')
             sshCommand.append('-c')
             sshCommand.append('"')
-            sshCommand.append('source ~/.bashrc && '+ command[len(command)-1])
+            sshCommand.append('source ~/.bashrc '+ command[len(command)-1])
             sshCommand.append('"')
-            #sshCommand.append(command[len(command)-1])
-            #sshCommand.append('-X')
+            sshCommand.append('`')
+            # sshCommand.append(command[len(command)-1])
+            # sshCommand.append('-X')
         else:
             for i in range(0, len(command)-1):
                 sshCommand.append(command[i])
             sshCommand.append('bash')
             sshCommand.append('-c')
             sshCommand.append(command[len(command)-1])
-        
-        #print(" ".join(sshCommand))
+        print(" ".join(sshCommand))
         #print(sshCommand)
         #subprocess.check_call(sshCommand) 
         # TODO
-        #p = subprocess.Popen(sshCommand, stdout=subprocess.PIPE)
+        p = subprocess.Popen(sshCommand, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         #print(p.communicate()[0])
         self.update()
 
 
     def update(self):
         self.listwidget.clear()
+        self.listwidgetSSH.clear()
+        
         p = subprocess.Popen(['screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)        
         output, err = p.communicate()
         lines = output.splitlines()
-        #print(len(lines))
+        print("Lines:", lines)
         if len(lines) > 2:
             for line in lines:
                 line = line.decode('utf-8')
                 if line[0] == '\t':
                     self.listwidget.insertItem(0, line.split()[0].strip().split('.')[1])
+        
+        # SSH Update
+        validIP, ipAddress = self.validateIPAddress()
+        ipAddress = '.'.join(ipAddress)
+        hostAddress = self.userData['username']+'@'+ipAddress
+
+        p = subprocess.Popen(['sshpass', '-p', self.userData['password'], 'ssh', hostAddress, 'screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output, err = p.communicate()
+        lines = output.splitlines()
+        
+        if len(lines) > 2:
+            for line in lines:
+                line = line.decode('utf-8')
+                if line[0] == '\t':
+                    self.listwidgetSSH.insertItem(0, line.split()[0].strip().split('.')[1])
+                
 
     def openscreen(self):
         item = self.listwidget.currentItem()
         #print(item.text() + " >> double click")        
         toexec = ''.join(['screen -r ', str(item.text()), '; exec bash'])
         subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', toexec])
+    
+    def openscreenSSH(self):
+        item = self.listwidgetSSH.currentItem()
+        #print(item.text() + " >> double click")        
+        toexec = ''.join(['screen -r ', str(item.text()), '; exec bash'])
+        subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', toexec])
 
     def listclick(self, qmodelindex):
         item = self.listwidget.currentItem()
-        #print("single click: " + item.text())
 
     def wipeAllScreens(self):
+        self.runningScreens = []
         cmd = ['pkill', 'screen']
         p = subprocess.Popen(cmd)
-        cmd = ['pkill', 'roscore']
+
+        validIP, ipAddress = self.validateIPAddress()
+        ipAddress = '.'.join(ipAddress)
+        hostAddress = self.userData['username']+'@'+ipAddress
+        print(ipAddress)
+
+        cmd = ['sshpass', '-p', self.userData['password'], 'ssh', hostAddress, 'pkill', 'screen']
         p = subprocess.Popen(cmd)
         print(cmd)
         self.update()

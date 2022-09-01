@@ -1,7 +1,7 @@
 {
     "userdata":
     {
-        "username":"nvidia",
-        "ros":"noetic"
+        "username":"username",
+        "password":"password"
     }
 }
