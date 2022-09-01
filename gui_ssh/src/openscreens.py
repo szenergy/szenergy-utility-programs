@@ -151,9 +151,6 @@ class PlotHandler(object):
         sshCommand = []
         # ssh nvidia@192.168.1.5 screen -mdS mc2 bash -c "source ~/.bashrc&& mc"
         if self.allowSSH.isChecked() == True:
-            sshCommand.append('sshpass')
-            sshCommand.append('-p')
-            sshCommand.append(self.userData['password'])
             sshCommand.append('ssh')
             sshCommand.append(hostAddress)
             for i in range(0, len(command)-1):
@@ -201,7 +198,7 @@ class PlotHandler(object):
         ipAddress = '.'.join(ipAddress)
         hostAddress = self.userData['username']+'@'+ipAddress
 
-        p = subprocess.Popen(['sshpass', '-p', self.userData['password'], 'ssh', hostAddress, 'screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(['ssh', hostAddress, 'screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, err = p.communicate()
         lines = output.splitlines()
         
@@ -237,7 +234,7 @@ class PlotHandler(object):
         hostAddress = self.userData['username']+'@'+ipAddress
         print(ipAddress)
 
-        cmd = ['sshpass', '-p', self.userData['password'], 'ssh', hostAddress, 'pkill', 'screen']
+        cmd = ['ssh', hostAddress, 'pkill', 'screen']
         p = subprocess.Popen(cmd)
         print(cmd)
         self.update()
