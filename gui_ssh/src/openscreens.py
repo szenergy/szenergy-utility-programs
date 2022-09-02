@@ -13,9 +13,6 @@ import pyqtgraph.dockarea as darea
 import re
 from functools import partial
 
-from sh import ssh
-
-
 class PlotHandler(object):
     def __init__(self, buttonData, userData):
         super(PlotHandler, self).__init__()
@@ -82,7 +79,7 @@ class PlotHandler(object):
         self.sshLabel = qtgqt.QtGui.QLabel("SSH IP")
         self.sshLabel.setAlignment(qtgqt.QtCore.Qt.AlignCenter)
         self.sshLabel.setMaximumHeight(15)
-        self.textArea = qtgqt.QtGui.QTextEdit("127.0.0.1")
+        self.textArea = qtgqt.QtGui.QTextEdit("192.168.1.5")
         self.textArea.setStyleSheet("color: rgb" + green)
         widg1.addWidget(self.wipeBtn, row=1, col=0)
         widg1.addWidget(self.updateBtn, row=1, col=2)
@@ -123,7 +120,8 @@ class PlotHandler(object):
         self.win.show()
 
     def validateIPAddress(self):
-        ipList = self.textArea.toPlainText().split('.')
+        ipList = str(self.textArea.toPlainText())
+        ipList = ipList.split('.')
         valid = True
 
         if len(ipList)!=4 or '' in ipList:
@@ -133,12 +131,13 @@ class PlotHandler(object):
                 if int(i)>255 or int(i)<0 or (len(i)>1 and i[0]=='0'):
                     valid = False
                     break
-
+        
         return valid, ipList
 
     def buttonClicked(self, command):
         if self.allowSSH.isChecked() == True:
             validIP, ipAddress = self.validateIPAddress()
+            
             if(validIP):
                 ipAddress = '.'.join(ipAddress)
             else:
@@ -155,13 +154,11 @@ class PlotHandler(object):
             sshCommand.append(hostAddress)
             for i in range(0, len(command)-1):
                 sshCommand.append(command[i])
-            sshCommand.append('`')
             sshCommand.append('bash')
             sshCommand.append('-c')
             sshCommand.append('"')
-            sshCommand.append('source ~/.bashrc '+ command[len(command)-1])
+            sshCommand.append('source ~/.bashrc && '+ command[len(command)-1])
             sshCommand.append('"')
-            sshCommand.append('`')
             # sshCommand.append(command[len(command)-1])
             # sshCommand.append('-X')
         else:
@@ -217,8 +214,14 @@ class PlotHandler(object):
     
     def openscreenSSH(self):
         item = self.listwidgetSSH.currentItem()
+
+        validIP, ipAddress = self.validateIPAddress()
+        ipAddress = '.'.join(ipAddress)
+        hostAddress = self.userData['username']+'@'+ipAddress
+
         #print(item.text() + " >> double click")        
-        toexec = ''.join(['screen -r ', str(item.text()), '; exec bash'])
+        toexec = ''.join(['ssh -t ', hostAddress, ' screen -r ', str(item.text()), '; exec bash'])
+        print(toexec)
         subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', toexec])
 
     def listclick(self, qmodelindex):
