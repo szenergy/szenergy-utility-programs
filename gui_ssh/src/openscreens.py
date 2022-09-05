@@ -79,7 +79,7 @@ class PlotHandler(object):
         self.sshLabel = qtgqt.QtGui.QLabel("SSH IP")
         self.sshLabel.setAlignment(qtgqt.QtCore.Qt.AlignCenter)
         self.sshLabel.setMaximumHeight(15)
-        self.textArea = qtgqt.QtGui.QTextEdit("192.168.1.5")
+        self.textArea = qtgqt.QtGui.QTextEdit("127.0.0.1")
         self.textArea.setStyleSheet("color: rgb" + green)
         widg1.addWidget(self.wipeBtn, row=1, col=0)
         widg1.addWidget(self.updateBtn, row=1, col=2)
@@ -229,15 +229,25 @@ class PlotHandler(object):
 
     def wipeAllScreens(self):
         self.runningScreens = []
-        cmd = ['pkill', 'screen']
-        p = subprocess.Popen(cmd)
+        # cmd = ['pkill', 'screen']
+        # p = subprocess.Popen(cmd)
+
+        p = subprocess.Popen(['screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)        
+        output, err = p.communicate()
+        lines = output.splitlines()
+
+        if lines[0] == 'There is a screen on:' or lines[0] == 'There are screens on:':
+            for i in range(1, len(lines)-1):
+                line = lines[i].decode('utf-8')
+                PID = line.split()[0].strip().split('.')[1]
+                p = subprocess.Popen(['screen', '-XS', PID, 'quit'])
 
         validIP, ipAddress = self.validateIPAddress()
         ipAddress = '.'.join(ipAddress)
         hostAddress = self.userData['username']+'@'+ipAddress
         print(ipAddress)
 
-        cmd = ['ssh', hostAddress, 'pkill', 'screen']
-        p = subprocess.Popen(cmd)
-        print(cmd)
+        # cmd = ['ssh', hostAddress, 'pkill', 'screen']
+        # p = subprocess.Popen(cmd)
+        # print(cmd)
         self.update()
