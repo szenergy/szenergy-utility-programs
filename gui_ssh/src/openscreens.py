@@ -79,7 +79,7 @@ class PlotHandler(object):
         self.sshLabel = qtgqt.QtGui.QLabel("SSH IP")
         self.sshLabel.setAlignment(qtgqt.QtCore.Qt.AlignCenter)
         self.sshLabel.setMaximumHeight(15)
-        self.textArea = qtgqt.QtGui.QTextEdit("127.0.0.1")
+        self.textArea = qtgqt.QtGui.QTextEdit("192.168.1.5")
         self.textArea.setStyleSheet("color: rgb" + green)
         widg1.addWidget(self.wipeBtn, row=1, col=0)
         widg1.addWidget(self.updateBtn, row=1, col=2)
@@ -119,6 +119,23 @@ class PlotHandler(object):
         self.timer.start(1000*10)
         self.win.show()
 
+    def checkIfScreenIsRunning(self):
+        p = subprocess.Popen(['screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)        
+        output, err = p.communicate()
+        lines = output.splitlines()
+        
+        # SSH Update
+        validIP, ipAddress = self.validateIPAddress()
+        ipAddress = '.'.join(ipAddress)
+        hostAddress = self.userData['username']+'@'+ipAddress
+
+        pSSH = subprocess.Popen(['ssh', hostAddress, 'screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)     
+        outputSSH, errSSH = pSSH.communicate()
+        linesSSH = outputSSH.splitlines()
+
+        return {'localrun': [lines[0] == 'There is a screen on:' or lines[0] == 'There are screens on:', output],
+        'sshrun': [linesSSH[0] == 'There is a screen on:' or linesSSH[0] == 'There are screens on:', outputSSH, hostAddress]}
+
     def validateIPAddress(self):
         ipList = str(self.textArea.toPlainText())
         ipList = ipList.split('.')
@@ -154,11 +171,13 @@ class PlotHandler(object):
             sshCommand.append(hostAddress)
             for i in range(0, len(command)-1):
                 sshCommand.append(command[i])
+            # sshCommand.append('`')
             sshCommand.append('bash')
             sshCommand.append('-c')
             sshCommand.append('"')
             sshCommand.append('source ~/.bashrc && '+ command[len(command)-1])
             sshCommand.append('"')
+            # sshCommand.append('`')
             # sshCommand.append(command[len(command)-1])
             # sshCommand.append('-X')
         else:
@@ -180,13 +199,13 @@ class PlotHandler(object):
         self.listwidget.clear()
         self.listwidgetSSH.clear()
         
-        p = subprocess.Popen(['screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)        
-        output, err = p.communicate()
-        lines = output.splitlines()
-        print("Lines:", lines)
-        if len(lines) > 2:
-            for line in lines:
-                line = line.decode('utf-8')
+        AllScreens = self.checkIfScreenIsRunning()
+
+        if AllScreens['localrun'][0]:
+            lines = AllScreens['localrun'][1].splitlines()
+            print("Lines:", lines)
+            for i in range(1, len(lines)-1):
+                line = lines[i].decode('utf-8') 
                 if line[0] == '\t':
                     self.listwidget.insertItem(0, line.split()[0].strip().split('.')[1])
         
@@ -194,14 +213,12 @@ class PlotHandler(object):
         validIP, ipAddress = self.validateIPAddress()
         ipAddress = '.'.join(ipAddress)
         hostAddress = self.userData['username']+'@'+ipAddress
-
-        p = subprocess.Popen(['ssh', hostAddress, 'screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output, err = p.communicate()
-        lines = output.splitlines()
         
-        if len(lines) > 2:
-            for line in lines:
-                line = line.decode('utf-8')
+        if AllScreens['sshrun'][0]:
+            lines = AllScreens['sshrun'][1].splitlines()
+            print("Lines:", lines)
+            for i in range(1, len(lines)-1):
+                line = lines[i].decode('utf-8')
                 if line[0] == '\t':
                     self.listwidgetSSH.insertItem(0, line.split()[0].strip().split('.')[1])
                 
@@ -229,25 +246,23 @@ class PlotHandler(object):
 
     def wipeAllScreens(self):
         self.runningScreens = []
-        # cmd = ['pkill', 'screen']
-        # p = subprocess.Popen(cmd)
 
-        p = subprocess.Popen(['screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)        
-        output, err = p.communicate()
-        lines = output.splitlines()
+        AllScreens = self.checkIfScreenIsRunning()
 
-        if lines[0] == 'There is a screen on:' or lines[0] == 'There are screens on:':
+        if AllScreens['localrun'][0]:
+            lines = AllScreens['localrun'][1].splitlines()
+            print("Lines:", lines)
             for i in range(1, len(lines)-1):
                 line = lines[i].decode('utf-8')
                 PID = line.split()[0].strip().split('.')[1]
                 p = subprocess.Popen(['screen', '-XS', PID, 'quit'])
 
-        validIP, ipAddress = self.validateIPAddress()
-        ipAddress = '.'.join(ipAddress)
-        hostAddress = self.userData['username']+'@'+ipAddress
-        print(ipAddress)
-
-        # cmd = ['ssh', hostAddress, 'pkill', 'screen']
-        # p = subprocess.Popen(cmd)
-        # print(cmd)
+        if AllScreens['sshrun'][0]:
+            lines = AllScreens['localrun'][1].splitlines()
+            print("Lines:", lines)
+            for i in range(1, len(lines)-1):
+                line = lines[i].decode('utf-8')
+                PID = line.split()[0].strip().split('.')[1]
+                p = subprocess.Popen(['ssh', AllScreens['sshrun'][2], 'screen', '-XS', PID, 'quit'])
+        
         self.update()
