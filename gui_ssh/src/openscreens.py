@@ -79,7 +79,7 @@ class PlotHandler(object):
         self.sshLabel = qtgqt.QtGui.QLabel("SSH IP")
         self.sshLabel.setAlignment(qtgqt.QtCore.Qt.AlignCenter)
         self.sshLabel.setMaximumHeight(15)
-        self.textArea = qtgqt.QtGui.QTextEdit("127.0.0.1")
+        self.textArea = qtgqt.QtGui.QTextEdit("192.168.1.5")
         self.textArea.setStyleSheet("color: rgb" + green)
         widg1.addWidget(self.wipeBtn, row=1, col=0)
         widg1.addWidget(self.updateBtn, row=1, col=2)
@@ -175,7 +175,7 @@ class PlotHandler(object):
             sshCommand.append('bash')
             sshCommand.append('-c')
             sshCommand.append('"')
-            sshCommand.append('source ~/.bashrc && '+ command[len(command)-1])
+            sshCommand.append('source /opt/ros/melodic/setup.bash'+ command[len(command)-1])
             sshCommand.append('"')
             sshCommand.append('`')
             # sshCommand.append(command[len(command)-1])
@@ -251,18 +251,19 @@ class PlotHandler(object):
 
         if AllScreens['localrun'][0]:
             lines = AllScreens['localrun'][1].splitlines()
-            print("Lines:", lines)
+            # print("Lines:", lines)
             for i in range(1, len(lines)-1):
                 line = lines[i].decode('utf-8')
                 PID = line.split()[0].strip().split('.')[1]
                 p = subprocess.Popen(['screen', '-XS', PID, 'quit'])
 
         if AllScreens['sshrun'][0]:
-            lines = AllScreens['localrun'][1].splitlines()
+            lines = AllScreens['sshrun'][1].splitlines()
             print("Lines:", lines)
             for i in range(1, len(lines)-1):
                 line = lines[i].decode('utf-8')
+                print("Actual Line:", lines[i])
                 PID = line.split()[0].strip().split('.')[1]
-                p = subprocess.Popen(['ssh', AllScreens['sshrun'][2], 'screen', '-XS', PID, 'quit'])
+                p = subprocess.Popen(['ssh', '-t', AllScreens['sshrun'][2], 'screen', '-XS', PID, 'quit'])
         
         self.update()
