@@ -171,13 +171,13 @@ class PlotHandler(object):
             sshCommand.append(hostAddress)
             for i in range(0, len(command)-1):
                 sshCommand.append(command[i])
-            sshCommand.append('`')
+            # sshCommand.append('`')
             sshCommand.append('bash')
             sshCommand.append('-c')
             sshCommand.append('"')
-            sshCommand.append('source /opt/ros/melodic/setup.bash'+ command[len(command)-1])
+            sshCommand.append('source ~/.bashrc && '+ command[len(command)-1])
             sshCommand.append('"')
-            sshCommand.append('`')
+            # sshCommand.append('`')
             # sshCommand.append(command[len(command)-1])
             # sshCommand.append('-X')
         else:
