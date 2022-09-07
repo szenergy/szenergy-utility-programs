@@ -175,7 +175,7 @@ class PlotHandler(object):
             sshCommand.append('bash')
             sshCommand.append('-c')
             sshCommand.append('"')
-            sshCommand.append('source ~/.bashrc && '+ command[len(command)-1])
+            sshCommand.append('source ~/ssh_ros && '+ command[len(command)-1])
             sshCommand.append('"')
             # sshCommand.append('`')
             # sshCommand.append(command[len(command)-1])
