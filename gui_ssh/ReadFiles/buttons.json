@@ -32,8 +32,22 @@
             "id":"coreButton",
             "label":"start_core",
             "command":"'screen', '-mdS', 'start_core1', '/home/nvidia/start_core.sh'"
+        },
+        {
+            "id":"duroButton",
+            "label":"duro",
+            "command":"'screen', '-mdS', 'duroScreen', 'roslaunch nissan_bringup gps.duro.launch'"
+        },
+        {
+            "id":"novatel",
+            "label":"novatel",
+            "command":"'screen', '-mdS', 'novatelScreen', 'roslaunch nissan_bringup gps.nova.launch'"
+        },
+        {
+            "id":"zed1",
+            "label":"zed1",
+            "command":"'screen', '-mdS', 'zedScreen', 'roslaunch nissan_bringup zed_camera_no_tf.launch'"
         }
-
 
     ]
 }
