@@ -47,7 +47,76 @@
             "id":"zed1",
             "label":"zed1",
             "command":"'screen', '-mdS', 'zedScreen', 'roslaunch nissan_bringup zed_camera_no_tf.launch'"
+        },
+        {
+            "id":"tfDuroButton",
+            "label":"tfDuro",
+            "command":"'screen', '-mdS', 'tfDuro', 'roslaunch nissan_bringup tf_duro_global_frame_tf_publisher.statictf.launch'"
+        },
+        {
+            "id":"tfNovaButton",
+            "label":"tfNova",
+            "command":"'screen', '-mdS', 'tfNova', 'roslaunch nissan_bringup tf_novatel_global_frame_tf_publisher.statictf.launch'"
+        },
+        {
+            "id":"temporaryButton",
+            "label":"temporary",
+            "command":"'screen', '-mdS', 'temporary', 'roslaunch ros_guis temporary.launch'"
+        },
+        {
+            "id":"sickSensorButton",
+            "label":"SICK",
+            "command":"'screen', '-mdS', 'SICK', 'roslaunch nissan_bringup sick_lms_111.nissan.launch'"
+        },
+        {
+            "id":"ousterLeftButton",
+            "label":"ousterLeft",
+            "command":"'screen', '-mdS', 'ousterLeft', 'roslaunch nissan_bringup ouster_left.launch'"
+        },
+        {
+            "id":"ousterRightButton",
+            "label":"ousterRight",
+            "command":"'screen', '-mdS', 'ousterRight', 'roslaunch nissan_bringup ouster_right.launch'"
+        },
+        {
+            "id":"veloLeftButton",
+            "label":"velodyneLeft",
+            "command":"'screen', '-mdS', 'veloLeft', 'roslaunch nissan_bringup velodyne_left.launch'"
+        },
+        {
+            "id":"veloRightButton",
+            "label":"velodyneRight",
+            "command":"'screen', '-mdS', 'veloRight', 'roslaunch nissan_bringup velodyne_right.launch'"
+        },
+        {
+            "id":"CANControlButton",
+            "label":"CANControl",
+            "command":"'screen', '-mdS', 'CANControl', 'roslaunch nissan_bringup nissan_can_control.launch'"
+        },
+        {
+            "id":"LeafTFButton",
+            "label":"LeftTF",
+            "command":"'screen', '-mdS', 'LeafTF', 'roslaunch nissan_bringup tf_nissanleaf_statictf.launch'"
+        },
+        {
+            "id":"AllSensorsButton",
+            "label":"start_all_sensors",
+            "command":"'screen', '-mdS', 'AllSensors', 'roslaunch nissan_bringup nissan.leaf.bringup.2020.A.launch'"
+        },
+        {
+            "id":"StartIMUButton",
+            "label":"start_imu",
+            "command":"'screen', '-mdS', 'IMU', 'roslaunch fsm_imu fsm9.launch'"
+        },
+        {
+            "id":"carParamsButton",
+            "label":"car_parameters",
+            "command":"'screen', '-mdS', 'carParams', 'roslaunch nissan_bringup car_parameters_leaf.launch'"
+        },
+        {
+            "id":"startOdomButton",
+            "label":"car_odometry",
+            "command":"'screen', '-mdS', 'carOdometry', 'roslaunch nissan_bringup odom.launch'"
         }
-
     ]
 }

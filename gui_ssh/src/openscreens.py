@@ -24,8 +24,8 @@ class PlotHandler(object):
         self.app = qtgqt.QtGui.QApplication([])
 
     def initButtons(self, widget):
-        col, row = (0, 2)
-        countRows = len(self.buttonData)//3
+        col, row = (0, 4)
+        countRows = len(self.buttonData)//5
         for button in self.buttonData:
             buttonName, buttonLabel, buttonFunction = button["id"], button["label"], button["command"]
             buttonBgColor, buttonTextColor = "rgb(40, 44, 52)", "rgb(171, 178, 191)"
@@ -34,13 +34,18 @@ class PlotHandler(object):
             if "textColor" in button.keys():
                 buttonTextColor = button["textColor"]
             
+            
             self.screenButtons[buttonName] = qtgqt.QtGui.QPushButton(buttonLabel)
-            if row-2 == countRows:
-                if(len(self.buttonData)%3) == 1:
-                    widget.addWidget(self.screenButtons[buttonName], row=row, col=1)
-                if(len(self.buttonData)%3) == 2:
+            if countRows == row-countRows:
+                if(len(self.buttonData)%5 == 2):
+                    if col==1:
+                        col=4
+                    widget.addWidget(self.screenButtons[buttonName], row=row, col=col)
+                if(len(self.buttonData)%5 == 3):
                     if col==1:
                         col=2
+                    elif col==3:
+                        col=4
                     widget.addWidget(self.screenButtons[buttonName], row=row, col=col)
             else:
                 widget.addWidget(self.screenButtons[buttonName], row=row, col=col)
@@ -49,7 +54,7 @@ class PlotHandler(object):
             print(" ".join(buttonFunction))
             self.screenButtons[buttonName].clicked.connect(partial(self.buttonClicked, buttonFunction))
             self.screenButtons[buttonName].setStyleSheet("background-color: " + buttonBgColor + "; color: " + buttonTextColor)
-            if col<2:
+            if col<4:
                 col+=1
             else:
                 col=0
@@ -79,12 +84,12 @@ class PlotHandler(object):
         self.sshLabel = qtgqt.QtGui.QLabel("SSH IP")
         self.sshLabel.setAlignment(qtgqt.QtCore.Qt.AlignCenter)
         self.sshLabel.setMaximumHeight(15)
-        self.textArea = qtgqt.QtGui.QTextEdit("192.168.1.5")
+        self.textArea = qtgqt.QtGui.QTextEdit("127.0.0.1")
         self.textArea.setStyleSheet("color: rgb" + green)
         widg1.addWidget(self.wipeBtn, row=1, col=0)
-        widg1.addWidget(self.updateBtn, row=1, col=2)
-        widg1.addWidget(self.textArea, row=1, col=1)
-        widg1.addWidget(self.sshLabel, row=0, col=1)
+        widg1.addWidget(self.updateBtn, row=1, col=4)
+        widg1.addWidget(self.textArea, row=1, col=2)
+        widg1.addWidget(self.sshLabel, row=0, col=2)
         widg1.addWidget(self.allowSSH, row=0, col=0)
         self.textArea.setMaximumHeight(25)
         self.textArea.setMaximumWidth(200)
