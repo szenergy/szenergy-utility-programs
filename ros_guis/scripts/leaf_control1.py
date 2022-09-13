@@ -714,7 +714,7 @@ class LeafSubscriber(object):
                 try:
                     rospy.wait_for_message("/left_os1/os1_cloud_node/points", senmsg.PointCloud2, timeout=0.2)
                     self.ouster_lef_ok = "OK"
-                except rospy.ROSException e:
+                except rospy.ROSException, e:
                     self.ouster_lef_ok = "ERR"
                 try:
                     rospy.wait_for_message("/right_os1/os1_cloud_node/points", senmsg.PointCloud2, timeout=0.2)
