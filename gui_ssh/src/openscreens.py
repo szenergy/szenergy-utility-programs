@@ -134,8 +134,12 @@ class PlotHandler(object):
         ipAddress = '.'.join(ipAddress)
         hostAddress = self.userData['username']+'@'+ipAddress
 
-        pSSH = subprocess.Popen(['ssh', hostAddress, 'screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)     
-        outputSSH, errSSH = pSSH.communicate()
+        if self.allowSSH.isChecked():
+            pSSH = subprocess.Popen(['ssh', hostAddress, 'screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)     
+            outputSSH, errSSH = pSSH.communicate()
+        else:
+            outputSSH = ""
+        
         linesSSH = outputSSH.splitlines()
 
         return {'localrun': [lines[0] == 'There is a screen on:' or lines[0] == 'There are screens on:', output],
@@ -215,17 +219,18 @@ class PlotHandler(object):
                     self.listwidget.insertItem(0, line.split()[0].strip().split('.')[1])
         
         # SSH Update
-        validIP, ipAddress = self.validateIPAddress()
-        ipAddress = '.'.join(ipAddress)
-        hostAddress = self.userData['username']+'@'+ipAddress
-        
-        if AllScreens['sshrun'][0]:
-            lines = AllScreens['sshrun'][1].splitlines()
-            print("Lines:", lines)
-            for i in range(1, len(lines)-1):
-                line = lines[i].decode('utf-8')
-                if line[0] == '\t':
-                    self.listwidgetSSH.insertItem(0, line.split()[0].strip().split('.')[1])
+        if self.allowSSH.isChecked():
+            validIP, ipAddress = self.validateIPAddress()
+            ipAddress = '.'.join(ipAddress)
+            hostAddress = self.userData['username']+'@'+ipAddress
+            
+            if AllScreens['sshrun'][0]:
+                lines = AllScreens['sshrun'][1].splitlines()
+                print("Lines:", lines)
+                for i in range(1, len(lines)-1):
+                    line = lines[i].decode('utf-8')
+                    if line[0] == '\t':
+                        self.listwidgetSSH.insertItem(0, line.split()[0].strip().split('.')[1])
                 
 
     def openscreen(self):
@@ -261,14 +266,15 @@ class PlotHandler(object):
                 line = lines[i].decode('utf-8')
                 PID = line.split()[0].strip().split('.')[1]
                 p = subprocess.Popen(['screen', '-XS', PID, 'quit'])
-
-        if AllScreens['sshrun'][0]:
-            lines = AllScreens['sshrun'][1].splitlines()
-            print("Lines:", lines)
-            for i in range(1, len(lines)-1):
-                line = lines[i].decode('utf-8')
-                print("Actual Line:", lines[i])
-                PID = line.split()[0].strip().split('.')[1]
-                p = subprocess.Popen(['ssh', '-t', AllScreens['sshrun'][2], 'screen', '-XS', PID, 'quit'])
+        
+        if self.allowSSH.isChecked():
+            if AllScreens['sshrun'][0]:
+                lines = AllScreens['sshrun'][1].splitlines()
+                print("Lines:", lines)
+                for i in range(1, len(lines)-1):
+                    line = lines[i].decode('utf-8')
+                    print("Actual Line:", lines[i])
+                    PID = line.split()[0].strip().split('.')[1]
+                    p = subprocess.Popen(['ssh', '-t', AllScreens['sshrun'][2], 'screen', '-XS', PID, 'quit'])
         
         self.update()
