@@ -84,7 +84,7 @@ class PlotHandler(object):
         self.sshLabel = qtgqt.QtGui.QLabel("SSH IP")
         self.sshLabel.setAlignment(qtgqt.QtCore.Qt.AlignCenter)
         self.sshLabel.setMaximumHeight(15)
-        self.textArea = qtgqt.QtGui.QTextEdit("127.0.0.1")
+        self.textArea = qtgqt.QtGui.QTextEdit("192.168.1.5")
         self.textArea.setStyleSheet("color: rgb" + green)
         widg1.addWidget(self.wipeBtn, row=1, col=0)
         widg1.addWidget(self.updateBtn, row=1, col=4)
@@ -170,7 +170,7 @@ class PlotHandler(object):
                 print("Invalid IP address", '.'.join(unicode(ipAddress)))
                 return
         else:
-            ipAddress = "127.0.0.1"
+            ipAddress = "192.168.1.5"
         
         hostAddress = self.userData['username']+'@'+ipAddress
         sshCommand = []
