@@ -139,6 +139,7 @@ class PlotHandler(object):
             outputSSH, errSSH = pSSH.communicate()
         else:
             outputSSH = ""
+            return {'localrun': [lines[0] == 'There is a screen on:' or lines[0] == 'There are screens on:', output]}
         
         linesSSH = outputSSH.splitlines()
 
