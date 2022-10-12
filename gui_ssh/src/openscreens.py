@@ -24,8 +24,8 @@ class PlotHandler(object):
         self.app = qtgqt.QtGui.QApplication([])
 
     def initButtons(self, widget):
-        col, row = (0, 2)
-        countRows = len(self.buttonData)//3
+        col, row = (0, 4)
+        countRows = len(self.buttonData)//5
         for button in self.buttonData:
             buttonName, buttonLabel, buttonFunction = button["id"], button["label"], button["command"]
             buttonBgColor, buttonTextColor = "rgb(40, 44, 52)", "rgb(171, 178, 191)"
@@ -34,13 +34,18 @@ class PlotHandler(object):
             if "textColor" in button.keys():
                 buttonTextColor = button["textColor"]
             
+            
             self.screenButtons[buttonName] = qtgqt.QtGui.QPushButton(buttonLabel)
-            if row-2 == countRows:
-                if(len(self.buttonData)%3) == 1:
-                    widget.addWidget(self.screenButtons[buttonName], row=row, col=1)
-                if(len(self.buttonData)%3) == 2:
+            if countRows == row-countRows:
+                if(len(self.buttonData)%5 == 2):
+                    if col==1:
+                        col=4
+                    widget.addWidget(self.screenButtons[buttonName], row=row, col=col)
+                if(len(self.buttonData)%5 == 3):
                     if col==1:
                         col=2
+                    elif col==3:
+                        col=4
                     widget.addWidget(self.screenButtons[buttonName], row=row, col=col)
             else:
                 widget.addWidget(self.screenButtons[buttonName], row=row, col=col)
@@ -49,7 +54,7 @@ class PlotHandler(object):
             print(" ".join(buttonFunction))
             self.screenButtons[buttonName].clicked.connect(partial(self.buttonClicked, buttonFunction))
             self.screenButtons[buttonName].setStyleSheet("background-color: " + buttonBgColor + "; color: " + buttonTextColor)
-            if col<2:
+            if col<4:
                 col+=1
             else:
                 col=0
@@ -82,9 +87,9 @@ class PlotHandler(object):
         self.textArea = qtgqt.QtGui.QTextEdit("192.168.1.5")
         self.textArea.setStyleSheet("color: rgb" + green)
         widg1.addWidget(self.wipeBtn, row=1, col=0)
-        widg1.addWidget(self.updateBtn, row=1, col=2)
-        widg1.addWidget(self.textArea, row=1, col=1)
-        widg1.addWidget(self.sshLabel, row=0, col=1)
+        widg1.addWidget(self.updateBtn, row=1, col=4)
+        widg1.addWidget(self.textArea, row=1, col=2)
+        widg1.addWidget(self.sshLabel, row=0, col=2)
         widg1.addWidget(self.allowSSH, row=0, col=0)
         self.textArea.setMaximumHeight(25)
         self.textArea.setMaximumWidth(200)
@@ -129,8 +134,13 @@ class PlotHandler(object):
         ipAddress = '.'.join(ipAddress)
         hostAddress = self.userData['username']+'@'+ipAddress
 
-        pSSH = subprocess.Popen(['ssh', hostAddress, 'screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)     
-        outputSSH, errSSH = pSSH.communicate()
+        if self.allowSSH.isChecked():
+            pSSH = subprocess.Popen(['ssh', hostAddress, 'screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)     
+            outputSSH, errSSH = pSSH.communicate()
+        else:
+            outputSSH = ""
+            return {'localrun': [lines[0] == 'There is a screen on:' or lines[0] == 'There are screens on:', output]}
+        
         linesSSH = outputSSH.splitlines()
 
         return {'localrun': [lines[0] == 'There is a screen on:' or lines[0] == 'There are screens on:', output],
@@ -161,7 +171,7 @@ class PlotHandler(object):
                 print("Invalid IP address", '.'.join(unicode(ipAddress)))
                 return
         else:
-            ipAddress = "127.0.0.1"
+            ipAddress = "192.168.1.5"
         
         hostAddress = self.userData['username']+'@'+ipAddress
         sshCommand = []
@@ -175,7 +185,7 @@ class PlotHandler(object):
             sshCommand.append('bash')
             sshCommand.append('-c')
             sshCommand.append('"')
-            sshCommand.append('source ~/.bashrc && '+ command[len(command)-1])
+            sshCommand.append('source ~/ssh_ros && '+ command[len(command)-1])
             sshCommand.append('"')
             # sshCommand.append('`')
             # sshCommand.append(command[len(command)-1])
@@ -210,17 +220,18 @@ class PlotHandler(object):
                     self.listwidget.insertItem(0, line.split()[0].strip().split('.')[1])
         
         # SSH Update
-        validIP, ipAddress = self.validateIPAddress()
-        ipAddress = '.'.join(ipAddress)
-        hostAddress = self.userData['username']+'@'+ipAddress
-        
-        if AllScreens['sshrun'][0]:
-            lines = AllScreens['sshrun'][1].splitlines()
-            print("Lines:", lines)
-            for i in range(1, len(lines)-1):
-                line = lines[i].decode('utf-8')
-                if line[0] == '\t':
-                    self.listwidgetSSH.insertItem(0, line.split()[0].strip().split('.')[1])
+        if self.allowSSH.isChecked():
+            validIP, ipAddress = self.validateIPAddress()
+            ipAddress = '.'.join(ipAddress)
+            hostAddress = self.userData['username']+'@'+ipAddress
+            
+            if AllScreens['sshrun'][0]:
+                lines = AllScreens['sshrun'][1].splitlines()
+                print("Lines:", lines)
+                for i in range(1, len(lines)-1):
+                    line = lines[i].decode('utf-8')
+                    if line[0] == '\t':
+                        self.listwidgetSSH.insertItem(0, line.split()[0].strip().split('.')[1])
                 
 
     def openscreen(self):
@@ -251,18 +262,20 @@ class PlotHandler(object):
 
         if AllScreens['localrun'][0]:
             lines = AllScreens['localrun'][1].splitlines()
-            print("Lines:", lines)
+            # print("Lines:", lines)
             for i in range(1, len(lines)-1):
                 line = lines[i].decode('utf-8')
                 PID = line.split()[0].strip().split('.')[1]
                 p = subprocess.Popen(['screen', '-XS', PID, 'quit'])
-
-        if AllScreens['sshrun'][0]:
-            lines = AllScreens['localrun'][1].splitlines()
-            print("Lines:", lines)
-            for i in range(1, len(lines)-1):
-                line = lines[i].decode('utf-8')
-                PID = line.split()[0].strip().split('.')[1]
-                p = subprocess.Popen(['ssh', AllScreens['sshrun'][2], 'screen', '-XS', PID, 'quit'])
+        
+        if self.allowSSH.isChecked():
+            if AllScreens['sshrun'][0]:
+                lines = AllScreens['sshrun'][1].splitlines()
+                print("Lines:", lines)
+                for i in range(1, len(lines)-1):
+                    line = lines[i].decode('utf-8')
+                    print("Actual Line:", lines[i])
+                    PID = line.split()[0].strip().split('.')[1]
+                    p = subprocess.Popen(['ssh', '-t', AllScreens['sshrun'][2], 'screen', '-XS', PID, 'quit'])
         
         self.update()
