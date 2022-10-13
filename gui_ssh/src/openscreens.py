@@ -14,10 +14,10 @@ import re
 from functools import partial
 
 class PlotHandler(object):
-    def __init__(self, buttonData, userData):
+    def __init__(self, buttonData, username):
         super(PlotHandler, self).__init__()
         self.buttonData = buttonData
-        self.userData = userData
+        self.username = username
         self.screenButtons = {}
         self.runningScreens = []
         pg.setConfigOptions(antialias=True)
@@ -132,7 +132,7 @@ class PlotHandler(object):
         # SSH Update
         validIP, ipAddress = self.validateIPAddress()
         ipAddress = '.'.join(ipAddress)
-        hostAddress = self.userData['username']+'@'+ipAddress
+        hostAddress = self.username+'@'+ipAddress
 
         if self.allowSSH.isChecked():
             pSSH = subprocess.Popen(['ssh', hostAddress, 'screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)     
@@ -173,7 +173,7 @@ class PlotHandler(object):
         else:
             ipAddress = "192.168.1.5"
         
-        hostAddress = self.userData['username']+'@'+ipAddress
+        hostAddress = self.username+'@'+ipAddress
         sshCommand = []
         # ssh nvidia@192.168.1.5 screen -mdS mc2 bash -c "source ~/.bashrc&& mc"
         if self.allowSSH.isChecked() == True:
@@ -223,7 +223,7 @@ class PlotHandler(object):
         if self.allowSSH.isChecked():
             validIP, ipAddress = self.validateIPAddress()
             ipAddress = '.'.join(ipAddress)
-            hostAddress = self.userData['username']+'@'+ipAddress
+            hostAddress = self.username+'@'+ipAddress
             
             if AllScreens['sshrun'][0]:
                 lines = AllScreens['sshrun'][1].splitlines()
@@ -245,7 +245,7 @@ class PlotHandler(object):
 
         validIP, ipAddress = self.validateIPAddress()
         ipAddress = '.'.join(ipAddress)
-        hostAddress = self.userData['username']+'@'+ipAddress
+        hostAddress = self.username+'@'+ipAddress
 
         #print(item.text() + " >> double click")        
         toexec = ''.join(['ssh -t ', hostAddress, ' screen -r ', str(item.text()), '; exec bash'])
