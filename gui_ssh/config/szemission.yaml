@@ -1,2 +1,4 @@
 username: szemission
 buttons: szemission_buttons.json
+SSH: True
+IP: "192.168.1.5"

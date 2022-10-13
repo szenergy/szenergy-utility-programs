@@ -14,10 +14,12 @@ import re
 from functools import partial
 
 class PlotHandler(object):
-    def __init__(self, buttonData, username):
+    def __init__(self, buttonData, username, ssh, ipAddress):
         super(PlotHandler, self).__init__()
         self.buttonData = buttonData
         self.username = username
+        self.ssh = ssh
+        self.ipAddress = ipAddress
         self.screenButtons = {}
         self.runningScreens = []
         pg.setConfigOptions(antialias=True)
@@ -73,7 +75,8 @@ class PlotHandler(object):
         self.win.setFixedSize(800, 600)
         self.win.move(600, 200)
         self.win.setCentralWidget(area)
-        self.allowSSH = qtgqt.QtGui.QCheckBox("SSH")
+        self.enableSSH = qtgqt.QtGui.QCheckBox("SSH")
+        self.enableSSH.setChecked(self.ssh)
         
         dock1 = darea.Dock("", size = (1,1))  # give this dock minimum possible size
         area.addDock(dock1, "left")
@@ -84,13 +87,13 @@ class PlotHandler(object):
         self.sshLabel = qtgqt.QtGui.QLabel("SSH IP")
         self.sshLabel.setAlignment(qtgqt.QtCore.Qt.AlignCenter)
         self.sshLabel.setMaximumHeight(15)
-        self.textArea = qtgqt.QtGui.QTextEdit("192.168.1.5")
+        self.textArea = qtgqt.QtGui.QTextEdit(self.ipAddress)
         self.textArea.setStyleSheet("color: rgb" + green)
         widg1.addWidget(self.wipeBtn, row=1, col=0)
         widg1.addWidget(self.updateBtn, row=1, col=4)
         widg1.addWidget(self.textArea, row=1, col=2)
         widg1.addWidget(self.sshLabel, row=0, col=2)
-        widg1.addWidget(self.allowSSH, row=0, col=0)
+        widg1.addWidget(self.enableSSH, row=0, col=0)
         self.textArea.setMaximumHeight(25)
         self.textArea.setMaximumWidth(200)
         widg1.setStyleSheet("background-color: rgb(40, 44, 52); color: rgb(171, 178, 191);")
@@ -134,7 +137,7 @@ class PlotHandler(object):
         ipAddress = '.'.join(ipAddress)
         hostAddress = self.username+'@'+ipAddress
 
-        if self.allowSSH.isChecked():
+        if self.enableSSH.isChecked() and validIP:
             pSSH = subprocess.Popen(['ssh', hostAddress, 'screen', '-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)     
             outputSSH, errSSH = pSSH.communicate()
         else:
@@ -162,7 +165,7 @@ class PlotHandler(object):
         return valid, ipList
 
     def buttonClicked(self, command):
-        if self.allowSSH.isChecked() == True:
+        if self.enableSSH.isChecked() == True:
             validIP, ipAddress = self.validateIPAddress()
             
             if(validIP):
@@ -176,7 +179,7 @@ class PlotHandler(object):
         hostAddress = self.username+'@'+ipAddress
         sshCommand = []
         # ssh nvidia@192.168.1.5 screen -mdS mc2 bash -c "source ~/.bashrc&& mc"
-        if self.allowSSH.isChecked() == True:
+        if self.enableSSH.isChecked() == True:
             sshCommand.append('ssh')
             sshCommand.append(hostAddress)
             for i in range(0, len(command)-1):
@@ -220,7 +223,7 @@ class PlotHandler(object):
                     self.listwidget.insertItem(0, line.split()[0].strip().split('.')[1])
         
         # SSH Update
-        if self.allowSSH.isChecked():
+        if self.enableSSH.isChecked():
             validIP, ipAddress = self.validateIPAddress()
             ipAddress = '.'.join(ipAddress)
             hostAddress = self.username+'@'+ipAddress
@@ -268,7 +271,7 @@ class PlotHandler(object):
                 PID = line.split()[0].strip().split('.')[1]
                 p = subprocess.Popen(['screen', '-XS', PID, 'quit'])
         
-        if self.allowSSH.isChecked():
+        if self.enableSSH.isChecked():
             if AllScreens['sshrun'][0]:
                 lines = AllScreens['sshrun'][1].splitlines()
                 print("Lines:", lines)

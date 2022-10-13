@@ -1,2 +1,4 @@
 username: dev
 buttons: lexus_buttons.json
+SSH: False
+IP: "127.0.0.1"
