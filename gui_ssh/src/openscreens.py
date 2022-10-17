@@ -81,8 +81,15 @@ class PlotHandler(object):
         self.initButtons(widg1)
         self.updateBtn = qtgqt.QtGui.QPushButton("update screen list")
         self.wipeBtn = qtgqt.QtGui.QPushButton("wipe screens")
+
+        if self.ssh:
+            SSHEnabledLabel = qtgqt.QtGui.QLabel("SSH Enabled")
+        else:
+            SSHEnabledLabel = qtgqt.QtGui.QLabel("SSH Disabled")
+
         widg1.addWidget(self.wipeBtn, row=1, col=0)
         widg1.addWidget(self.updateBtn, row=1, col=4)
+        widg1.addWidget(SSHEnabledLabel, row=0, col=2)
         widg1.setStyleSheet("background-color: rgb(40, 44, 52); color: rgb(171, 178, 191);")
         dock1.setStyleSheet("background-color: rgb(18, 20, 23);")
         dock1.addWidget(widg1)
