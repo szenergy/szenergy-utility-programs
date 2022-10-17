@@ -102,18 +102,7 @@ class PlotHandler(object):
         self.listwidget.itemDoubleClicked.connect(self.openscreen)
         self.listwidget
         
-        self.listwidgetSSH = qtgqt.QtGui.QListWidget()
-        self.listwidgetSSH.setStyleSheet("""QListWidget{ color: rgb(171, 178, 191);}""")
-        self.listwidgetSSH.clicked.connect(self.listclick)
-        self.listwidgetSSH.itemDoubleClicked.connect(self.openscreenSSH)
-        self.listwidgetSSH
-        
         dock1.addWidget(self.listwidget)
-        
-        SSHCommandLabel = qtgqt.QtGui.QLabel("SSH Commands")
-        SSHCommandLabel.setStyleSheet("""background-color: rgb(24, 28, 31); color:white""")
-        dock1.addWidget(SSHCommandLabel)
-        dock1.addWidget(self.listwidgetSSH)
 
         self.update()
         self.timer = qtgqt.QtCore.QTimer()
@@ -204,7 +193,6 @@ class PlotHandler(object):
 
     def update(self):
         self.listwidget.clear()
-        self.listwidgetSSH.clear()
         
         AllScreens = self.checkIfScreenIsRunning()
 
@@ -228,7 +216,7 @@ class PlotHandler(object):
                 for i in range(1, len(lines)-1):
                     line = lines[i].decode('utf-8')
                     if line[0] == '\t':
-                        self.listwidgetSSH.insertItem(0, line.split()[0].strip().split('.')[1])
+                        self.listwidget.insertItem(0, line.split()[0].strip().split('.')[1])
                 
 
     def openscreen(self):
@@ -238,7 +226,7 @@ class PlotHandler(object):
         subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', toexec])
     
     def openscreenSSH(self):
-        item = self.listwidgetSSH.currentItem()
+        item = self.listwidget.currentItem()
 
         validIP, ipAddress = self.validateIPAddress()
         ipAddress = '.'.join(ipAddress)
