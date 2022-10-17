@@ -168,7 +168,7 @@ class PlotHandler(object):
                 print("Invalid IP address", '.'.join(unicode(ipAddress)))
                 return
         else:
-            ipAddress = "192.168.1.5"
+            ipAddress = "127.0.0.1"
         
         hostAddress = self.username+'@'+ipAddress
         sshCommand = []
