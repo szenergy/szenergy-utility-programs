@@ -128,6 +128,7 @@ class PlotHandler(object):
             return {'localrun': [lines[0] == 'There is a screen on:' or lines[0] == 'There are screens on:', output]}
         
         linesSSH = outputSSH.splitlines()
+        print(linesSSH)
 
         return {'localrun': [lines[0] == 'There is a screen on:' or lines[0] == 'There are screens on:', output],
         'sshrun': [linesSSH[0] == 'There is a screen on:' or linesSSH[0] == 'There are screens on:', outputSSH, hostAddress]}
@@ -204,7 +205,7 @@ class PlotHandler(object):
                 if line[0] == '\t':
                     self.listwidget.insertItem(0, line.split()[0].strip().split('.')[1])
         
-        # SSH Update
+        """ # SSH Update
         if self.ssh:
             validIP, ipAddress = self.validateIPAddress()
             ipAddress = '.'.join(ipAddress)
@@ -216,7 +217,7 @@ class PlotHandler(object):
                 for i in range(1, len(lines)-1):
                     line = lines[i].decode('utf-8')
                     if line[0] == '\t':
-                        self.listwidget.insertItem(0, line.split()[0].strip().split('.')[1])
+                        self.listwidget.insertItem(0, line.split()[0].strip().split('.')[1]) """
                 
 
     def openscreen(self):
