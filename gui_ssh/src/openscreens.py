@@ -99,7 +99,10 @@ class PlotHandler(object):
         self.listwidget = qtgqt.QtGui.QListWidget()
         self.listwidget.setStyleSheet("""QListWidget{ color: rgb(171, 178, 191);}""")
         self.listwidget.clicked.connect(self.listclick)
-        self.listwidget.itemDoubleClicked.connect(self.openscreen)
+        if self.ssh:
+            self.listwidget.itemDoubleClicked.connect(self.openscreenSSH)
+        else:
+            self.listwidget.itemDoubleClicked.connect(self.openscreen)
         self.listwidget
         
         dock1.addWidget(self.listwidget)
@@ -125,13 +128,13 @@ class PlotHandler(object):
             outputSSH, errSSH = pSSH.communicate()
         else:
             outputSSH = ""
-            return {'localrun': [lines[0] == 'There is a screen on:' or lines[0] == 'There are screens on:', output]}
+            return {'localrun': [lines[0] == b'There is a screen on:' or lines[0] == b'There are screens on:', output]}
         
         linesSSH = outputSSH.splitlines()
         print(linesSSH)
 
-        return {'localrun': [lines[0] == 'There is a screen on:' or lines[0] == 'There are screens on:', output],
-        'sshrun': [linesSSH[0] == 'There is a screen on:' or linesSSH[0] == 'There are screens on:', outputSSH, hostAddress]}
+        return {'localrun': [lines[0] == b'There is a screen on:' or lines[0] == b'There are screens on:', output],
+        'sshrun': [linesSSH[0] == b'There is a screen on:' or linesSSH[0] == b'There are screens on:', outputSSH, hostAddress]}
 
     def validateIPAddress(self):
         ipList = str(self.ipAddress)
@@ -205,7 +208,7 @@ class PlotHandler(object):
                 if line[0] == '\t':
                     self.listwidget.insertItem(0, line.split()[0].strip().split('.')[1])
         
-        """ # SSH Update
+        # SSH Update
         if self.ssh:
             validIP, ipAddress = self.validateIPAddress()
             ipAddress = '.'.join(ipAddress)
@@ -217,7 +220,7 @@ class PlotHandler(object):
                 for i in range(1, len(lines)-1):
                     line = lines[i].decode('utf-8')
                     if line[0] == '\t':
-                        self.listwidget.insertItem(0, line.split()[0].strip().split('.')[1]) """
+                        self.listwidget.insertItem(0, line.split()[0].strip().split('.')[1])
                 
 
     def openscreen(self):
@@ -245,6 +248,7 @@ class PlotHandler(object):
         self.runningScreens = []
 
         AllScreens = self.checkIfScreenIsRunning()
+        print(AllScreens)
 
         if AllScreens['localrun'][0]:
             lines = AllScreens['localrun'][1].splitlines()
