@@ -37,19 +37,9 @@ class PlotHandler(object):
                 buttonTextColor = button["textColor"]
             
             self.screenButtons[buttonName] = qtgqt.QtGui.QPushButton(buttonLabel)
-            if countRows == row-countRows:
-                if(len(self.buttonData)%5 == 2):
-                    if col==1:
-                        col=4
-                    widget.addWidget(self.screenButtons[buttonName], row=row, col=col)
-                if(len(self.buttonData)%5 == 3):
-                    if col==1:
-                        col=2
-                    elif col==3:
-                        col=4
-                    widget.addWidget(self.screenButtons[buttonName], row=row, col=col)
-            else:
-                widget.addWidget(self.screenButtons[buttonName], row=row, col=col)
+            
+            widget.addWidget(self.screenButtons[buttonName], row=row, col=col)
+            
             buttonFunction = buttonFunction.replace("'","")
             buttonFunction = re.split(r'[,]\s*', buttonFunction)
             print(" ".join(buttonFunction))
