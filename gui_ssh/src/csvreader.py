@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+
 class CSVReader:
     def __init__(self, filename):
         self.filename = filename
@@ -12,5 +15,4 @@ class CSVReader:
                 self.data.append(actData)
 
     def printData(self):
-        print("CSV DATA:")
-        print(f"{self.data}")
+        print("CSV DATA:", self.data)

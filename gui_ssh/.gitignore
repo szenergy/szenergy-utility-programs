@@ -2,3 +2,4 @@ __pycache__/
 csv_files/
 .vscode/
 ReadFiles/*.csv
+*.pyc

@@ -1,0 +1,4 @@
+<launch>
+    <rosparam command="load" file="$(find gui_ssh)/config/lexus.yaml" />
+    <node type="main.py" name="gui_ssh" pkg="gui_ssh"/>
+</launch>

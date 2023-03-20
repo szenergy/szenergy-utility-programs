@@ -1,0 +1,131 @@
+{
+    "buttons":
+    [
+        {
+            "id":"roscoreButton",
+            "textColor":"cyan",
+            "bgColor":"black",
+            "label":"roscore",
+            "command":"'screen', '-dmS', 'roscore1', 'roscore'"
+        },
+        {
+            "id":"rvizButton",
+            "label":"rviz",
+            "command":"'screen', '-mdS', 'rviz1', 'rosrun rviz rviz'"
+        },
+        {
+            "id":"tftreeButton",
+            "label":"tf_tree",
+            "command":"'screen', '-mdS', 'tftree1', 'rosrun rqt_tf_tree rqt_tf_tree'"
+        },
+        {
+            "id":"rqtReconfigureButton",
+            "label":"rqt_reconfigure",
+            "command":"'screen', '-mdS', 'rqt_reconfigure1', 'rosrun rqt_reconfigure rqt_reconfigure'"
+        },
+        {
+            "id":"mcButton",
+            "label":"mc",
+            "command":"'screen', '-mdS', 'mc1', 'mc'"
+        },
+        {
+            "id":"coreButton",
+            "label":"start_core_sh",
+            "command":"'screen', '-mdS', 'start_core1', '/home/nvidia/start_core.sh'"
+        },
+        {
+            "id":"duroButton",
+            "label":"duro_driver",
+            "command":"'screen', '-mdS', 'duroScreen', 'roslaunch nissan_bringup gps.duro.launch'"
+        },
+        {
+            "id":"novatelButton",
+            "label":"novatel_driver",
+            "command":"'screen', '-mdS', 'novatelScreen', 'roslaunch nissan_bringup gps.nova.launch'"
+        },
+        {
+            "id":"zed1Button",
+            "label":"zed1",
+            "command":"'screen', '-mdS', 'zedScreen', 'roslaunch nissan_bringup zed_camera_no_tf.launch'"
+        },
+        {
+            "id":"temporaryButton",
+            "label":"temporary",
+            "command":"'screen', '-mdS', 'temporary', 'roslaunch ros_guis temporary.launch'"
+        },
+        {
+            "id":"tfDuroButton",
+            "label":"tf_duro",
+            "command":"'screen', '-mdS', 'tfDuro', 'roslaunch nissan_bringup tf_duro_global_frame_tf_publisher.statictf.launch'",
+            "textColor":"yellow",
+            "bgColor":"black"
+        },
+        {
+            "id":"tfNovaButton",
+            "label":"tf_nova",
+            "command":"'screen', '-mdS', 'tfNova', 'roslaunch nissan_bringup tf_novatel_global_frame_tf_publisher.statictf.launch'",
+            "textColor":"yellow",
+            "bgColor":"black"
+        },
+        {
+            "id":"sickSensorButton",
+            "label":"sick",
+            "command":"'screen', '-mdS', 'SICK', 'roslaunch nissan_bringup sick_lms_111.nissan.launch'"
+        },
+        {
+            "id":"ousterLeftButton",
+            "label":"ouster_left",
+            "command":"'screen', '-mdS', 'ousterLeft', 'roslaunch nissan_bringup ouster_left.launch'"
+        },
+        {
+            "id":"ousterRightButton",
+            "label":"ouster_right",
+            "command":"'screen', '-mdS', 'ousterRight', 'roslaunch nissan_bringup ouster_right.launch'"
+        },
+        {
+            "id":"veloLeftButton",
+            "label":"velodyne_left",
+            "command":"'screen', '-mdS', 'veloLeft', 'roslaunch nissan_bringup velodyne_left.launch'"
+        },
+        {
+            "id":"veloRightButton",
+            "label":"velodyne_right",
+            "command":"'screen', '-mdS', 'veloRight', 'roslaunch nissan_bringup velodyne_right.launch'"
+        },
+        {
+            "id":"CANControlButton",
+            "label":"can",
+            "command":"'screen', '-mdS', 'CANControl', 'roslaunch can_leaf_driver nissan_can_control.launch'"
+        },
+        {
+            "id":"LeafTFButton",
+            "label":"static_tf",
+            "command":"'screen', '-mdS', 'LeafTF', 'roslaunch nissan_bringup tf_nissanleaf_statictf.launch'"
+        },
+        {
+            "id":"AllSensorsButton",
+            "label":"start_all_sensors",
+            "command":"'screen', '-mdS', 'AllSensors', 'roslaunch nissan_bringup nissan.leaf.bringup.2020.A.launch'"
+        },
+        {
+            "id":"StartIMUButton",
+            "label":"start_imu",
+            "command":"'screen', '-mdS', 'IMU', 'roslaunch fsm_imu fsm9.launch'"
+        },
+        {
+            "id":"carParamsButton",
+            "label":"car_parameters",
+            "command":"'screen', '-mdS', 'carParams', 'roslaunch nissan_bringup car_parameters_leaf.launch'"
+        },
+        {
+            "id":"kalmanFilterButton",
+            "label":"kalman_filter",
+            "command":"'screen', '-mdS', 'kalman_pos', 'roslaunch kalman_pos kalman_pos01.launch'"
+        },
+        {
+            "id":"startOdomButton",
+            "label":"car_odometry",
+            "command":"'screen', '-mdS', 'carOdometry', 'roslaunch nissan_bringup odom.launch'"
+        }
+    ]
+}

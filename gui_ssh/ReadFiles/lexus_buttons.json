@@ -1,0 +1,79 @@
+{
+    "buttons":
+    [
+        {
+            "id":"roscoreButton",
+            "textColor":"cyan",
+            "bgColor":"black",
+            "label":"roscore",
+            "command":"'screen', '-dmS', 'roscore1', 'roscore'"
+        },
+        {
+            "id":"rvizButton",
+            "label":"rviz",
+            "command":"'screen', '-mdS', 'rviz1', 'roslaunch lexus_base rviz01static.launch'"
+        },
+        {
+            "id":"tftreeButton",
+            "label":"tf_tree",
+            "command":"'screen', '-mdS', 'tftree1', 'rosrun rqt_tf_tree rqt_tf_tree'"
+        },
+        {
+            "id":"rqtReconfigureButton",
+            "label":"rqt_reconfigure",
+            "command":"'screen', '-mdS', 'rqt_reconfigure1', 'rosrun rqt_reconfigure rqt_reconfigure'"
+        },
+        {
+            "id":"duroButton",
+            "label":"duro_driver",
+            "command":"'screen', '-mdS', 'duroScreen', 'roslaunch lexus_base gps_duro.launch'"
+        },
+        {
+            "id":"zed1Button",
+            "label":"zed1",
+            "command":"'screen', '-mdS', 'zedScreen', 'roslaunch lexus_base zed_default.launch'"
+        },
+        {
+            "id":"tfDuroButton",
+            "label":"tf_duro",
+            "command":"'screen', '-mdS', 'tfDuro', 'roslaunch lexus_base tf_gps_duro.launch'",
+            "textColor":"yellow",
+            "bgColor":"black"
+        },
+        {
+            "id":"ousterLeftButton",
+            "label":"ouster_left",
+            "command":"'screen', '-mdS', 'ousterLeft', 'roslaunch lexus_base os_32_left_a.launch'"
+        },
+        {
+            "id":"ousterRightButton",
+            "label":"ouster_right",
+            "command":"'screen', '-mdS', 'ousterRight', 'roslaunch lexus_base os_32_right_a.launch'"
+        },
+        {
+            "id":"ousterCenter64Button",
+            "label":"ouster_center64",
+            "command":"'screen', '-mdS', 'ousterCenter64', 'roslaunch lexus_base os_64_center_a.launch'"
+        },
+        {
+            "id":"CANControlButton",
+            "label":"can",
+            "command":"'screen', '-mdS', 'CANControl', 'roslaunch lexus_base can_pacmod_a.launch'"
+        },
+        {
+            "id":"LexusTFButton",
+            "label":"static_tf",
+            "command":"'screen', '-mdS', 'LexusTF', 'roslaunch lexus_base tf_static.launch'"
+        },
+        {
+            "id":"kalmanFilterButton",
+            "label":"kalman_filter",
+            "command":"'screen', '-mdS', 'kalman_pos', 'roslaunch kalman_pos kalman_pos01.launch'"
+        },
+        {
+            "id":"3DLaunch",
+            "label":"3d_launch",
+            "command":"'screen', '-mdS', '3d_launch', 'roslaunch lexus_base 3d.launch'"
+        }
+    ]
+}

@@ -13,3 +13,4 @@
   - ![imgeditor](https://github.com/facontidavide/rosbag_editor/blob/master/rosbag_editor.png)
 - `Rosbag Exporter`: GUI to extract data from bag files: https://gitlab.com/InstitutMaupertuis/rqt_bag_exporter 
   - ![imgexporter](https://gitlab.com/InstitutMaupertuis/rqt_bag_exporter/-/raw/melodic/documentation/rqt_bag_exporter.png)
+- `Bags to dataset`:https://github.com/norbertmarko/bags-to-dataset
