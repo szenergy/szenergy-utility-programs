@@ -13,7 +13,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl_ros/point_cloud.h>
 #include <jsk_rviz_plugins/OverlayText.h>
-#include <autoware_msgs/ControlCommandStamped.h>
+#include <autoware_msgs/ControlCommand.h>
 
 const float rtod = 180/M_PI;  //rad-to-deg
 
@@ -37,13 +37,13 @@ std::vector<std::string> chstr =
 jsk_rviz_plugins::OverlayText stxt;     //status text
 jsk_rviz_plugins::OverlayText ctxt;     //challenge state text
 
-ros::Subscriber sub_refvec;            //ctrl_cmd speed and angle reference
-ros::Subscriber sub_ctxt;           //challenge_state
-ros::Publisher  pub_ctxt;           //challenge_state_text
+ros::Subscriber sub_refvec;             //ctrlCmd speed and angle reference
+ros::Subscriber sub_ctxt;               //challenge_state
+ros::Publisher  pub_ctxt;               //challenge_state_text
 
 ros::Publisher pub_stxt;
-ros::Publisher pub_a_ref;          //angle reference (ctrl_cmd)
-ros::Publisher pub_s_ref;          //speed reference (ctrl_cmd)
+ros::Publisher pub_a_ref;               //angle reference (ctrlCmd)
+ros::Publisher pub_s_ref;               //speed reference (ctrlCmd)
 
 const std::string base_text = "TOPIC STATUS REPORT:\n";
 const std::string oktext = "<span style=\"color: green;\">OK</span>";
@@ -82,11 +82,11 @@ void cb_gps_s   (const std_msgs::String &data_in)                       {status[
 void cb_traj	(const visualization_msgs::MarkerArray &data_in)        {status[4].ts = ros::Time::now();}
 void cb_angle   (const std_msgs::Float32 &data_in)                      {status[5].ts = ros::Time::now();}
 void cb_speed   (const std_msgs::Float32 &data_in)                      {status[6].ts = ros::Time::now();}
-void cb_ref     (const autoware_msgs::ControlCommandStamped &data_in)   {status[7].ts = ros::Time::now();
-                                                                            a_temp.data = data_in.cmd.steering_angle * rtod;
+void cb_ref     (const autoware_msgs::ControlCommand &data_in)          {status[7].ts = ros::Time::now();
+                                                                            a_temp.data = data_in.steering_angle * rtod;
                                                                             pub_a_ref.publish(a_temp);
-                                                                            s_temp.data = data_in.cmd.linear_velocity;
-                                                                            pub_s_ref.publish(s_temp);    }
+                                                                            s_temp.data = data_in.linear_velocity;
+                                                                            pub_s_ref.publish(s_temp);   }
 
 void timerCallback(const ros::TimerEvent& event)
 {
@@ -133,7 +133,7 @@ int main(int argc, char **argv)
     status.push_back(topok("/polynomial_trajectory", "trajectory"));
     status.push_back(topok("/wheel_angle_deg", "steering angle"));
     status.push_back(topok("/vehicle_speed_kmph", "speed"));
-    status.push_back(topok("/ctrl_cmd", "control command"));
+    status.push_back(topok("/ctrlCmd", "control command"));
 
     status[0].s = (nh.subscribe(status[0].tn, 1, cb_model));
     status[1].s = (nh.subscribe(status[1].tn, 1, cb_ouster));
@@ -150,10 +150,16 @@ int main(int argc, char **argv)
 
     pub_stxt = nh.advertise<jsk_rviz_plugins::OverlayText>("status_text", 1);           //all-in-one status text publisher
     pub_ctxt = nh.advertise<jsk_rviz_plugins::OverlayText>("challenge_state_text", 1);  //challenge state (text) publisher
-    pub_a_ref = nh.advertise<std_msgs::Float32>("wheel_angle_deg_ref", 1);              //ctrl_cmd angle reference
-    pub_s_ref = nh.advertise<std_msgs::Float32>("vehicle_speed_kmph_ref", 1);           //ctrl_cmd speed reference
+    pub_a_ref = nh.advertise<std_msgs::Float32>("wheel_angle_deg_ref", 1);              //ctrlCmd angle reference
+    pub_s_ref = nh.advertise<std_msgs::Float32>("vehicle_speed_kmph_ref", 1);           //ctrlCmd speed reference
     
     ctxt.text = "-";
+
+    //init (to show even when no data)
+    a_temp.data = 0.0;
+    pub_a_ref.publish(a_temp);
+    s_temp.data = 0.0;
+    pub_s_ref.publish(s_temp); 
 
     ros::spin();
 }
