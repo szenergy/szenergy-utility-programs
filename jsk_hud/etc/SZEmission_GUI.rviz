@@ -104,12 +104,12 @@ Visualization Manager:
       Use rainbow: true
       Value: true
     - Align Bottom: false
-      Background Alpha: 0.20000000298023224
-      Background Color: 255; 255; 255
+      Background Alpha: 0.800000011920929
+      Background Color: 0; 0; 0
       Class: jsk_rviz_plugin/OverlayText
       Enabled: true
-      Foreground Alpha: 0.800000011920929
-      Foreground Color: 0; 0; 0
+      Foreground Alpha: 1
+      Foreground Color: 255; 255; 255
       Invert Shadow: false
       Name: status report
       Overtake BG Color Properties: true
@@ -118,12 +118,12 @@ Visualization Manager:
       Topic: /status_text
       Value: true
       font: Noto Mono
-      height: 800
+      height: 700
       left: 10
       line width: 2
       text size: 24
       top: 10
-      width: 400
+      width: 300
     - Class: jsk_rviz_plugin/PieChart
       Enabled: true
       Name: CPU %
@@ -131,22 +131,22 @@ Visualization Manager:
       Value: true
       auto color change: true
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.800000011920929
       clockwise rotate direction: true
       foreground alpha: 0.699999988079071
       foreground alpha 2: 0.4000000059604645
-      foreground color: 78; 154; 6
-      left: 1560
+      foreground color: 255; 255; 255
+      left: 10
       max color: 255; 0; 0
       max color change threthold: 0
       max value: 100
-      med color: 250; 255; 0
+      med color: 255; 255; 0
       med color change threthold: 0
       min value: 0
       show caption: true
-      size: 120
-      text size: 20
-      top: 900
+      size: 150
+      text size: 30
+      top: 750
     - Class: jsk_rviz_plugin/PieChart
       Enabled: true
       Name: CPU °C
@@ -154,22 +154,22 @@ Visualization Manager:
       Value: true
       auto color change: true
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.800000011920929
       clockwise rotate direction: true
       foreground alpha: 0.699999988079071
       foreground alpha 2: 0.4000000059604645
-      foreground color: 78; 154; 6
-      left: 1720
+      foreground color: 255; 255; 255
+      left: 180
       max color: 255; 0; 0
       max color change threthold: 0
       max value: 100
-      med color: 250; 255; 0
+      med color: 255; 255; 0
       med color change threthold: 0
       min value: 0
       show caption: true
-      size: 120
-      text size: 20
-      top: 900
+      size: 150
+      text size: 30
+      top: 750
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
       Enabled: true
@@ -180,21 +180,21 @@ Visualization Manager:
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.4000000059604645
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 239; 41; 41
-      height: 250
-      left: 1580
+      foreground alpha: 1
+      foreground color: 255; 255; 0
+      height: 400
+      left: 1450
       linewidth: 3
       max color: 255; 0; 0
       max value: 6
       min value: -6
       show caption: true
       text size: 20
-      top: 50
+      top: 10
       update interval: 0.03999999910593033
-      width: 250
+      width: 400
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
       Enabled: true
@@ -205,21 +205,21 @@ Visualization Manager:
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.4000000059604645
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 0; 127; 255
-      height: 250
-      left: 1580
+      foreground alpha: 1
+      foreground color: 0; 255; 255
+      height: 400
+      left: 1450
       linewidth: 3
       max color: 255; 0; 0
       max value: 6
       min value: -6
       show caption: true
       text size: 20
-      top: 50
+      top: 10
       update interval: 0.03999999910593033
-      width: 250
+      width: 400
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
       Enabled: true
@@ -230,21 +230,21 @@ Visualization Manager:
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.4000000059604645
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 239; 41; 41
-      height: 250
-      left: 1580
+      foreground alpha: 1
+      foreground color: 255; 255; 0
+      height: 400
+      left: 1450
       linewidth: 3
       max color: 255; 0; 0
       max value: 22.5
       min value: 7.5
       show caption: true
       text size: 20
-      top: 500
+      top: 550
       update interval: 0.03999999910593033
-      width: 250
+      width: 400
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
       Enabled: true
@@ -255,30 +255,30 @@ Visualization Manager:
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.4000000059604645
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 0; 127; 255
-      height: 250
-      left: 1580
+      foreground alpha: 1
+      foreground color: 0; 255; 255
+      height: 400
+      left: 1450
       linewidth: 3
       max color: 255; 0; 0
       max value: 22.5
       min value: 7.5
       show caption: true
       text size: 20
-      top: 500
+      top: 550
       update interval: 0.03999999910593033
-      width: 250
+      width: 400
     - Align Bottom: false
-      Background Alpha: 0.20000000298023224
-      Background Color: 243; 243; 243
+      Background Alpha: 0.800000011920929
+      Background Color: 0; 0; 0
       Class: jsk_rviz_plugin/OverlayText
       Enabled: true
-      Foreground Alpha: 0.800000011920929
-      Foreground Color: 0; 0; 0
+      Foreground Alpha: 1
+      Foreground Color: 255; 248; 64
       Invert Shadow: false
-      Name: CHALLENGE
+      Name: state
       Overtake BG Color Properties: true
       Overtake FG Color Properties: true
       Overtake Position Properties: true
@@ -379,21 +379,21 @@ Visualization Manager:
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.800000011920929
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 239; 41; 41
+      foreground alpha: 1
+      foreground color: 255; 255; 0
       height: 50
-      left: 1550
+      left: 1450
       linewidth: 1
       max color: 255; 0; 0
       max value: -370
       min value: -371
       show caption: true
       text size: 20
-      top: 350
+      top: 440
       update interval: 0.03999999910593033
-      width: 150
+      width: 200
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
       Enabled: true
@@ -404,21 +404,21 @@ Visualization Manager:
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.800000011920929
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 0; 127; 255
+      foreground alpha: 1
+      foreground color: 0; 255; 255
       height: 50
-      left: 1700
+      left: 1650
       linewidth: 1
       max color: 255; 0; 0
       max value: -370
       min value: -371
       show caption: true
       text size: 20
-      top: 350
+      top: 440
       update interval: 0.03999999910593033
-      width: 150
+      width: 200
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
       Enabled: true
@@ -429,21 +429,21 @@ Visualization Manager:
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.800000011920929
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 239; 41; 41
+      foreground alpha: 1
+      foreground color: 255; 255; 0
       height: 50
-      left: 1550
+      left: 1650
       linewidth: 1
       max color: 255; 0; 0
       max value: -99
       min value: -100
       show caption: true
       text size: 20
-      top: 800
+      top: 980
       update interval: 0.03999999910593033
-      width: 150
+      width: 200
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
       Enabled: true
@@ -454,35 +454,35 @@ Visualization Manager:
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.800000011920929
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 0; 127; 255
+      foreground alpha: 1
+      foreground color: 0; 255; 255
       height: 50
-      left: 1700
+      left: 1450
       linewidth: 1
       max color: 255; 0; 0
       max value: -99
       min value: -100
       show caption: true
       text size: 20
-      top: 800
+      top: 980
       update interval: 0.03999999910593033
-      width: 150
+      width: 200
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
-      Enabled: true
+      Enabled: false
       Name: "+12                                        "
       Show Value: false
       Topic: /wheel_angle_deg_ref
-      Value: true
+      Value: false
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
       backround alpha: 0
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 115; 210; 22
+      foreground alpha: 1
+      foreground color: 0; 255; 0
       height: 1
       left: 1530
       linewidth: 1
@@ -496,18 +496,18 @@ Visualization Manager:
       width: 300
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
-      Enabled: true
+      Enabled: false
       Name: "0                                          "
       Show Value: false
       Topic: /wheel_angle_deg_ref
-      Value: true
+      Value: false
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
       backround alpha: 0
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 115; 210; 22
+      foreground alpha: 1
+      foreground color: 0; 255; 0
       height: 1
       left: 1530
       linewidth: 1
@@ -521,18 +521,18 @@ Visualization Manager:
       width: 300
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
-      Enabled: true
+      Enabled: false
       Name: "-12                                        "
       Show Value: false
       Topic: /wheel_angle_deg_ref
-      Value: true
+      Value: false
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
       backround alpha: 0
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 115; 210; 22
+      foreground alpha: 1
+      foreground color: 0; 255; 0
       height: 1
       left: 1530
       linewidth: 1
@@ -546,18 +546,18 @@ Visualization Manager:
       width: 300
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
-      Enabled: true
+      Enabled: false
       Name: "30                                         "
       Show Value: false
       Topic: /vehicle_speed_kmph_ref
-      Value: true
+      Value: false
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
       backround alpha: 0
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 115; 210; 22
+      foreground alpha: 1
+      foreground color: 0; 255; 0
       height: 1
       left: 1530
       linewidth: 1
@@ -571,18 +571,18 @@ Visualization Manager:
       width: 300
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
-      Enabled: true
+      Enabled: false
       Name: "15                                         "
       Show Value: false
       Topic: /vehicle_speed_kmph_ref
-      Value: true
+      Value: false
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
       backround alpha: 0
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 115; 210; 22
+      foreground alpha: 1
+      foreground color: 0; 255; 0
       height: 1
       left: 1530
       linewidth: 1
@@ -596,18 +596,18 @@ Visualization Manager:
       width: 300
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
-      Enabled: true
+      Enabled: false
       Name: "0                                          "
       Show Value: false
       Topic: /vehicle_speed_kmph_ref
-      Value: true
+      Value: false
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
       backround alpha: 0
       border: true
-      foreground alpha: 0.699999988079071
-      foreground color: 115; 210; 22
+      foreground alpha: 1
+      foreground color: 0; 255; 0
       height: 1
       left: 1530
       linewidth: 1
@@ -667,7 +667,7 @@ Window Geometry:
   Height: 1136
   Hide Left Dock: true
   Hide Right Dock: true
-  QMainWindow State: 000000ff00000000fd0000000400000000000001560000043dfc0200000008fb000000100044006900730070006c00610079007300000000160000043d000000c900fffffffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c0000026100000001000001000000043dfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0056006900650077007300000000160000043d000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004bd0000003efc0100000002fb0000000800540069006d00650000000000000004bd000003bc00fffffffb0000000800540069006d00650100000000000004500000000000000000000007800000043d00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730000000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000001560000043dfc0200000008fb000000100044006900730070006c00610079007300000000160000043d000000c900fffffffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c0000026100000001000001000000043dfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0056006900650077007300000000160000043d000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000780000000c9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004bd0000003efc0100000002fb0000000800540069006d00650000000000000004bd000003bc00fffffffb0000000800540069006d00650100000000000004500000000000000000000007800000043d00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730000000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:

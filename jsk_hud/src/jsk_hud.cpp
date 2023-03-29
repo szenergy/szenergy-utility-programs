@@ -26,7 +26,7 @@ std_msgs::Float32 a_temp, s_temp;
 std::vector<std::string> chstr =
 {
     "[0] Idle",
-    "[1] Distance",
+    "Mission id: 1\nDrive off",
     "[2] Parking",
     "[3] Obstacle avoidance",
     "[4] Distance C",
@@ -45,8 +45,8 @@ ros::Publisher pub_stxt;
 ros::Publisher pub_a_ref;               //angle reference (ctrlCmd)
 ros::Publisher pub_s_ref;               //speed reference (ctrlCmd)
 
-const std::string base_text = "TOPIC STATUS REPORT:\n";
-const std::string oktext = "<span style=\"color: green;\">OK</span>";
+const std::string base_text = "TOPIC STATUS:\n";
+const std::string oktext = "<span style=\"color: cyan;\">OK</span>";
 const std::string notoktext = "<span style=\"color: red;\">N/A</span>";
 std::string status_text;
 
@@ -62,10 +62,10 @@ struct topok
     bool ok = false;            //status
     bool okonly = true;         //view only status (bool)
 
-    topok(std::string tn_in, std::string name_in)
+    topok(std::string name_in, std::string tn_in)
     {
-        tn = tn_in;
         name = name_in;
+        tn = tn_in;
     }
 };
 
@@ -77,8 +77,8 @@ void cb_ctxt    (const std_msgs::Int8 &data_in)                         {ctxt.te
 
 void cb_model   (const visualization_msgs::Marker &data_in)             {status[0].ts = ros::Time::now();}
 void cb_ouster  (const pcl::PCLPointCloud2ConstPtr &data_in)            {status[1].ts = ros::Time::now();}
-void cb_gps     (const geometry_msgs::PoseStamped &data_in)             {status[2].ts = ros::Time::now();}
-void cb_gps_s   (const std_msgs::String &data_in)                       {status[3].outmsg = "<span style=\"color: blue;\">" + data_in.data + "</span>";}
+void cb_stop    (const geometry_msgs::PoseStamped &data_in)             {status[2].ts = ros::Time::now();}
+void cb_park    (const geometry_msgs::PoseStamped &data_in)             {status[3].ts = ros::Time::now();}
 void cb_traj	(const visualization_msgs::MarkerArray &data_in)        {status[4].ts = ros::Time::now();}
 void cb_angle   (const std_msgs::Float32 &data_in)                      {status[5].ts = ros::Time::now();}
 void cb_speed   (const std_msgs::Float32 &data_in)                      {status[6].ts = ros::Time::now();}
@@ -87,6 +87,8 @@ void cb_ref     (const autoware_msgs::ControlCommand &data_in)          {status[
                                                                             pub_a_ref.publish(a_temp);
                                                                             s_temp.data = data_in.linear_velocity;
                                                                             pub_s_ref.publish(s_temp);   }
+void cb_gps     (const geometry_msgs::PoseStamped &data_in)             {status[8].ts = ros::Time::now();}
+void cb_gps_s   (const std_msgs::String &data_in)                       {status[9].outmsg = "<span style=\"color: yellow;\">" + data_in.data + "</span>";}
 
 void timerCallback(const ros::TimerEvent& event)
 {
@@ -110,7 +112,7 @@ void timerCallback(const ros::TimerEvent& event)
             else status[i].outmsg = notoktext;
         }
 
-        status_text += "\n" + status[i].name + ": " + status[i].outmsg;
+        status_text += "\n" + status[i].name + "|" + status[i].outmsg;
         stxt.text = base_text + status_text;
     }
     
@@ -126,25 +128,36 @@ int main(int argc, char **argv)
 
     ros::Timer timer = nh.createTimer(ros::Duration(freq), timerCallback);
 
-    status.push_back(topok("/szemission_3d/szemission_marker", "model"));
-    status.push_back(topok("/os_cloud_node/points", "ouster"));
-    status.push_back(topok("/current_pose", "gps"));
-    status.push_back(topok("/gps/duro/status_string", "gps status"));
-    status.push_back(topok("/polynomial_trajectory", "trajectory"));
-    status.push_back(topok("/wheel_angle_deg", "steering angle"));
-    status.push_back(topok("/vehicle_speed_kmph", "speed"));
-    status.push_back(topok("/ctrlCmd", "control command"));
+    status.push_back(topok("model", "/szemission_3d/szemission_marker"));
+    status.push_back(topok("ouster", "/os_cloud_node/points"));
+    status.push_back(topok("stop line", "/stop_line_pose"));
+    status.push_back(topok("park-area", "/park_goal_pose"));
+    status.push_back(topok("trajectory", "/polynomial_trajectory"));
+    status.push_back(topok("steer ang", "/wheel_angle_deg"));
+    status.push_back(topok("speed", "/vehicle_speed_kmph"));
+    status.push_back(topok("ctrl cmd", "/ctrlCmd"));
+    status.push_back(topok("gps", "/current_pose"));
+    status.push_back(topok("gps status", "/gps/duro/status_string"));
+
+    //auto-adjsted equal-length names (unfortunately does not work with whitespace characters)
+    {
+        int l = 0, i, s = status.size();
+        for (i=0; i<s; i++) if (l<status[i].name.size()) l = status[i].name.size();
+        for (i=0; i<s; i++) status[i].name.resize(l, '_');
+    }
 
     status[0].s = (nh.subscribe(status[0].tn, 1, cb_model));
     status[1].s = (nh.subscribe(status[1].tn, 1, cb_ouster));
-    status[2].s = (nh.subscribe(status[2].tn, 1, cb_gps));
-    status[3].s = (nh.subscribe(status[3].tn, 1, cb_gps_s));
+    status[2].s = (nh.subscribe(status[2].tn, 1, cb_stop));
+    status[3].s = (nh.subscribe(status[3].tn, 1, cb_park));
     status[4].s = (nh.subscribe(status[4].tn, 1, cb_traj));
     status[5].s = (nh.subscribe(status[5].tn, 1, cb_angle));
     status[6].s = (nh.subscribe(status[6].tn, 1, cb_speed));
     status[7].s = (nh.subscribe(status[7].tn, 1, cb_ref));
+    status[8].s = (nh.subscribe(status[8].tn, 1, cb_gps));
+    status[9].s = (nh.subscribe(status[9].tn, 1, cb_gps_s));
 
-    status[3].okonly = false;
+    status[9].okonly = false;
 
     sub_ctxt = nh.subscribe("/challenge_state", 1, cb_ctxt);
 
