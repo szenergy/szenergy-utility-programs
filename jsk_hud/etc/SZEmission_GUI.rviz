@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /state1
       Splitter Ratio: 0.5
     Tree Height: 946
   - Class: rviz/Selection
@@ -282,7 +283,7 @@ Visualization Manager:
       Overtake BG Color Properties: true
       Overtake FG Color Properties: true
       Overtake Position Properties: true
-      Topic: /challenge_state_text
+      Topic: /mission_state_text
       Value: true
       font: Noto Mono
       height: 128
@@ -290,7 +291,7 @@ Visualization Manager:
       line width: 2
       text size: 40
       top: 950
-      width: 800
+      width: 700
     - Alpha: 1
       Class: rviz/RobotModel
       Collision Enabled: false
@@ -366,7 +367,7 @@ Visualization Manager:
       Marker Topic: /szemission_3d/szemission_marker
       Name: Model
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Buffer length: 100
@@ -434,7 +435,7 @@ Visualization Manager:
       foreground alpha: 1
       foreground color: 255; 255; 0
       height: 50
-      left: 1650
+      left: 1450
       linewidth: 1
       max color: 255; 0; 0
       max value: -99
@@ -459,7 +460,7 @@ Visualization Manager:
       foreground alpha: 1
       foreground color: 0; 255; 255
       height: 50
-      left: 1450
+      left: 1650
       linewidth: 1
       max color: 255; 0; 0
       max value: -99
