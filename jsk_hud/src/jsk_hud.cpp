@@ -20,28 +20,32 @@
 const float rtod = 180/M_PI;  //rad-to-deg
 
 //global variables (todo: dynamic recfg)
-float freq = 0.2;               //refresh frequency
-float maxtime = 0.5;            //max time to wait for topics
+float freq = 0.2;                       //refresh frequency
+float maxtime = 0.5;                    //max time to wait for topics
 
 std_msgs::Float32 a_temp, s_temp;
 
-jsk_rviz_plugins::OverlayText stxt;     //status text
-jsk_rviz_plugins::OverlayText ctxt;     //mission/state text
+std_msgs::String ttxt;                  //topic (sub)list text
+std_msgs::String stxt;                  //mission/state text
+std_msgs::String otxt;                  //'ok' text column
+std_msgs::String ntxt;                  //'not ok' text column
 
 ros::Subscriber sub_refvec;             //ctrlCmd speed and angle reference
 ros::Subscriber sub_mtxt;               //mission ID
-ros::Subscriber sub_ctxt;               //state machine string
-ros::Publisher  pub_ctxt;               //mission/state text
+ros::Subscriber sub_stxt;               //state machine string
+ros::Publisher  pub_stxt;               //mission/state text
 std::string mid = "-1", smt = "No Data";
 
-ros::Publisher pub_stxt;
+ros::Publisher pub_ttxt;                //topic (sub)list
+ros::Publisher pub_otxt;                //formatted text for list of 'ok' topics
+ros::Publisher pub_ntxt;                //formatted text for list of 'not ok' topics
 ros::Publisher pub_a_ref;               //angle reference (ctrlCmd)
 ros::Publisher pub_s_ref;               //speed reference (ctrlCmd)
 
-const std::string base_text = "TOPIC STATUS:\n";
-const std::string oktext = "<span style=\"color: cyan;\">OK</span>";
-const std::string notoktext = "<span style=\"color: red;\">N/A</span>";
-std::string status_text;
+const std::string oktext = "OK";
+const std::string notoktext = "X";
+const std::string okspace = "  ";
+const std::string notokspace = " ";
 
 struct topok
 {
@@ -66,9 +70,9 @@ std::vector<topok> status; //text-based topic status indicator ("topic: OK")
 
 //callbacks
 
-//void cb_mtxt    (const std_msgs::UInt32 &data_in)                       {mid =  std::string(data_in.data);  ctxt.text = "mission ID: " + mid + "\n" + smt;}
-void cb_mtxt    (const std_msgs::String &data_in)                       {mid =  data_in.data;               ctxt.text = "mission ID: " + mid + "\n" + smt;}
-void cb_ctxt    (const std_msgs::String &data_in)                       {smt =  data_in.data;               ctxt.text = "mission ID: " + mid + "\n" + smt;}
+//void cb_mtxt    (const std_msgs::UInt32 &data_in)                       {mid =  std::string(data_in.data);  stxt.text = "mission ID: " + mid + "\n" + smt;}
+void cb_mtxt    (const std_msgs::String &data_in)                       {mid =  data_in.data;               stxt.data = "mission ID: " + mid + "\n" + smt;}
+void cb_stxt    (const std_msgs::String &data_in)                       {smt =  data_in.data;               stxt.data = "mission ID: " + mid + "\n" + smt;}
 
 void cb_model   (const visualization_msgs::Marker &data_in)             {status[0].ts = ros::Time::now();}
 void cb_ouster  (const pcl::PCLPointCloud2ConstPtr &data_in)            {status[1].ts = ros::Time::now();}
@@ -90,31 +94,31 @@ void cb_gps_s   (const std_msgs::String &data_in)                       {status[
 void timerCallback(const ros::TimerEvent& event)
 {
     float time;
-    stxt.text = base_text;
-    status_text = "";
+    otxt.data = "\n\n";
+    ntxt.data = "\n\n";
+
     for (int i = 0; i < status.size(); i++)
     {
+
         time = ros::Duration(ros::Time::now() - status[i].ts).toSec();
         if (time < maxtime )
         {
             status[i].ok = true;
+            otxt.data += oktext;
         }
         else
         {
             status[i].ok = false;
+            ntxt.data += notoktext;
         }
-        if (status[i].okonly)
-        {
-            if (status[i].ok) status[i].outmsg = oktext;
-            else status[i].outmsg = notoktext;
-        }
-
-        status_text += "\n" + status[i].name + "|" + status[i].outmsg;
-        stxt.text = base_text + status_text;
+        otxt.data += "\n";
+        ntxt.data += "\n";
     }
     
+    pub_ttxt.publish(ttxt);
+    pub_otxt.publish(otxt);
+    pub_ntxt.publish(ntxt);
     pub_stxt.publish(stxt);
-    pub_ctxt.publish(ctxt);
 }
 
 int main(int argc, char **argv)
@@ -138,13 +142,6 @@ int main(int argc, char **argv)
     status.push_back(topok("gps", "/current_pose"));
     status.push_back(topok("gps status", "/gps/duro/status_string"));
 
-    //auto-adjsted equal-length names (unfortunately does not work with whitespace characters)
-    {
-        int l = 0, i, s = status.size();
-        for (i=0; i<s; i++) if (l<status[i].name.size()) l = status[i].name.size();
-        for (i=0; i<s; i++) status[i].name.resize(l, '_');
-    }
-
     status[ 0].s = (nh.subscribe(status[ 0].tn, 1, cb_model));
     status[ 1].s = (nh.subscribe(status[ 1].tn, 1, cb_ouster));
     status[ 2].s = (nh.subscribe(status[ 2].tn, 1, cb_stop));
@@ -160,19 +157,25 @@ int main(int argc, char **argv)
 
     status[11].okonly = false;
 
-    sub_mtxt = nh.subscribe("/smMissionID", 1, cb_mtxt);
-    sub_ctxt = nh.subscribe("/smState", 1, cb_ctxt);
+    ttxt.data = "TOPIC STATUS:\n\n";
+    for (int i=0; i<status.size(); i++) ttxt.data += status[i].name + "\n";
 
-    pub_stxt = nh.advertise<jsk_rviz_plugins::OverlayText>("status_text", 1);           //all-in-one status text publisher
-    pub_ctxt = nh.advertise<jsk_rviz_plugins::OverlayText>("mission_state_text", 1);    //challenge state (text) publisher
-    pub_a_ref = nh.advertise<std_msgs::Float32>("wheel_angle_deg_ref", 1);              //ctrlCmd angle reference
-    pub_s_ref = nh.advertise<std_msgs::Float32>("vehicle_speed_kmph_ref", 1);           //ctrlCmd speed reference
+    sub_mtxt = nh.subscribe("/smMissionID", 1, cb_mtxt);
+    sub_stxt = nh.subscribe("/smState", 1, cb_stxt);
+
+    pub_ttxt = nh.advertise<std_msgs::String>("status_topic_text", 1);          //topic (sub)list publisher
+    pub_otxt = nh.advertise<std_msgs::String>("status_ok_text", 1);             //status 'ok' text publisher
+    pub_ntxt = nh.advertise<std_msgs::String>("status_notok_text", 1);          //status 'not ok' text publisher
+    pub_stxt = nh.advertise<std_msgs::String>("mission_state_text", 1);         //mission/state (text) publisher
+    pub_a_ref = nh.advertise<std_msgs::Float32>("wheel_angle_deg_ref", 1);      //ctrlCmd angle reference
+    pub_s_ref = nh.advertise<std_msgs::Float32>("vehicle_speed_kmph_ref", 1);   //ctrlCmd speed reference
 
     //init (to show even when no data)
     a_temp.data = 0.0;
     pub_a_ref.publish(a_temp);
     s_temp.data = 0.0;
-    pub_s_ref.publish(s_temp); 
+    pub_s_ref.publish(s_temp);
+    pub_ttxt.publish(ttxt);
 
     ros::spin();
 }

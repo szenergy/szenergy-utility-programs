@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /state1
       Splitter Ratio: 0.5
     Tree Height: 946
   - Class: rviz/Selection
@@ -107,16 +106,14 @@ Visualization Manager:
     - Align Bottom: false
       Background Alpha: 0.800000011920929
       Background Color: 0; 0; 0
-      Class: jsk_rviz_plugin/OverlayText
+      Class: jsk_rviz_plugin/String
       Enabled: true
       Foreground Alpha: 1
       Foreground Color: 255; 255; 255
-      Invert Shadow: false
-      Name: status report
-      Overtake BG Color Properties: true
-      Overtake FG Color Properties: true
+      Name: status topic list
+      Overtake Color Properties: true
       Overtake Position Properties: true
-      Topic: /status_text
+      Topic: /status_topic_text
       Value: true
       font: Noto Mono
       height: 700
@@ -124,7 +121,64 @@ Visualization Manager:
       line width: 2
       text size: 24
       top: 10
-      width: 300
+      width: 250
+    - Align Bottom: false
+      Background Alpha: 0.800000011920929
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/String
+      Enabled: true
+      Foreground Alpha: 1
+      Foreground Color: 25; 255; 240
+      Name: "'ok' column"
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /status_ok_text
+      Value: true
+      font: Noto Mono
+      height: 700
+      left: 260
+      line width: 2
+      text size: 24
+      top: 10
+      width: 40
+    - Align Bottom: false
+      Background Alpha: 0.800000011920929
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/String
+      Enabled: true
+      Foreground Alpha: 1
+      Foreground Color: 239; 41; 41
+      Name: "'not ok' column"
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /status_notok_text
+      Value: true
+      font: Noto Mono
+      height: 700
+      left: 300
+      line width: 2
+      text size: 24
+      top: 10
+      width: 20
+    - Align Bottom: false
+      Background Alpha: 0.800000011920929
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/String
+      Enabled: true
+      Foreground Alpha: 1
+      Foreground Color: 252; 233; 79
+      Name: state
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /mission_state_text
+      Value: true
+      font: Noto Mono
+      height: 128
+      left: 10
+      line width: 2
+      text size: 40
+      top: 950
+      width: 700
     - Class: jsk_rviz_plugin/PieChart
       Enabled: true
       Name: CPU %
@@ -271,27 +325,6 @@ Visualization Manager:
       top: 550
       update interval: 0.03999999910593033
       width: 400
-    - Align Bottom: false
-      Background Alpha: 0.800000011920929
-      Background Color: 0; 0; 0
-      Class: jsk_rviz_plugin/OverlayText
-      Enabled: true
-      Foreground Alpha: 1
-      Foreground Color: 255; 248; 64
-      Invert Shadow: false
-      Name: state
-      Overtake BG Color Properties: true
-      Overtake FG Color Properties: true
-      Overtake Position Properties: true
-      Topic: /mission_state_text
-      Value: true
-      font: Noto Mono
-      height: 128
-      left: 10
-      line width: 2
-      text size: 40
-      top: 950
-      width: 700
     - Alpha: 1
       Class: rviz/RobotModel
       Collision Enabled: false
@@ -346,7 +379,7 @@ Visualization Manager:
       Value: false
     - Alpha: 0.699999988079071
       Class: rviz/Map
-      Color Scheme: map
+      Color Scheme: costmap
       Draw Behind: false
       Enabled: true
       Name: Map
