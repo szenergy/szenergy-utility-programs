@@ -7,7 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
       Splitter Ratio: 0.5
-    Tree Height: 946
+    Tree Height: 952
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -116,7 +116,7 @@ Visualization Manager:
       Topic: /status_topic_text
       Value: true
       font: Noto Mono
-      height: 700
+      height: 460
       left: 10
       line width: 2
       text size: 24
@@ -135,7 +135,7 @@ Visualization Manager:
       Topic: /status_ok_text
       Value: true
       font: Noto Mono
-      height: 700
+      height: 460
       left: 260
       line width: 2
       text size: 24
@@ -154,12 +154,31 @@ Visualization Manager:
       Topic: /status_notok_text
       Value: true
       font: Noto Mono
-      height: 700
+      height: 460
       left: 300
       line width: 2
       text size: 24
       top: 10
       width: 20
+    - Align Bottom: false
+      Background Alpha: 0.800000011920929
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/String
+      Enabled: true
+      Foreground Alpha: 1
+      Foreground Color: 0; 255; 255
+      Name: gps status
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /gps/duro/status_string
+      Value: true
+      font: Noto Mono
+      height: 80
+      left: 70
+      line width: 2
+      text size: 24
+      top: 472
+      width: 250
     - Align Bottom: false
       Background Alpha: 0.800000011920929
       Background Color: 0; 0; 0
@@ -400,7 +419,7 @@ Visualization Manager:
       Marker Topic: /szemission_3d/szemission_marker
       Name: Model
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
     - Buffer length: 100
@@ -425,7 +444,7 @@ Visualization Manager:
       min value: -371
       show caption: true
       text size: 20
-      top: 440
+      top: 443
       update interval: 0.03999999910593033
       width: 200
     - Buffer length: 100
@@ -450,7 +469,7 @@ Visualization Manager:
       min value: -371
       show caption: true
       text size: 20
-      top: 440
+      top: 443
       update interval: 0.03999999910593033
       width: 200
     - Buffer length: 100
@@ -475,7 +494,7 @@ Visualization Manager:
       min value: -100
       show caption: true
       text size: 20
-      top: 980
+      top: 983
       update interval: 0.03999999910593033
       width: 200
     - Buffer length: 100
@@ -500,150 +519,125 @@ Visualization Manager:
       min value: -100
       show caption: true
       text size: 20
-      top: 980
+      top: 983
       update interval: 0.03999999910593033
       width: 200
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
-      Enabled: false
-      Name: "+12                                        "
+      Enabled: true
+      Name: +12°
       Show Value: false
       Topic: /wheel_angle_deg_ref
-      Value: false
+      Value: true
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.6000000238418579
       border: true
       foreground alpha: 1
-      foreground color: 0; 255; 0
+      foreground color: 255; 255; 255
       height: 1
-      left: 1530
+      left: 1375
       linewidth: 1
       max color: 255; 0; 0
       max value: 0
       min value: 0
       show caption: true
       text size: 20
-      top: 50
+      top: 10
       update interval: 3
-      width: 300
+      width: 75
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
-      Enabled: false
-      Name: "0                                          "
+      Enabled: true
+      Name: 0°
       Show Value: false
       Topic: /wheel_angle_deg_ref
-      Value: false
+      Value: true
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.6000000238418579
       border: true
       foreground alpha: 1
-      foreground color: 0; 255; 0
+      foreground color: 255; 255; 255
       height: 1
-      left: 1530
+      left: 1410
       linewidth: 1
       max color: 255; 0; 0
       max value: 0
       min value: 0
       show caption: true
       text size: 20
-      top: 175
+      top: 210
       update interval: 3
-      width: 300
+      width: 40
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
-      Enabled: false
-      Name: "-12                                        "
+      Enabled: true
+      Name: -12°
       Show Value: false
       Topic: /wheel_angle_deg_ref
-      Value: false
+      Value: true
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.6000000238418579
       border: true
       foreground alpha: 1
-      foreground color: 0; 255; 0
+      foreground color: 255; 255; 255
       height: 1
-      left: 1530
+      left: 1375
       linewidth: 1
       max color: 255; 0; 0
       max value: 0
       min value: 0
       show caption: true
       text size: 20
-      top: 300
+      top: 410
       update interval: 3
-      width: 300
+      width: 75
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
-      Enabled: false
-      Name: "30                                         "
+      Enabled: true
+      Name: 30
       Show Value: false
       Topic: /vehicle_speed_kmph_ref
-      Value: false
+      Value: true
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.6000000238418579
       border: true
       foreground alpha: 1
-      foreground color: 0; 255; 0
+      foreground color: 255; 255; 255
       height: 1
-      left: 1530
+      left: 1400
       linewidth: 1
       max color: 255; 0; 0
       max value: 0
       min value: 0
       show caption: true
       text size: 20
-      top: 500
+      top: 550
       update interval: 3
-      width: 300
+      width: 50
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
-      Enabled: false
-      Name: "15                                         "
+      Enabled: true
+      Name: 15
       Show Value: false
       Topic: /vehicle_speed_kmph_ref
-      Value: false
+      Value: true
       auto color change: false
       auto scale: false
       background color: 0; 0; 0
-      backround alpha: 0
+      backround alpha: 0.6000000238418579
       border: true
       foreground alpha: 1
-      foreground color: 0; 255; 0
+      foreground color: 255; 255; 255
       height: 1
-      left: 1530
-      linewidth: 1
-      max color: 255; 0; 0
-      max value: 0
-      min value: 0
-      show caption: true
-      text size: 20
-      top: 625
-      update interval: 3
-      width: 300
-    - Buffer length: 100
-      Class: jsk_rviz_plugin/Plotter2D
-      Enabled: false
-      Name: "0                                          "
-      Show Value: false
-      Topic: /vehicle_speed_kmph_ref
-      Value: false
-      auto color change: false
-      auto scale: false
-      background color: 0; 0; 0
-      backround alpha: 0
-      border: true
-      foreground alpha: 1
-      foreground color: 0; 255; 0
-      height: 1
-      left: 1530
+      left: 1400
       linewidth: 1
       max color: 255; 0; 0
       max value: 0
@@ -652,7 +646,82 @@ Visualization Manager:
       text size: 20
       top: 750
       update interval: 3
-      width: 300
+      width: 50
+    - Buffer length: 100
+      Class: jsk_rviz_plugin/Plotter2D
+      Enabled: true
+      Name: 0
+      Show Value: false
+      Topic: /vehicle_speed_kmph_ref
+      Value: true
+      auto color change: false
+      auto scale: false
+      background color: 0; 0; 0
+      backround alpha: 0.6000000238418579
+      border: true
+      foreground alpha: 1
+      foreground color: 255; 255; 255
+      height: 1
+      left: 1410
+      linewidth: 1
+      max color: 255; 0; 0
+      max value: 0
+      min value: 0
+      show caption: true
+      text size: 20
+      top: 950
+      update interval: 3
+      width: 40
+    - Buffer length: 100
+      Class: jsk_rviz_plugin/Plotter2D
+      Enabled: true
+      Name: angle midline
+      Show Value: false
+      Topic: /wheel_angle_deg_ref
+      Value: true
+      auto color change: false
+      auto scale: false
+      background color: 0; 0; 0
+      backround alpha: 0
+      border: true
+      foreground alpha: 1
+      foreground color: 255; 255; 255
+      height: 1
+      left: 1450
+      linewidth: 1
+      max color: 255; 0; 0
+      max value: 0
+      min value: 0
+      show caption: false
+      text size: 20
+      top: 210
+      update interval: 3
+      width: 400
+    - Buffer length: 100
+      Class: jsk_rviz_plugin/Plotter2D
+      Enabled: true
+      Name: speed midline
+      Show Value: false
+      Topic: /vehicle_speed_kmph_ref
+      Value: true
+      auto color change: false
+      auto scale: false
+      background color: 0; 0; 0
+      backround alpha: 0
+      border: true
+      foreground alpha: 1
+      foreground color: 255; 255; 255
+      height: 1
+      left: 1450
+      linewidth: 1
+      max color: 255; 0; 0
+      max value: 0
+      min value: 0
+      show caption: false
+      text size: 20
+      top: 750
+      update interval: 3
+      width: 400
   Enabled: true
   Global Options:
     Background Color: 184; 184; 184
@@ -701,7 +770,7 @@ Window Geometry:
   Height: 1136
   Hide Left Dock: true
   Hide Right Dock: true
-  QMainWindow State: 000000ff00000000fd0000000400000000000001560000043dfc0200000008fb000000100044006900730070006c00610079007300000000160000043d000000c900fffffffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c0000026100000001000001000000043dfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0056006900650077007300000000160000043d000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000780000000c9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004bd0000003efc0100000002fb0000000800540069006d00650000000000000004bd000003bc00fffffffb0000000800540069006d00650100000000000004500000000000000000000007800000043d00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730000000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000015600000441fc0200000008fb000000100044006900730070006c006100790073000000001400000441000000c700fffffffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c0000026100000001000001000000043dfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0056006900650077007300000000160000043d000000a000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000780000000c9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004bd0000003efc0100000002fb0000000800540069006d00650000000000000004bd0000030700fffffffb0000000800540069006d00650100000000000004500000000000000000000007800000044100000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730000000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -711,5 +780,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1920
-  X: 0
-  Y: 27
+  X: -30
+  Y: -33
