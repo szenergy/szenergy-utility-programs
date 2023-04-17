@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 import rospkg
@@ -14,10 +14,10 @@ def subscriber():
 def callback_fuction(message):
     global buf
     if (1 - message.drivemode + buf == 0):
-        playsound(rospack.get_path("drivemode_sound") + "/src/start_trimmed.mp3")
+        playsound(rospack.get_path("drivemode_sound") + "/src/airbus_ap_engage.mp3")
         buf = 1
     elif (2 - message.drivemode - buf == 1):
-        playsound(rospack.get_path("drivemode_sound") + "/src/stop_trimmed.mp3")
+        playsound(rospack.get_path("drivemode_sound") + "/src/airbus_ap_disengage.mp3")
         buf = 0
 
 
