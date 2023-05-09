@@ -9,6 +9,7 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <sensor_msgs/Imu.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
@@ -21,10 +22,10 @@
 const float rtod = 180/M_PI;  //rad-to-deg
 
 //global variables (todo: dynamic recfg)
-float freq = 0.2;                       //refresh frequency             [seconds]
+float freq = 0.1;                       //refresh frequency             [seconds]
 float maxtime = 0.5;                    //max time to wait for topics   [seconds]
 
-std_msgs::Float32 a_temp, s_temp;
+std_msgs::Float32 a_temp, s_temp, gui_angle, gui_speed;
 
 std_msgs::String ttxt;                  //topic (sub)list text
 std_msgs::String stxt;                  //mission/state text
@@ -40,8 +41,10 @@ std::string mid = "-1", smt = "No Data";
 ros::Publisher pub_ttxt;                //topic (sub)list
 ros::Publisher pub_otxt;                //formatted text for list of 'ok' topics
 ros::Publisher pub_ntxt;                //formatted text for list of 'not ok' topics
-ros::Publisher pub_a_ref;               //angle reference (ctrl_cmd)
-ros::Publisher pub_s_ref;               //speed reference (ctrl_cmd)
+ros::Publisher pub_a_ref;               //angle reference (ctrl_cmd) [sync]
+ros::Publisher pub_s_ref;               //speed reference (ctrl_cmd) [sync]
+ros::Publisher pub_a_gui;               //angle republish (same Hz as "sync" group) [sync]
+ros::Publisher pub_s_gui;               //speed republish (same Hz as "sync" group) [sync]
 
 const std::string oktext = "OK";
 const std::string notoktext = "X";
@@ -80,14 +83,16 @@ void cb_park    (const geometry_msgs::PoseStamped &data_in)             {status[
 void cb_occup   (const nav_msgs::OccupancyGrid &data_in)                {status[3].ts = ros::Time::now();}
 void cb_lapoint (const visualization_msgs::Marker &data_in)             {status[4].ts = ros::Time::now();}
 void cb_traj	(const visualization_msgs::MarkerArray &data_in)        {status[5].ts = ros::Time::now();}
-void cb_angle   (const std_msgs::Float32 &data_in)                      {status[6].ts = ros::Time::now();}
-void cb_speed   (const std_msgs::Float32 &data_in)                      {status[7].ts = ros::Time::now();}
+void cb_angle   (const std_msgs::Float32 &data_in)                      {status[6].ts = ros::Time::now();   gui_angle = data_in;}
+void cb_speed   (const std_msgs::Float32 &data_in)                      {status[7].ts = ros::Time::now();   gui_speed = data_in;}
 void cb_ref     (const autoware_msgs::ControlCommandStamped &data_in)   {status[8].ts = ros::Time::now();
                                                                             a_temp.data = data_in.cmd.steering_angle * rtod;
-                                                                            pub_a_ref.publish(a_temp);
+                                                                            //pub_a_ref.publish(a_temp);
                                                                             s_temp.data = data_in.cmd.linear_velocity;
-                                                                            pub_s_ref.publish(s_temp);   }
-void cb_gps     (const geometry_msgs::PoseStamped &data_in)             {status[9].ts = ros::Time::now();}
+                                                                            //pub_s_ref.publish(s_temp);
+                                                                        }
+void cb_imu     (const sensor_msgs::Imu &data_in)                       {status[9].ts = ros::Time::now();}
+void cb_gps     (const geometry_msgs::PoseStamped &data_in)             {status[10].ts = ros::Time::now();}
 
 void timerCallback(const ros::TimerEvent& event)
 {
@@ -119,6 +124,12 @@ void timerCallback(const ros::TimerEvent& event)
         ntxt.data += "\n";
     }
 
+    //publish values at 'freq' frequency [in seconds]
+    pub_a_ref.publish(a_temp);
+    pub_s_ref.publish(s_temp);
+    pub_a_gui.publish(gui_angle);
+    pub_s_gui.publish(gui_speed);
+
     pub_ttxt.publish(ttxt);
     pub_otxt.publish(otxt);
     pub_ntxt.publish(ntxt);
@@ -133,16 +144,17 @@ int main(int argc, char **argv)
 
     ros::Timer timer = nh.createTimer(ros::Duration(freq), timerCallback);
 
-    status.push_back(topok("autonom mode", "/vehicle_status"));
-    status.push_back(topok("stop l. pose", "/stop_line_pose"));
-    status.push_back(topok("parking pose", "/park_goal_pose"));
-    status.push_back(topok("occup map", "/occupancy_map"));
-    status.push_back(topok("look fwd p", "/lookAheadPoint"));
-    status.push_back(topok("trajectory", "/polynomial_trajectory"));
-    status.push_back(topok("steer angle", "/wheel_angle_deg"));
-    status.push_back(topok("veh. speed", "/vehicle_speed_kmph"));
-    status.push_back(topok("ctrl cmd", "/ctrl_cmd"));
-    status.push_back(topok("gps ↴", "/current_pose"));
+    status.push_back(topok("autonom mode",  "/vehicle_status"));
+    status.push_back(topok("stop l. pose",  "/stop_line_pose"));
+    status.push_back(topok("parking pose",  "/park_goal_pose"));
+    status.push_back(topok("occup map",     "/occupancy_map"));
+    status.push_back(topok("look fwd p",    "/lookAheadPoint"));
+    status.push_back(topok("trajectory",    "/polynomial_trajectory"));
+    status.push_back(topok("steer angle",   "/wheel_angle_deg"));
+    status.push_back(topok("veh. speed",    "/vehicle_speed_kmph"));
+    status.push_back(topok("ctrl cmd",      "/ctrl_cmd"));
+    status.push_back(topok("IMU data",      "/imu/data"));
+    status.push_back(topok("gps ↴",         "/current_pose"));
 
     status[0].s = (nh.subscribe(status[0].tn, 1, cb_mode));
     status[1].s = (nh.subscribe(status[1].tn, 1, cb_stop));
@@ -153,7 +165,8 @@ int main(int argc, char **argv)
     status[6].s = (nh.subscribe(status[6].tn, 1, cb_angle));
     status[7].s = (nh.subscribe(status[7].tn, 1, cb_speed));
     status[8].s = (nh.subscribe(status[8].tn, 1, cb_ref));
-    status[9].s = (nh.subscribe(status[9].tn, 1, cb_gps));
+    status[9].s = (nh.subscribe(status[9].tn, 1, cb_imu));
+    status[10].s = (nh.subscribe(status[10].tn, 1, cb_gps));
 
     ttxt.data = "TOPIC STATUS:\n\n";
     for (int i=0; i<status.size(); i++) ttxt.data += status[i].name + "\n";
@@ -167,12 +180,15 @@ int main(int argc, char **argv)
     pub_stxt = nh.advertise<std_msgs::String>("mission_state_text", 1);         //mission/state (text) publisher
     pub_a_ref = nh.advertise<std_msgs::Float32>("wheel_angle_deg_ref", 1);      //ctrl_cmd angle reference
     pub_s_ref = nh.advertise<std_msgs::Float32>("vehicle_speed_kmph_ref", 1);   //ctrl_cmd speed reference
+    pub_a_gui = nh.advertise<std_msgs::Float32>("gui_msg_angle", 1);            //angle republished [at fix Hz]
+    pub_s_gui = nh.advertise<std_msgs::Float32>("gui_msg_speed", 1);            //speed republished [at fix Hz]
 
     //init (to show even when no data)
-    a_temp.data = 0.0;
-    pub_a_ref.publish(a_temp);
-    s_temp.data = 0.0;
-    pub_s_ref.publish(s_temp);
+    a_temp.data = 0.0;      pub_a_ref.publish(a_temp);
+    s_temp.data = 0.0;      pub_s_ref.publish(s_temp);
+    gui_angle.data = 0.0;   pub_a_gui.publish(gui_angle);
+    gui_speed.data = 0.0;   pub_s_gui.publish(gui_speed);
+
     pub_ttxt.publish(ttxt);
     pub_stxt.publish(stxt);
 
