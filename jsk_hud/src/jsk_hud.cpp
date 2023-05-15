@@ -6,6 +6,7 @@
 #include <std_msgs/UInt32.h>
 #include <std_msgs/UInt64.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Bool.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -93,6 +94,19 @@ void cb_ref     (const autoware_msgs::ControlCommandStamped &data_in)   {status[
                                                                         }
 void cb_imu     (const sensor_msgs::Imu &data_in)                       {status[9].ts = ros::Time::now();}
 void cb_gps     (const geometry_msgs::PoseStamped &data_in)             {status[10].ts = ros::Time::now();}
+void rosbag_rececord_callback(const std_msgs::Bool& msg)
+{
+    if (msg.data)
+    {
+        status[11].ok = true;
+        status[11].ts = ros::Time::now();
+    }
+    else
+    {
+        status[11].ok = false;
+        status[11].ts = ros::Time::now();
+    }
+}
 
 void timerCallback(const ros::TimerEvent& event)
 {
@@ -155,6 +169,7 @@ int main(int argc, char **argv)
     status.push_back(topok("ctrl cmd",      "/ctrl_cmd"));
     status.push_back(topok("IMU data",      "/imu/data"));
     status.push_back(topok("gps ↴",         "/current_pose"));
+    status.push_back(topok("ROSBAG RECORD",         "/rosbag_record"));
 
     status[0].s = (nh.subscribe(status[0].tn, 1, cb_mode));
     status[1].s = (nh.subscribe(status[1].tn, 1, cb_stop));
@@ -167,6 +182,7 @@ int main(int argc, char **argv)
     status[8].s = (nh.subscribe(status[8].tn, 1, cb_ref));
     status[9].s = (nh.subscribe(status[9].tn, 1, cb_imu));
     status[10].s = (nh.subscribe(status[10].tn, 1, cb_gps));
+    status[11].s = (nh.subscribe(status[11].tn, 1, rosbag_rececord_callback));
 
     ttxt.data = "TOPIC STATUS:\n\n";
     for (int i=0; i<status.size(); i++) ttxt.data += status[i].name + "\n";
