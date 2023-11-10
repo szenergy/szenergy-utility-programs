@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /topic errors1
         - /right-image1
       Splitter Ratio: 0.5
     Tree Height: 939
@@ -79,60 +80,24 @@ Visualization Manager:
     - Align Bottom: false
       Background Alpha: 0.800000011920929
       Background Color: 0; 0; 0
-      Class: jsk_rviz_plugin/String
+      Class: jsk_rviz_plugin/OverlayText
       Enabled: true
-      Foreground Alpha: 1
+      Foreground Alpha: 0.800000011920929
       Foreground Color: 255; 255; 255
-      Name: status topic list
-      Overtake Color Properties: true
+      Invert Shadow: false
+      Name: topic errors
+      Overtake BG Color Properties: false
+      Overtake FG Color Properties: true
       Overtake Position Properties: true
-      Topic: /status_topic_text
+      Topic: /topic_error
       Value: true
       font: Noto Mono
-      height: 540
+      height: 230
       left: 10
       line width: 2
       text size: 24
       top: 200
-      width: 250
-    - Align Bottom: false
-      Background Alpha: 0.800000011920929
-      Background Color: 0; 0; 0
-      Class: jsk_rviz_plugin/String
-      Enabled: true
-      Foreground Alpha: 1
-      Foreground Color: 25; 255; 240
-      Name: "'ok' column"
-      Overtake Color Properties: true
-      Overtake Position Properties: true
-      Topic: /status_ok_text
-      Value: true
-      font: Noto Mono
-      height: 465
-      left: 261
-      line width: 2
-      text size: 24
-      top: 275
-      width: 40
-    - Align Bottom: false
-      Background Alpha: 0.800000011920929
-      Background Color: 0; 0; 0
-      Class: jsk_rviz_plugin/String
-      Enabled: true
-      Foreground Alpha: 1
-      Foreground Color: 239; 41; 41
-      Name: "'not ok' column"
-      Overtake Color Properties: true
-      Overtake Position Properties: true
-      Topic: /status_notok_text
-      Value: true
-      font: Noto Mono
-      height: 465
-      left: 302
-      line width: 2
-      text size: 24
-      top: 275
-      width: 20
+      width: 500
     - Align Bottom: false
       Background Alpha: 0.800000011920929
       Background Color: 0; 0; 0
@@ -231,7 +196,7 @@ Visualization Manager:
       border: true
       foreground alpha: 1
       foreground color: 255; 255; 0
-      height: 400
+      height: 200
       left: 1450
       linewidth: 3
       max color: 255; 0; 0
@@ -256,7 +221,7 @@ Visualization Manager:
       border: true
       foreground alpha: 1
       foreground color: 0; 255; 255
-      height: 400
+      height: 200
       left: 1450
       linewidth: 3
       max color: 255; 0; 0
@@ -281,7 +246,7 @@ Visualization Manager:
       border: true
       foreground alpha: 1
       foreground color: 255; 255; 0
-      height: 400
+      height: 200
       left: 1450
       linewidth: 3
       max color: 255; 0; 0
@@ -289,7 +254,7 @@ Visualization Manager:
       min value: 7.5
       show caption: true
       text size: 20
-      top: 633
+      top: 433
       update interval: 0.03999999910593033
       width: 400
     - Buffer length: 100
@@ -306,7 +271,7 @@ Visualization Manager:
       border: true
       foreground alpha: 1
       foreground color: 0; 255; 255
-      height: 400
+      height: 200
       left: 1450
       linewidth: 3
       max color: 255; 0; 0
@@ -314,7 +279,7 @@ Visualization Manager:
       min value: 7.5
       show caption: true
       text size: 20
-      top: 633
+      top: 433
       update interval: 0.03999999910593033
       width: 400
     - Alpha: 1
@@ -384,7 +349,7 @@ Visualization Manager:
       Marker Topic: /polynomial_trajectory
       Name: Trajectory
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -392,7 +357,7 @@ Visualization Manager:
       Marker Topic: /szemission/szemission_marker
       Name: Model
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
     - Buffer length: 100
@@ -467,7 +432,7 @@ Visualization Manager:
       min value: -100
       show caption: true
       text size: 20
-      top: 550
+      top: 350
       update interval: 0.03999999910593033
       width: 200
     - Buffer length: 100
@@ -492,7 +457,7 @@ Visualization Manager:
       min value: -100
       show caption: true
       text size: 20
-      top: 550
+      top: 350
       update interval: 0.03999999910593033
       width: 200
     - Buffer length: 100
@@ -542,7 +507,7 @@ Visualization Manager:
       min value: 0
       show caption: true
       text size: 20
-      top: 300
+      top: 200
       update interval: 3
       width: 40
     - Buffer length: 100
@@ -567,7 +532,7 @@ Visualization Manager:
       min value: 0
       show caption: true
       text size: 20
-      top: 500
+      top: 300
       update interval: 3
       width: 75
     - Buffer length: 100
@@ -592,7 +557,7 @@ Visualization Manager:
       min value: 0
       show caption: true
       text size: 20
-      top: 633
+      top: 433
       update interval: 3
       width: 50
     - Buffer length: 100
@@ -617,7 +582,7 @@ Visualization Manager:
       min value: 0
       show caption: true
       text size: 20
-      top: 833
+      top: 533
       update interval: 3
       width: 50
     - Buffer length: 100
@@ -642,7 +607,7 @@ Visualization Manager:
       min value: 0
       show caption: true
       text size: 20
-      top: 1033
+      top: 633
       update interval: 3
       width: 40
     - Buffer length: 100
@@ -667,7 +632,7 @@ Visualization Manager:
       min value: 0
       show caption: false
       text size: 20
-      top: 300
+      top: 200
       update interval: 3
       width: 400
     - Buffer length: 100
@@ -692,7 +657,7 @@ Visualization Manager:
       min value: 0
       show caption: false
       text size: 20
-      top: 833
+      top: 533
       update interval: 3
       width: 400
     - Class: rviz/MarkerArray
@@ -700,7 +665,7 @@ Visualization Manager:
       Marker Topic: /polygon_trajectory
       Name: MarkerArray
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -708,7 +673,7 @@ Visualization Manager:
       Marker Topic: /polynomial_trajectory
       Name: MarkerArray
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -716,7 +681,7 @@ Visualization Manager:
       Marker Topic: /lookAheadPoint
       Name: Marker
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
     - Class: rviz/Camera
@@ -730,8 +695,6 @@ Visualization Manager:
       Unreliable: false
       Value: false
       Visibility:
-        "'not ok' column": true
-        "'ok' column": true
         +12°: true
         -12°: true
         0: true
@@ -747,6 +710,7 @@ Visualization Manager:
         Marker: true
         MarkerArray: true
         Model: true
+        OverlayText: true
         Pose: true
         RobotModel: true
         Trajectory: true
@@ -765,7 +729,6 @@ Visualization Manager:
         speed [km/h]: true
         speed midline: true
         state: true
-        status topic list: true
         stop line: true
         value: true
       Zoom Factor: 1
@@ -786,7 +749,7 @@ Visualization Manager:
       Axes Radius: 0.10000000149011612
       Class: rviz/Pose
       Color: 0; 255; 0
-      Enabled: true
+      Enabled: false
       Head Length: 0.6000000238418579
       Head Radius: 0.6000000238418579
       Name: Pose
@@ -796,13 +759,13 @@ Visualization Manager:
       Shape: Arrow
       Topic: /park_goal_pose
       Unreliable: false
-      Value: true
+      Value: false
     - Alpha: 1
       Axes Length: 1
       Axes Radius: 0.10000000149011612
       Class: rviz/Pose
       Color: 0; 255; 255
-      Enabled: true
+      Enabled: false
       Head Length: 0.6000000238418579
       Head Radius: 0.20000000298023224
       Name: Pose
@@ -812,7 +775,7 @@ Visualization Manager:
       Shape: Arrow
       Topic: /stop_line_pose
       Unreliable: false
-      Value: true
+      Value: false
     - Class: rviz/Image
       Enabled: false
       Image Topic: /camera_stream/detections/parking_place_detector
@@ -899,6 +862,22 @@ Visualization Manager:
       top: 233
       update interval: 3
       width: 414
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /park_pose_marker
+      Name: Marker
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /stop_line_pose_marker
+      Name: Marker
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 184; 184; 184
@@ -951,7 +930,7 @@ Window Geometry:
   Hide Right Dock: true
   Image:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001560000043dfc020000000efc000000160000043d0000000000fffffffa000000000100000002fb0000001c00730074006f00700020006c0069006e006500200070006f00730065020000041f000000a0000001560000010afb000000100044006900730070006c0061007900730000000000000001560000015600fffffffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d006100670065000000036c000000e70000001600fffffffb0000000a0049006d006100670065020000045c0000014d0000015600000107fb0000000a0049006d00610067006502000005a50000033f000001a700000141fb0000001c007000610072006b00200067006f0061006c00200070006f0073006502000002b90000009f000001560000010bfb0000000c00430061006d0065007200610000000381000000d20000001600fffffffb0000000a0049006d00610067006500000002380000021b000000000000000000000001000001000000043dfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0056006900650077007300000000160000043d000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b20000000000000000000000020000078000000108fc0100000002fb0000000c00430061006d0065007200610000000000000007800000000000000000fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004bd0000003efc0100000002fb0000000800540069006d00650000000000000004bd000003bc00fffffffb0000000800540069006d00650100000000000004500000000000000000000007800000043d00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730000000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000001560000043dfc020000000ffb000000100044006900730070006c00610079007300000000160000043d000000c900fffffffc000000160000043d0000000000fffffffa000000000100000001fb0000001c00730074006f00700020006c0069006e006500200070006f00730065020000041f000000a0000001560000010afb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d006100670065000000036c000000e70000001600fffffffb0000000a0049006d006100670065020000045c0000014d00000280000001e0fb0000000a0049006d00610067006502000005a50000033f000001a700000141fb0000001c007000610072006b00200067006f0061006c00200070006f0073006502000002b90000009f000001560000010bfb0000000c00430061006d0065007200610000000381000000d20000001600fffffffb0000000a0049006d00610067006500000002380000021b000000000000000000000001000001000000043dfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0056006900650077007300000000160000043d000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b20000000000000000000000020000078000000108fc0100000002fb0000000c00430061006d0065007200610000000000000007800000000000000000fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004bd0000003efc0100000002fb0000000800540069006d00650000000000000004bd000003bc00fffffffb0000000800540069006d00650100000000000004500000000000000000000007800000043d00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730000000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
