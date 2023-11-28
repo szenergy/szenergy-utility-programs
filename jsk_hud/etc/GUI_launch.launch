@@ -1,6 +1,7 @@
 <launch>
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find jsk_hud)/etc/SZEmission_GUI.rviz"/>
   <node name="jsk_hud" pkg="jsk_hud" type="jsk_hud" />
+  <node name="topic_sound_alarm" pkg="jsk_hud" type="soundalarm.py" />
   <node name="drivemode_sound" pkg="drivemode_sound" type="play_sound_sub.py" />
   <node name="cpu_monitor" pkg="cpu_monitor" type="monitor.py" />
   <node name="szemission" pkg="rviz_markers" type="szemission" />

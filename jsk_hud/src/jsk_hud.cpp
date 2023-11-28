@@ -10,6 +10,7 @@
 #include <std_msgs/ColorRGBA.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/Image.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/Imu.h>
 #include <nav_msgs/OccupancyGrid.h>
@@ -27,7 +28,6 @@ const float rtod = 180/M_PI;  //rad-to-deg
 float freq = 0.1;                       //refresh frequency             [seconds]
 float maxtime = 0.5;                    //max time to wait for topics   [seconds]
 //float color_freq = 0.1;                 //color flash frequency         [seconds] -- currently same as freq
-
 
 std_msgs::ColorRGBA color_bg;
 std_msgs::ColorRGBA color_idle;
@@ -50,11 +50,10 @@ ros::Publisher pub_s_ref;               //speed reference (ctrl_cmd) [sync]
 ros::Publisher pub_a_gui;               //angle republish (same Hz as "sync" group) [sync]
 ros::Publisher pub_s_gui;               //speed republish (same Hz as "sync" group) [sync]
 
-bool allok = false;                     //no errors
-bool idle = false;                      //no change
-bool fc = false;                        //toggle error color (flashing)
+bool allok = true;                     //no errors
+bool idle = true;                      //no change
 
-
+bool fc = false;                        //error color variable (flashing)
 
 std::string color_prefix[] = {"<span style=\"color: yellow;\">", "<span style=\"color: red;\">"};
 std::string flashstr[] = {" !!! ", " --- "};
@@ -86,17 +85,19 @@ void cb_stxt        (const std_msgs::String &data_in)                       {smt
 void cb_occup       (const nav_msgs::OccupancyGrid &data_in)                {status[0].ts = ros::Time::now();}
 void cb_lapoint     (const visualization_msgs::Marker &data_in)             {status[1].ts = ros::Time::now();}
 void cb_traj        (const visualization_msgs::MarkerArray &data_in)        {status[2].ts = ros::Time::now();}
-//void cb_can         (const visualization_msgs::MarkerArray &data_in)        {status[3].ts = ros::Time::now();}
 void cb_ctrl_cmd    (const autoware_msgs::ControlCommandStamped &data_in)   {status[3].ts = ros::Time::now();
                                                                             a_temp.data = data_in.cmd.steering_angle * rtod;
                                                                             //pub_a_ref.publish(a_temp);
                                                                             s_temp.data = data_in.cmd.linear_velocity;
                                                                             //pub_s_ref.publish(s_temp);
-                                                                        }
-void cb_imu     (const sensor_msgs::Imu &data_in)                       {status[4].ts = ros::Time::now();}
+                                                                            }
+void cb_imu         (const sensor_msgs::Imu &data_in)                       {status[4].ts = ros::Time::now();}
+void cb_zed         (const sensor_msgs::Image &data_in)                     {status[5].ts = ros::Time::now();}
+void cb_lidar       (const sensor_msgs::PointCloud2 &data_in)               {status[6].ts = ros::Time::now();}
 
-void cb_angle   (const std_msgs::Float32 &data_in)                      {gui_angle = data_in;}
-void cb_speed   (const std_msgs::Float32 &data_in)                      {gui_speed = data_in;}
+void cb_angle       (const std_msgs::Float32 &data_in)                      {status[7].ts = ros::Time::now();
+                                                                             gui_angle = data_in;}
+void cb_speed       (const std_msgs::Float32 &data_in)                      {gui_speed = data_in;}
 
 void timerCallback(const ros::TimerEvent& event)
 {
@@ -121,6 +122,7 @@ void timerCallback(const ros::TimerEvent& event)
     }
     if (!allok)
     {
+        //topic_alarm->stopAll();
         ttxt.bg_color = color_bg;               //set background to visible
         //ttxt.fg_color = flashcolor[fc];         //set text color
         fc = !fc;                               //switch color
@@ -129,6 +131,7 @@ void timerCallback(const ros::TimerEvent& event)
         {
             if (status[i].error) ttxt.text += flashstr[fc] + status[i].name + flashstr[fc] + "\n";
         }
+
         idle = false;
     }
     else if (!idle)
@@ -153,7 +156,7 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "SZEmission_HUD");
     ros::NodeHandle nh;
-    ROS_INFO("HUD node started.");
+    ROS_INFO("HUD node started, initializing...");
 
     ros::Timer timer = nh.createTimer(ros::Duration(freq), timerCallback);
 /*
@@ -172,7 +175,7 @@ int main(int argc, char **argv)
     color_bg.r = 0.0;
     color_bg.g = 0.0;
     color_bg.b = 0.0;
-    color_bg.a = 8.0;
+    color_bg.a = 0.8;
 
     color_idle.r = 0.0;
     color_idle.g = 0.0;
@@ -182,16 +185,20 @@ int main(int argc, char **argv)
     status.push_back(topok("occupancy map",    "/occupancy_map"));
     status.push_back(topok("look ahead point", "/lookAheadPoint"));
     status.push_back(topok("trajectory",       "/polynomial_trajectory"));
-    //status.push_back(topok("CAN messages",     "/wheel_angle_deg"));
     status.push_back(topok("control command",  "/ctrl_cmd"));
     status.push_back(topok("IMU data",         "/imu/data"));
+    status.push_back(topok("camera (L) image", "/zed2i/zed_node/left/image_rect_color"));
+    status.push_back(topok("lidar pointcloud", "/ouster/points"));
+    status.push_back(topok("CAN messages",     "/wheel_angle_deg"));
 
     status[0].s = (nh.subscribe(status[0].tn, 1, cb_occup));
     status[1].s = (nh.subscribe(status[1].tn, 1, cb_lapoint));
     status[2].s = (nh.subscribe(status[2].tn, 1, cb_traj));
-    //status[3].s = (nh.subscribe(status[3].tn, 1, cb_can));
     status[3].s = (nh.subscribe(status[3].tn, 1, cb_ctrl_cmd));
     status[4].s = (nh.subscribe(status[4].tn, 1, cb_imu));
+    status[5].s = (nh.subscribe(status[5].tn, 1, cb_zed));
+    status[6].s = (nh.subscribe(status[6].tn, 1, cb_lidar));
+    status[7].s = (nh.subscribe(status[7].tn, 1, cb_angle));
 
     ttxt.fg_color = color_idle;
     ttxt.bg_color = color_idle;
@@ -223,6 +230,8 @@ int main(int argc, char **argv)
 
     pub_topic_error_txt.publish(ttxt);
     pub_mstate_txt.publish(stxt);
+
+    ROS_INFO("HUD node is now ready.");
 
     ros::spin();
 }
