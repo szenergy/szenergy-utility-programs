@@ -35,7 +35,8 @@ std_msgs::ColorRGBA color_idle;
 
 std_msgs::Float32 a_temp, s_temp, gui_angle, gui_speed;
 
-jsk_rviz_plugins::OverlayText ttxt;     //topic error (no data) text
+jsk_rviz_plugins::OverlayText ttxt[3];  //topic error (no data) text\
+                                        - hardware, software (essential) and object detection poses separately
 std_msgs::String stxt;                  //mission/state text
 
 ros::Subscriber sub_refvec;             //ctrl_cmd speed and angle reference
@@ -44,18 +45,26 @@ ros::Subscriber sub_stxt;               //state machine string
 ros::Publisher  pub_mstate_txt;         //mission/state text
 std::string mid = "-1", smt = "No Data";
 
-ros::Publisher pub_topic_error_txt;     //error in main topics
+ros::Publisher pub_hw_topic_error_txt;  //error in hardware topics
+ros::Publisher pub_sw_topic_error_txt;  //error in software topics (essentials)
+ros::Publisher pub_od_topic_error_txt;  //error in object detection / pose topics
 ros::Publisher pub_a_ref;               //angle reference (ctrl_cmd) [sync]
 ros::Publisher pub_s_ref;               //speed reference (ctrl_cmd) [sync]
 ros::Publisher pub_a_gui;               //angle republish (same Hz as "sync" group) [sync]
 ros::Publisher pub_s_gui;               //speed republish (same Hz as "sync" group) [sync]
 
-bool allok = true;                     //no errors
-bool idle = true;                      //no change
+bool status_ok[3] = {true, true, true}; //no errors
+bool idle[3] = {true, true, true};      //no change
 
 bool fc = false;                        //error color variable (flashing)
 
-std::string color_prefix[] = {"<span style=\"color: yellow;\">", "<span style=\"color: red;\">"};
+int lim[] = {0, 3, 8, 11};
+
+std::string color_prefix[] =
+{
+    "<span style=\"color: red;\">",
+    "<span style=\"color: yellow;\">",
+    "<span style=\"color: cyan;\">"};
 std::string flashstr[] = {" !!! ", " --- "};
 
 struct topok
@@ -79,68 +88,102 @@ std::vector<topok> status; //text-based topic status indicator ("topic: OK")
 
 //callbacks
 
+void cb_lidar       (const sensor_msgs::PointCloud2 &data_in)               {status[0].ts = ros::Time::now();}
+void cb_imu         (const sensor_msgs::Imu &data_in)                       {status[1].ts = ros::Time::now();}
+void cb_zed         (const sensor_msgs::Image &data_in)                     {status[2].ts = ros::Time::now();}
 void cb_mtxt        (const std_msgs::UInt32 &data_in)                       {mid =  std::to_string(data_in.data);   stxt.data = "mission ID: " + mid + "\n" + smt;}
 void cb_stxt        (const std_msgs::String &data_in)                       {smt =  data_in.data;                   stxt.data = "mission ID: " + mid + "\n" + smt;}
 
-void cb_occup       (const nav_msgs::OccupancyGrid &data_in)                {status[0].ts = ros::Time::now();}
-void cb_lapoint     (const visualization_msgs::Marker &data_in)             {status[1].ts = ros::Time::now();}
-void cb_traj        (const visualization_msgs::MarkerArray &data_in)        {status[2].ts = ros::Time::now();}
-void cb_ctrl_cmd    (const autoware_msgs::ControlCommandStamped &data_in)   {status[3].ts = ros::Time::now();
+void cb_occup       (const nav_msgs::OccupancyGrid &data_in)                {status[3].ts = ros::Time::now();}
+void cb_lapoint     (const visualization_msgs::Marker &data_in)             {status[4].ts = ros::Time::now();}
+void cb_traj        (const visualization_msgs::MarkerArray &data_in)        {status[5].ts = ros::Time::now();}
+void cb_ctrl_cmd    (const autoware_msgs::ControlCommandStamped &data_in)   {status[6].ts = ros::Time::now();
                                                                             a_temp.data = data_in.cmd.steering_angle * rtod;
                                                                             //pub_a_ref.publish(a_temp);
                                                                             s_temp.data = data_in.cmd.linear_velocity;
                                                                             //pub_s_ref.publish(s_temp);
                                                                             }
-void cb_imu         (const sensor_msgs::Imu &data_in)                       {status[4].ts = ros::Time::now();}
-void cb_zed         (const sensor_msgs::Image &data_in)                     {status[5].ts = ros::Time::now();}
-void cb_lidar       (const sensor_msgs::PointCloud2 &data_in)               {status[6].ts = ros::Time::now();}
 
 void cb_angle       (const std_msgs::Float32 &data_in)                      {status[7].ts = ros::Time::now();
                                                                              gui_angle = data_in;}
 void cb_speed       (const std_msgs::Float32 &data_in)                      {gui_speed = data_in;}
+void cb_stop        (const std_msgs::Bool &data_in)                         {if (data_in.data) status[8].ts = ros::Time::now();}
+void cb_line        (const geometry_msgs::PoseStamped &data_in)             {status[9].ts = ros::Time::now();}
+void cb_park        (const geometry_msgs::PoseStamped &data_in)             {status[10].ts = ros::Time::now();}
+
+
 
 void timerCallback(const ros::TimerEvent& event)
 {
     float time;
 
     time = ros::Duration(ros::Time::now() - status[0].ts).toSec();
-    allok = true;
-//    if ( !status[0].ok || (time > maxtime) )    { status[0].ok = false; ntxt.data += notoktext; }
-//    else                                        { status[0].ok = true;  otxt.data += oktext;    }
-    for (int i = 0; i < status.size(); i++)
+    fc = !fc;                                       //switch color
+    for (int c=0; c<3; c++)
     {
-        time = ros::Duration(ros::Time::now() - status[i].ts).toSec();
-        if (time > maxtime)
+        status_ok[c] = true;
+    //    if ( !status[0].ok || (time > maxtime) )    { status[0].ok = false; ntxt.data += notoktext; }
+    //    else                                        { status[0].ok = true;  otxt.data += oktext;    }
+        for (int i = lim[c]; i < lim[c+1]; i++)
         {
-            allok = false;
-            status[i].error = true;
+            time = ros::Duration(ros::Time::now() - status[i].ts).toSec();
+            if (time > maxtime)
+            {
+                status_ok[c] = false;
+                status[i].error = true;
+            }
+            else
+            {
+                status[i].error = false;
+            }
         }
-        else
+        if (c==2) continue;
+        if (!status_ok[c])
         {
-            status[i].error = false;
-        }
-    }
-    if (!allok)
-    {
-        //topic_alarm->stopAll();
-        ttxt.bg_color = color_bg;               //set background to visible
-        //ttxt.fg_color = flashcolor[fc];         //set text color
-        fc = !fc;                               //switch color
-        ttxt.text = color_prefix[fc] + flashstr[fc] + "NO DATA FROM:" + flashstr[fc] + "\n";
-        for (int i=0; i<status.size(); i++)
-        {
-            if (status[i].error) ttxt.text += flashstr[fc] + status[i].name + flashstr[fc] + "\n";
-        }
+            ttxt[c].bg_color = color_bg;               //set background to visible
+            //ttxt[0].fg_color = flashcolor[fc];         //set text color
+            ttxt[c].text = color_prefix[fc] + "### " + "NO DATA FROM:" + " ###" + "\n";
+            for (int i=lim[c]; i<lim[c+1]; i++)
+            {
+                if (status[i].error) ttxt[c].text += flashstr[fc] + status[i].name + flashstr[fc] + "\n";
+            }
 
-        idle = false;
+            idle[c] = false;
+        }
+        else if (!idle[c])
+        {
+            ttxt[c].text = "";
+            ttxt[c].fg_color = color_idle;
+            ttxt[c].bg_color = color_idle;
+            idle[c] = true;
+        }
     }
-    else if (!idle)
-    {
-        ttxt.text = "";
-        ttxt.fg_color = color_idle;
-        ttxt.bg_color = color_idle;
-        idle = true;
-    }
+
+    if (!status_ok[2])
+        {
+            ttxt[2].text = color_prefix[2];
+            for (int i=lim[2]; i<lim[3]; i++)
+            {
+                if (!status[i].error) ttxt[2].text += flashstr[1] + status[i].name + flashstr[1] + "\n";
+            }
+            ttxt[2].text += color_prefix[0];
+            ttxt[2].text += "### NO DATA FROM: ###\n";
+            for (int i=lim[2]; i<lim[3]; i++)
+            {
+                if (status[i].error) ttxt[2].text += flashstr[0] + status[i].name + flashstr[0] + "\n";
+            }
+
+            idle[2] = false;
+        }
+        else if (!idle[2])
+        {
+            ttxt[2].text = color_prefix[2];
+            for (int i=lim[2]; i<lim[3]; i++)
+            {
+                if (!status[i].error) ttxt[2].text += flashstr[1] + status[i].name + flashstr[1] + "\n";
+            }
+            idle[2] = true;
+        }
 
     //publish values at 'freq' frequency [in seconds]
     pub_a_ref.publish(a_temp);
@@ -148,7 +191,9 @@ void timerCallback(const ros::TimerEvent& event)
     pub_a_gui.publish(gui_angle);
     pub_s_gui.publish(gui_speed);
 
-    pub_topic_error_txt.publish(ttxt);
+    pub_hw_topic_error_txt.publish(ttxt[0]);
+    pub_sw_topic_error_txt.publish(ttxt[1]);
+    pub_od_topic_error_txt.publish(ttxt[2]);
     pub_mstate_txt.publish(stxt);
 }
 
@@ -182,40 +227,52 @@ int main(int argc, char **argv)
     color_idle.b = 0.0;
     color_idle.a = 0.0;
 
+    status.push_back(topok("lidar pointcloud", "/ouster/points"));
+    status.push_back(topok("IMU data",         "/imu/data"));
+    status.push_back(topok("camera (L) image", "/zed2i/zed_node/left/image_rect_color"));
     status.push_back(topok("occupancy map",    "/occupancy_map"));
     status.push_back(topok("look ahead point", "/lookAheadPoint"));
     status.push_back(topok("trajectory",       "/polynomial_trajectory"));
     status.push_back(topok("control command",  "/ctrl_cmd"));
-    status.push_back(topok("IMU data",         "/imu/data"));
-    status.push_back(topok("camera (L) image", "/zed2i/zed_node/left/image_rect_color"));
-    status.push_back(topok("lidar pointcloud", "/ouster/points"));
     status.push_back(topok("CAN messages",     "/wheel_angle_deg"));
+    status.push_back(topok("stop sign exists",   "/stop_sign_exists"));
+    status.push_back(topok("stop line pose",   "/stop_line_pose"));
+    status.push_back(topok("park goal pose",   "/park_goal_pose"));
 
-    status[0].s = (nh.subscribe(status[0].tn, 1, cb_occup));
-    status[1].s = (nh.subscribe(status[1].tn, 1, cb_lapoint));
-    status[2].s = (nh.subscribe(status[2].tn, 1, cb_traj));
-    status[3].s = (nh.subscribe(status[3].tn, 1, cb_ctrl_cmd));
-    status[4].s = (nh.subscribe(status[4].tn, 1, cb_imu));
-    status[5].s = (nh.subscribe(status[5].tn, 1, cb_zed));
-    status[6].s = (nh.subscribe(status[6].tn, 1, cb_lidar));
+    status[0].s = (nh.subscribe(status[0].tn, 1, cb_lidar));
+    status[1].s = (nh.subscribe(status[1].tn, 1, cb_imu));
+    status[2].s = (nh.subscribe(status[2].tn, 1, cb_zed));
+    status[3].s = (nh.subscribe(status[3].tn, 1, cb_occup));
+    status[4].s = (nh.subscribe(status[4].tn, 1, cb_lapoint));
+    status[5].s = (nh.subscribe(status[5].tn, 1, cb_traj));
+    status[6].s = (nh.subscribe(status[6].tn, 1, cb_ctrl_cmd));
     status[7].s = (nh.subscribe(status[7].tn, 1, cb_angle));
+    status[8].s = (nh.subscribe(status[8].tn, 1, cb_stop));
+    status[9].s = (nh.subscribe(status[9].tn, 1, cb_line));
+    status[10].s = (nh.subscribe(status[10].tn, 1, cb_park));
 
-    ttxt.fg_color = color_idle;
-    ttxt.bg_color = color_idle;
-    ttxt.text = "";
+    for (int i=0; i<3; i++)
+    {
+        ttxt[i].fg_color = color_idle;
+        ttxt[i].bg_color = color_idle;
+        ttxt[i].text = "";
 
-    //ttxt.fg_color = flashcolor[0];
-    ttxt.bg_color = color_bg;
-    ttxt.text = "NO DATA FROM TOPIC:\n\n";
+        //ttxt[0].fg_color = flashcolor[0];
+        ttxt[i].bg_color = color_bg;
+    }
+/*
     for (int i=0; i<status.size(); i++)
     {
-        if (status[i].error) ttxt.text += status[i].name + "\n";
+        if (status[i].error) ttxt[0].text += status[i].name + "\n";
     }
+*/
 
     sub_mtxt = nh.subscribe("/smMissionID", 1, cb_mtxt);
     sub_stxt = nh.subscribe("/smState", 1, cb_stxt);
 
-    pub_topic_error_txt = nh.advertise<jsk_rviz_plugins::OverlayText>("topic_error", 1);     //topic error (no data) publisher
+    pub_hw_topic_error_txt = nh.advertise<jsk_rviz_plugins::OverlayText>("topic_error_hw", 1);     //hardware topic error (no data) publisher
+    pub_sw_topic_error_txt = nh.advertise<jsk_rviz_plugins::OverlayText>("topic_error_sw", 1);     //software topic error (no data) publisher
+    pub_od_topic_error_txt = nh.advertise<jsk_rviz_plugins::OverlayText>("topic_error_od", 1);     //obj.det./pose topic error (no data) publisher
     pub_mstate_txt = nh.advertise<std_msgs::String>("mission_state_text", 1);   //mission/state (text) publisher
     pub_a_ref = nh.advertise<std_msgs::Float32>("wheel_angle_deg_ref", 1);      //ctrl_cmd angle reference
     pub_s_ref = nh.advertise<std_msgs::Float32>("vehicle_speed_kmph_ref", 1);   //ctrl_cmd speed reference
@@ -228,7 +285,9 @@ int main(int argc, char **argv)
     gui_angle.data = 0.0;   pub_a_gui.publish(gui_angle);
     gui_speed.data = 0.0;   pub_s_gui.publish(gui_speed);
 
-    pub_topic_error_txt.publish(ttxt);
+    pub_hw_topic_error_txt.publish(ttxt[0]);
+    pub_sw_topic_error_txt.publish(ttxt[1]);
+    pub_od_topic_error_txt.publish(ttxt[2]);
     pub_mstate_txt.publish(stxt);
 
     ROS_INFO("HUD node is now ready.");

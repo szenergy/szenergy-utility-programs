@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /right-image1
       Splitter Ratio: 0.5
     Tree Height: 939
   - Class: rviz/Selection
@@ -84,18 +83,60 @@ Visualization Manager:
       Foreground Alpha: 0.800000011920929
       Foreground Color: 255; 255; 255
       Invert Shadow: false
-      Name: topic errors
+      Name: HW errors
       Overtake BG Color Properties: false
       Overtake FG Color Properties: true
       Overtake Position Properties: true
-      Topic: /topic_error
+      Topic: /topic_error_hw
+      Value: true
+      font: Noto Mono
+      height: 156
+      left: 10
+      line width: 2
+      text size: 24
+      top: 200
+      width: 500
+    - Align Bottom: false
+      Background Alpha: 0.800000011920929
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.800000011920929
+      Foreground Color: 255; 255; 255
+      Invert Shadow: false
+      Name: SW core errors
+      Overtake BG Color Properties: false
+      Overtake FG Color Properties: true
+      Overtake Position Properties: true
+      Topic: /topic_error_sw
       Value: true
       font: Noto Mono
       height: 345
       left: 10
       line width: 2
       text size: 24
-      top: 200
+      top: 400
+      width: 500
+    - Align Bottom: false
+      Background Alpha: 0.800000011920929
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 1
+      Foreground Color: 25; 255; 240
+      Invert Shadow: false
+      Name: obj det errors
+      Overtake BG Color Properties: true
+      Overtake FG Color Properties: true
+      Overtake Position Properties: true
+      Topic: /topic_error_od
+      Value: true
+      font: Noto Mono
+      height: 156
+      left: 10
+      line width: 2
+      text size: 24
+      top: 900
       width: 500
     - Align Bottom: false
       Background Alpha: 0.800000011920929
@@ -144,11 +185,11 @@ Visualization Manager:
       background color: 0; 0; 0
       backround alpha: 0.800000011920929
       clockwise rotate direction: true
-      foreground alpha: 0.699999988079071
-      foreground alpha 2: 0.4000000059604645
+      foreground alpha: 1
+      foreground alpha 2: 1
       foreground color: 25; 255; 240
-      left: 10
-      max color: 255; 0; 0
+      left: 1500
+      max color: 255; 127; 0
       max color change threthold: 0
       max value: 100
       med color: 255; 255; 0
@@ -167,11 +208,11 @@ Visualization Manager:
       background color: 0; 0; 0
       backround alpha: 0.800000011920929
       clockwise rotate direction: true
-      foreground alpha: 0.699999988079071
-      foreground alpha 2: 0.4000000059604645
+      foreground alpha: 1
+      foreground alpha 2: 1
       foreground color: 25; 255; 240
-      left: 180
-      max color: 255; 0; 0
+      left: 1700
+      max color: 255; 127; 0
       max color change threthold: 0
       max value: 100
       med color: 255; 255; 0
@@ -704,6 +745,7 @@ Visualization Manager:
         CPU °C: true
         Goal block: true
         Grid: true
+        HW errors: true
         Image: true
         Map: true
         Marker: true
@@ -711,6 +753,7 @@ Visualization Manager:
         Model: true
         Pose: true
         RobotModel: true
+        SW core errors: true
         Trajectory: true
         Value: true
         angle [deg]: true
@@ -720,15 +763,15 @@ Visualization Manager:
         cylinder_points: true
         global waypoints: true
         gps status: true
-        left-image: true
+        image (obj det): true
+        obj det errors: true
+        object detection: true
         parking space: true
         ref: true
         right-image: true
         speed [km/h]: true
         speed midline: true
         state: true
-        stop line: true
-        topic errors: true
         value: true
       Zoom Factor: 1
     - Class: rviz/Image
@@ -789,8 +832,8 @@ Visualization Manager:
       Value: false
     - Class: jsk_rviz_plugin/OverlayImage
       Enabled: true
-      Name: left-image
-      Topic: /camera_stream/detections/stop_line_detection
+      Name: image (obj det)
+      Topic: /vision/signs/detection/image_bbox
       Value: true
       alpha: 1
       height: 233
@@ -801,10 +844,10 @@ Visualization Manager:
       transport hint: raw
       width: 414
     - Class: jsk_rviz_plugin/OverlayImage
-      Enabled: true
+      Enabled: false
       Name: right-image
       Topic: /camera_stream/detections/parking_place_detector
-      Value: true
+      Value: false
       alpha: 1
       height: 233
       keep aspect ratio: true
@@ -815,7 +858,7 @@ Visualization Manager:
       width: 414
     - Class: jsk_rviz_plugin/LinearGauge
       Enabled: true
-      Name: stop line
+      Name: object detection
       Show Value: false
       Topic: /gui_msg_speed
       Value: true
@@ -827,22 +870,22 @@ Visualization Manager:
       foreground alpha: 1
       foreground color: 252; 233; 79
       height: 1
-      left: 520
+      left: 750
       linewidth: 1
       max color: 255; 0; 0
       max value: 0
       min value: 0
       show caption: true
       text size: 32
-      top: 233
+      top: 250
       update interval: 3
       width: 414
     - Class: jsk_rviz_plugin/LinearGauge
-      Enabled: true
+      Enabled: false
       Name: parking space
       Show Value: false
       Topic: /gui_msg_speed
-      Value: true
+      Value: false
       Vertical Gauge: true
       auto color change: false
       background color: 0; 0; 0
