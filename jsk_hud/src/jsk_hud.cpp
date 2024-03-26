@@ -25,8 +25,8 @@
 const float rtod = 180/M_PI;  //rad-to-deg
 
 //global variables (todo: dynamic recfg)
-float freq = 0.1;                       //refresh frequency             [seconds]
-float maxtime = 0.5;                    //max time to wait for topics   [seconds]
+float freq = 0.5;                       //refresh frequency             [seconds]
+float maxtime = 1.0;                    //max time to wait for topics   [seconds]
 //float color_freq = 0.1;                 //color flash frequency         [seconds] -- currently same as freq
 
 std_msgs::ColorRGBA color_bg;
@@ -63,8 +63,9 @@ int lim[] = {0, 3, 8, 11};
 std::string color_prefix[] =
 {
     "<span style=\"color: red;\">",
-    "<span style=\"color: yellow;\">",
-    "<span style=\"color: cyan;\">"};
+    "<span style=\"color: red;\">",
+    "<span style=\"color: cyan;\">"
+};
 std::string flashstr[] = {" !!! ", " --- "};
 
 struct topok
@@ -142,47 +143,51 @@ void timerCallback(const ros::TimerEvent& event)
         {
             ttxt[c].bg_color = color_bg;               //set background to visible
             //ttxt[0].fg_color = flashcolor[fc];         //set text color
-            ttxt[c].text = color_prefix[fc] + "### " + "NO DATA FROM:" + " ###" + "\n";
+            ttxt[c].text = color_prefix[c] + "### NO DATA FROM: ###\n";
             for (int i=lim[c]; i<lim[c+1]; i++)
             {
-                if (status[i].error) ttxt[c].text += flashstr[fc] + status[i].name + flashstr[fc] + "\n";
+                if (status[i].error) ttxt[c].text += status[i].name + "\n";
             }
-
+            //if (idle[c])
+            {
+                if (!c) pub_hw_topic_error_txt.publish(ttxt[0]);
+                else pub_sw_topic_error_txt.publish(ttxt[1]);
+            }
             idle[c] = false;
         }
         else if (!idle[c])
         {
             ttxt[c].text = "";
-            ttxt[c].fg_color = color_idle;
             ttxt[c].bg_color = color_idle;
             idle[c] = true;
+            if (!c) pub_hw_topic_error_txt.publish(ttxt[0]);
+            else pub_sw_topic_error_txt.publish(ttxt[1]);
         }
     }
 
     if (!status_ok[2])
         {
-            ttxt[2].text = color_prefix[2];
             for (int i=lim[2]; i<lim[3]; i++)
             {
-                if (!status[i].error) ttxt[2].text += flashstr[1] + status[i].name + flashstr[1] + "\n";
+                if (!status[i].error) ttxt[2].text += status[i].name + "\n";
             }
-            ttxt[2].text += color_prefix[0];
-            ttxt[2].text += "### NO DATA FROM: ###\n";
+            ttxt[2].text += color_prefix[2] + "### NO DATA FROM: ###\n";
             for (int i=lim[2]; i<lim[3]; i++)
             {
-                if (status[i].error) ttxt[2].text += flashstr[0] + status[i].name + flashstr[0] + "\n";
+                if (status[i].error) ttxt[2].text += status[i].name + "\n";
             }
-
+            //if (idle[2])
+                pub_od_topic_error_txt.publish(ttxt[2]);
             idle[2] = false;
         }
         else if (!idle[2])
         {
-            ttxt[2].text = color_prefix[2];
             for (int i=lim[2]; i<lim[3]; i++)
             {
-                if (!status[i].error) ttxt[2].text += flashstr[1] + status[i].name + flashstr[1] + "\n";
+                if (!status[i].error) ttxt[2].text += status[i].name + "\n";
             }
             idle[2] = true;
+            pub_od_topic_error_txt.publish(ttxt[2]);
         }
 
     //publish values at 'freq' frequency [in seconds]
@@ -191,9 +196,6 @@ void timerCallback(const ros::TimerEvent& event)
     pub_a_gui.publish(gui_angle);
     pub_s_gui.publish(gui_speed);
 
-    pub_hw_topic_error_txt.publish(ttxt[0]);
-    pub_sw_topic_error_txt.publish(ttxt[1]);
-    pub_od_topic_error_txt.publish(ttxt[2]);
     pub_mstate_txt.publish(stxt);
 }
 
@@ -255,7 +257,7 @@ int main(int argc, char **argv)
     {
         ttxt[i].fg_color = color_idle;
         ttxt[i].bg_color = color_idle;
-        ttxt[i].text = "";
+        ttxt[i].text = color_prefix[i];
 
         //ttxt[0].fg_color = flashcolor[0];
         ttxt[i].bg_color = color_bg;
