@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This is NOT an UDP-based Android control, it used a Logitech or any other game pad
 
